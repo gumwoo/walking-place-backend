@@ -69,7 +69,11 @@
 - [x] 최종 데이터베이스 스키마 설계 및 구현 완료 (9개 테이블)
 - [x] 모든 Sequelize 모델 생성 및 관계 설정 완료
 - [x] 데이터베이스 동기화 및 서버 실행 테스트 성공
-- [x] **GitHub 저장소 인프라 구축 완료**
+- [x] **GitHub 저장소 인프라 구축 및 첫 커밋 완료**
+  - [x] GitHub 저장소 생성 (https://github.com/gumwoo/walking-place-backend.git)
+  - [x] Git 초기화 및 원격 저장소 연결
+  - [x] 첫 커밋 및 main 브랜치 푸시 완료
+  - [x] GitHub Flow 브랜치 전략 준비 완료
   - [x] GitHub 이슈/PR 템플릿 생성 (버그, 기능요청, 질문)
   - [x] 기본 응답 통일 코드 (ApiResponse 유틸리티)
   - [x] 공통 예외 처리 코드 (ErrorHandler 미들웨어)
