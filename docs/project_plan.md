@@ -69,7 +69,11 @@
 - [x] 최종 데이터베이스 스키마 설계 및 구현 완료 (9개 테이블)
 - [x] 모든 Sequelize 모델 생성 및 관계 설정 완료
 - [x] 데이터베이스 동기화 및 서버 실행 테스트 성공
-- [x] **GitHub 저장소 인프라 구축 완료**
+- [x] **GitHub 저장소 인프라 구축 및 첫 커밋 완료**
+  - [x] GitHub 저장소 생성 (https://github.com/gumwoo/walking-place-backend.git)
+  - [x] Git 초기화 및 원격 저장소 연결
+  - [x] 첫 커밋 및 main 브랜치 푸시 완료
+  - [x] GitHub Flow 브랜치 전략 준비 완료
   - [x] GitHub 이슈/PR 템플릿 생성 (버그, 기능요청, 질문)
   - [x] 기본 응답 통일 코드 (ApiResponse 유틸리티)
   - [x] 공통 예외 처리 코드 (ErrorHandler 미들웨어)
@@ -83,8 +87,15 @@
 - [ ] 사용자 관리 API 구현
 - [ ] 코스 관리 API 구현 (생성, 조회, 수정, 삭제, 신고)
 - [ ] 산책 기록 API 구현 (시작, 진행, 완료, 꼬리점수)
-- [ ] 마킹포토존 API 구현
-- [ ] 포토존 사진 업로드 API 구현
+- [x] **마킹포토존 API 구현 완료** (담당: 백엔드 개발자 - API 명세서 기준)
+  - [x] 근처 포토존 조회 API (/api/photo-zone/nearby)
+  - [x] 포토존 사진 업로드 API (/api/photo-zone/upload) 
+  - [x] 업로드된 사진들 조회 API (/api/photo-zone/photos)
+  - [x] PostGIS ST_DWithin을 활용한 근처 포토존 검색 로직
+  - [x] 이미지 업로드 및 파일 관리 시스템 (multer + sharp 최적화)
+  - [x] 포토존 감지 범위 확인 로직
+  - [x] photoZoneService.js, photoZoneController.js, imageUploadService.js 생성
+  - [x] photoZone.js 라우트 생성 및 메인 라우터 연결
 - [ ] 코스 특징 관리 API 구현
 - [ ] 꼬리점수 시스템 API 구현
 - [ ] GPS 경로 매칭 알고리즘 구현
