@@ -4,12 +4,13 @@
 - **프로젝트명**: 산책명소 (Walking Places Backend)
 - **목적**: 반려견 산책 코스 추천 및 공유 플랫폼의 백엔드 API 개발
 - **개발 기간**: 2025-07-03 시작
-- **현재 상태**: 기반 구조 완성, API 개발 준비 완료
+- **현재 상태**: 기반 구조 완성 + GitHub 인프라 구축 완료
+- **GitHub 저장소**: https://github.com/gumwoo/walking-place-backend.git
 
-## 🏗️ 기술 스택 선정
+## 🏗️ 기술 스택
 
 ### 데이터베이스
-- **PostgreSQL 17.5** + **PostGIS 확장**
+- **PostgreSQL** + **PostGIS 확장**
 - **선정 이유**: 
   - 위치 기반 서비스에 최적화된 공간 데이터 처리
   - 복잡한 지리정보 쿼리 지원 (반경 검색, 경로 매칭 등)
@@ -18,33 +19,42 @@
 ### 백엔드 프레임워크
 - **Node.js** + **Express.js**
 - **Sequelize ORM** (PostgreSQL 연동)
-- **추가 라이브러리**: Winston(로깅), Helmet(보안), Multer(파일업로드), Sharp(이미지처리)
+- **인증**: Passport.js (JWT + OAuth)
+- **API 문서화**: Swagger UI
+- **추가 라이브러리**: Winston(로깅), Helmet(보안), Rate Limiting
 
 ## 🗂️ 프로젝트 구조
 
 ```
-C:\walking-backend/
-├── docs/                    # 📚 프로젝트 문서
-│   ├── project_plan.md     # 프로젝트 계획서
-│   ├── api_design.md       # API 설계 문서
-│   ├── database_schema.md  # DB 스키마 설계
-│   └── project_structure.md # 프로젝트 구조 문서
-├── src/                    # 💻 소스 코드
-│   ├── config/             # 설정 파일
-│   │   ├── database.js     # DB 연결 설정
-│   │   └── logger.js       # 로깅 설정
-│   ├── models/             # 📊 Sequelize 모델 (16개)
-│   ├── controllers/        # 🎮 컨트롤러 (준비중)
-│   ├── services/           # 🔧 비즈니스 로직 (준비중)
-│   ├── routes/             # 🛣️ 라우터 (준비중)
-│   ├── middleware/         # 🔒 미들웨어 (준비중)
-│   ├── utils/              # 🛠️ 유틸리티 (준비중)
-│   └── app.js              # Express 앱 설정
-├── logs/                   # 📝 로그 파일
-├── uploads/                # 📁 업로드 파일
-├── package.json            # 📦 npm 설정
-├── .env                    # 🔐 환경변수
-└── server.js               # 🚀 서버 진입점
+walking-backend/
+├── .github/                    # 🔧 GitHub 템플릿
+│   ├── ISSUE_TEMPLATE/         # 이슈 템플릿 (버그, 기능요청, 질문)
+│   └── pull_request_template.md # PR 템플릿
+├── docs/                       # 📚 프로젝트 문서
+│   ├── project_plan.md         # 프로젝트 계획서
+│   ├── api_design.md           # API 설계 문서
+│   ├── database_schema.md      # DB 스키마 설계
+│   └── project_structure.md    # 프로젝트 구조 문서
+├── src/                        # 💻 소스 코드
+│   ├── config/                 # 설정 파일
+│   │   ├── database.js         # DB 연결 설정
+│   │   ├── logger.js           # 로깅 설정
+│   │   ├── passport.js         # Passport.js 인증 설정
+│   │   └── swagger.js          # Swagger 설정
+│   ├── models/                 # 📊 Sequelize 모델 (9개)
+│   ├── controllers/            # 🎮 컨트롤러 (MVC)
+│   ├── services/               # 🔧 비즈니스 로직
+│   ├── routes/                 # 🛣️ 라우터
+│   ├── middlewares/            # 🔒 미들웨어 (인증, 에러처리)
+│   ├── utils/                  # 🛠️ 유틸리티 (응답통일)
+│   ├── validations/            # ✅ 입력 검증
+│   └── app.js                  # Express 앱 설정
+├── logs/                       # 📝 로그 파일
+├── uploads/                    # 📁 업로드 파일
+├── package.json                # 📦 npm 설정
+├── .env                        # 🔐 환경변수
+├── README.md                   # 📖 프로젝트 설명서
+└── server.js                   # 🚀 서버 진입점
 ```
 
 ## 💾 데이터베이스 설계
@@ -87,38 +97,56 @@ C:\walking-backend/
 
 ### ✅ 데이터베이스 레벨에서 준비 완료
 1. **GPS 좌표 기반 경로 매칭** → `courses.path_geometry`, `walks.walk_path`
-2. **꼬리점수 높은 순 정렬** → `courses.tail_score` + 인덱스
-3. **걷기 궤적 좌표 저장** → `walk_tracks` 테이블
-4. **포토존 데이터 저장** → `marking_spots` 테이블
-5. **포토존 내 사진/강아지 정보** → `photos` 테이블 + `dog_detected`, `dog_info`
-6. **일지 데이터 조회** → `walk_diaries` 테이블
+2. **꼬리점수 높은 순 정렬** → `courses.average_tail_score` + 인덱스
+3. **걷기 궤적 좌표 저장** → `walks.walk_path` 
+4. **포토존 데이터 저장** → `marking_photozones` 테이블
+5. **포토존 내 사진/강아지 정보** → `photozone_photos` 테이블
+6. **일지 데이터 조회** → `walks` 테이블 (산책 기록 자동 저장)
 7. **코스 데이터 재사용** → `courses` 테이블 + 복제 로직 준비
-8. **20m 이탈 감지** → `walk_tracks.is_deviation` 필드
-9. **점수 저장** → `score_records` 테이블
-10. **프로필 데이터 저장** → `users` 테이블 (강아지 정보 포함)
-11. **카카오/구글 OAuth** → `users.kakao_id`, `users.google_id`
-12. **약관 버전 관리** → `terms_versions`, `user_terms_agreements`
+8. **20m 이탈 감지** → `marking_photozones.detection_radius` 필드
+9. **점수 저장** → `walks.tail_score`, `courses.total_tail_score` 
+10. **프로필 데이터 저장** → `users` 테이블 (OAuth + 반려견 정보)
+11. **카카오/구글 OAuth** → `users.oauth_provider`, `users.oauth_id`
+12. **약관 버전 관리** → 추후 구현 예정
 13. **타 유저 프로필 조회** → `users` 테이블 + 프라이버시 설정
+
+### ✅ 인프라 레벨에서 준비 완료
+- **통일된 API 응답 형태** → ApiResponse 유틸리티
+- **중앙 집중식 에러 처리** → ErrorHandler 미들웨어  
+- **JWT + OAuth 인증 시스템** → Passport.js 설정
+- **API 문서화** → Swagger UI
+- **GitHub 협업 환경** → 이슈/PR 템플릿
 
 ## 🚀 현재 상태
 
 ### ✅ 완료된 작업
-- 프로젝트 기반 구조 100% 완성
-- 데이터베이스 스키마 설계 및 테이블 생성 완료
-- 서버 실행 및 DB 연결 테스트 성공
-- 로깅 시스템, 보안 설정, 에러 핸들링 구축
+- **프로젝트 기반 구조 100% 완성**
+- **데이터베이스 스키마 설계 및 테이블 생성 완료 (9개)**
+- **GitHub 저장소 인프라 구축 완료**
+  - 이슈/PR 템플릿, README, .gitignore
+  - 기본 응답 통일 및 예외 처리 시스템
+  - Swagger API 문서화 설정
+  - Passport.js 인증 시스템 기반
+- **서버 실행 및 DB 연결 테스트 성공**
+- **GitHub Flow 브랜치 전략 적용 완료**
+- **첫 커밋 및 main 브랜치 푸시 완료**
 
-### 🔄 다음 단계 (5단계)
-1. **인증 시스템 구현** (카카오/구글 OAuth + JWT)
+### 🔄 다음 단계 (API 개발)
+1. **인증 시스템 구현** (카카오/구글 OAuth + JWT API)
 2. **핵심 API 개발** (사용자, 코스, 산책, 포토존)
 3. **GPS 알고리즘 구현** (경로 매칭, 이탈 감지)
-4. **파일 업로드 시스템** (이미지 처리, 썸네일 생성)
+4. **파일 업로드 시스템** (이미지 처리)
 5. **점수 시스템 구현** (꼬리점수 계산 로직)
 
 ## 📈 개발 준비도
 - **인프라**: 100% 완료 ✅
-- **데이터 모델**: 100% 완료 ✅
-- **API 설계**: 100% 완료 ✅
-- **개발 환경**: 100% 완료 ✅
+- **데이터 모델**: 100% 완료 ✅  
+- **GitHub 협업 환경**: 100% 완료 ✅
+- **API 개발 기반**: 100% 완료 ✅
 
 **→ API 개발 즉시 시작 가능한 상태! 🎯**
+
+## 🔗 접속 정보
+- **Swagger UI**: http://localhost:5000/api-docs
+- **API Health Check**: http://localhost:5000/api/health
+- **GitHub Repository**: https://github.com/gumwoo/walking-place-backend.git
