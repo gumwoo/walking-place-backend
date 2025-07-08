@@ -83,6 +83,15 @@
   - [x] MVC 폴더 구조 생성 (controllers, services, routes, validations)
   - [x] .gitignore 및 README.md 작성
   - [x] 기본 API 라우트 구조 생성
+- [x] **20m 이탈 감지 로직 개발 완료** (팀원과 협업)
+  - [x] walkPathRefinementService.js 생성 (별도 모듈)
+  - [x] PostGIS ST_Distance() 함수로 GPS-경로 간 거리 계산
+  - [x] 20m 이내 좌표만 필터링하는 정제 알고리즘
+  - [x] 자유 산책 vs 코스 산책 구분 처리
+  - [x] 기존 walkService.js와 안전한 연동 (기존 코드 보존)
+  - [x] 20m 이탈 구간 분석 API 추가 (deviation-analysis)
+  - [x] 정제 전후 비교 로깅 및 통계 제공
+  - [x] 에러 발생시 기본 분석 결과 보존하는 안전장치
 - [ ] 인증 시스템 구현 (카카오/구글 OAuth)
 - [ ] 사용자 관리 API 구현
 - [ ] 코스 관리 API 구현 (생성, 조회, 수정, 삭제, 신고)
@@ -92,7 +101,7 @@
 - [ ] 코스 특징 관리 API 구현
 - [ ] 꼬리점수 시스템 API 구현
 - [ ] GPS 경로 매칭 알고리즘 구현
-- [ ] 20m 이탈 감지 로직 구현
+- [x] 20m 이탈 감지 로직 구현
 - [ ] 파일 업로드 시스템 구현
 - [ ] API 테스트 작성
 - [ ] API 문서화 (Swagger)

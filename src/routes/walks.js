@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { matchWalkPath } = require('../services/walkService');
+const { analyze20mDeviations } = require('../services/walkPathRefinementService');
 const { Walk } = require('../models');
 const ApiResponse = require('../utils/response');
 
@@ -93,6 +94,36 @@ router.get('/:id/path', async (req, res) => {
     return res.status(500).json({ error: '경로 조회 중 오류 발생', details: err });
   }
 });
+
+// 20m 이탈 구간 분석 API (선택적 기능)
+router.get('/:id/deviation-analysis', async (req, res) => {
+  try {
+    const walk = await Walk.findByPk(req.params.id);
+    if (!walk) {
+      return ApiResponse.notFound(res, '산책 기록을 찾을 수 없습니다');
+    }
+
+    if (!walk.course_id) {
+      return ApiResponse.success(res, {
+        message: '자유 산책은 이탈 분석이 불가능합니다',
+        analysis: null
+      }, '이탈 분석 결과');
+    }
+
+    const deviationStats = await analyze20mDeviations(walk.id);
+    
+    return ApiResponse.success(res, {
+      walkId: walk.id,
+      courseId: walk.course_id,
+      analysis: deviationStats
+    }, '20m 이탈 구간 분석 완료');
+
+  } catch (error) {
+    console.error('20m 이탈 분석 오류:', error);
+    return ApiResponse.serverError(res, '이탈 구간 분석 중 오류가 발생했습니다', error);
+  }
+});
+
 
 
 
