@@ -43,12 +43,20 @@ app.use(helmet()); // 보안 헤더
 app.use(compression()); // 응답 압축
 
 // CORS 설정
+const allowedOrigins = ['http://localhost:5173', 'http://localhost:3000'];
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS 차단됨'));
+    }
+  },
+  credentials: true
 }));
+
+
 
 // 요청 파싱
 app.use(express.json({ limit: '10mb' }));
@@ -113,8 +121,8 @@ const connectDatabase = async () => {
     
     // 개발 환경에서는 sync 실행
     if (process.env.NODE_ENV === 'development') {
-      await sequelize.sync({ force: true }); // force: true로 기존 테이블 삭제 후 재생성
-      logger.info('데이터베이스 모델 동기화 완료 (기존 테이블 재생성)');
+      await sequelize.sync({ alter: true }); 
+      logger.info('데이터베이스 모델 동기화 완료');
     }
   } catch (error) {
     logger.error('데이터베이스 연결 실패:', error);

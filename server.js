@@ -13,7 +13,7 @@ const startServer = async () => {
     // 서버 시작
     const server = app.listen(PORT, () => {
       logger.info(`🚀 서버가 포트 ${PORT}에서 실행 중입니다.`);
-      logger.info(`🌍 환경: ${process.env.NODE_ENV || 'development'}`);
+      //logger.info(`🌍 환경: ${process.env.NODE_ENV || 'development'}`);
       logger.info(`📍 URL: http://localhost:${PORT}`);
       logger.info(`📊 헬스체크: http://localhost:${PORT}/health`);
     });

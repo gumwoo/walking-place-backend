@@ -70,6 +70,12 @@ const Walk = sequelize.define('Walk', {
     type: DataTypes.GEOMETRY('LINESTRING', 4326),
     allowNull: true
   },
+
+  // 실시간 GPS 좌표  (7/7 추가)
+   raw_coordinates: {
+    type: DataTypes.JSONB,
+    allowNull: true
+  },
   
   // 상태
   status: {

@@ -3,6 +3,12 @@ const ApiResponse = require('../utils/response');
 
 const router = express.Router();
 
+
+// 라우터 불러오기
+const walkRoutes = require('./walks');
+
+
+
 /**
  * @swagger
  * /api:
@@ -66,5 +72,8 @@ router.get('/health', async (req, res) => {
     ApiResponse.serverError(res, '서버 상태 확인 중 오류가 발생했습니다', error);
   }
 });
+
+// 하위 라우터 연결
+router.use('/walks', walkRoutes);
 
 module.exports = router;
