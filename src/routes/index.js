@@ -1,6 +1,9 @@
 const express = require('express');
 const ApiResponse = require('../utils/response');
 
+// 각 도메인별 라우터 import
+const courseRoutes = require('./courses');
+
 const router = express.Router();
 
 /**
@@ -66,5 +69,8 @@ router.get('/health', async (req, res) => {
     ApiResponse.serverError(res, '서버 상태 확인 중 오류가 발생했습니다', error);
   }
 });
+
+// 도메인별 라우트 등록
+router.use('/courses', courseRoutes);
 
 module.exports = router;
