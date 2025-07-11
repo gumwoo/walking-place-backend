@@ -3,11 +3,13 @@ const ApiResponse = require('../utils/response');
 
 const router = express.Router();
 
-
 // 라우터 불러오기
+const authRoutes = require('./auth');
+const userRoutes = require('./users');
+const courseRoutes = require('./courses');
 const walkRoutes = require('./walks');
-
-
+const photozoneRoutes = require('./photozones');
+const courseFeatureRoutes = require('./course-features');
 
 /**
  * @swagger
@@ -25,7 +27,7 @@ const walkRoutes = require('./walks');
  *               $ref: '#/components/schemas/ApiResponse'
  *             example:
  *               success: true
- *               message: "산책명소 API 서버가 정상적으로 동작 중입니다"
+ *               message: "산책멍소 API 서버가 정상적으로 동작 중입니다"
  *               data:
  *                 version: "1.0.0"
  *                 environment: "development"
@@ -37,7 +39,7 @@ router.get('/', (req, res) => {
     version: '1.0.0',
     environment: process.env.NODE_ENV || 'development',
     documentation: '/api-docs'
-  }, '산책명소 API 서버가 정상적으로 동작 중입니다');
+  }, '산책멍소 API 서버가 정상적으로 동작 중입니다');
 });
 
 /**
@@ -74,6 +76,11 @@ router.get('/health', async (req, res) => {
 });
 
 // 하위 라우터 연결
+router.use('/auth', authRoutes);
+router.use('/users', userRoutes);
+router.use('/courses', courseRoutes);
 router.use('/walks', walkRoutes);
+router.use('/photozones', photozoneRoutes);
+router.use('/course-features', courseFeatureRoutes);
 
 module.exports = router;

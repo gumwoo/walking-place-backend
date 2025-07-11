@@ -9,7 +9,7 @@ const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: '산책명소 API',
+      title: '산책멍소 API',
       version: '1.0.0',
       description: '반려견 산책 코스 추천 및 공유 플랫폼 API',
       contact: {
@@ -114,6 +114,10 @@ const swaggerOptions = {
     ],
     tags: [
       {
+        name: 'System',
+        description: '시스템 상태 확인 API'
+      },
+      {
         name: 'Auth',
         description: '인증 관련 API'
       },
@@ -123,19 +127,19 @@ const swaggerOptions = {
       },
       {
         name: 'Courses',
-        description: '코스 관리 API'
+        description: '산책 코스 관리 API'
       },
       {
         name: 'Walks',
-        description: '산책 기록 API'
-      },
-      {
-        name: 'Photos',
-        description: '사진 관리 API'
+        description: '산책 기록 관리 API'
       },
       {
         name: 'Photozones',
-        description: '포토존 관리 API'
+        description: '마킹포토존 관리 API'
+      },
+      {
+        name: 'Course Features',
+        description: '코스 특징 관리 API'
       }
     ]
   },
@@ -169,7 +173,7 @@ const swaggerUiOptions = {
     .swagger-ui .info .description { color: #6b7280; }
     .swagger-ui .scheme-container { background: #f9fafb; }
   `,
-  customSiteTitle: '산책명소 API 문서',
+  customSiteTitle: '산책멍소 API 문서',
   customfavIcon: '/favicon.ico'
 };
 
