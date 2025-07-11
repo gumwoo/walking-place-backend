@@ -56,7 +56,7 @@ router.get('/', (req, res) => {
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ApiResponse'
- */
+ */ 
 router.get('/health', async (req, res) => {
   try {
     // 데이터베이스 연결 상태 확인
