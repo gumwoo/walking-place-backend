@@ -2,13 +2,13 @@ const { sequelize } = require('../config/database');
 const logger = require('../config/logger');
 
 /**
- * 20m 이탈 감지 로직을 통한 산책 경로 정제
+ * 100m 이탈 감지 로직을 통한 산책 경로 정제
  * @param {string} walkId - 산책 ID
  * @returns {Promise<void>}
  */
-async function refineWalkPathWith20mLogic(walkId) {
+async function refineWalkPathWith100mLogic(walkId) {
   try {
-    logger.info(`20m 로직 경로 정제 시작 - walkId: ${walkId}`);
+    logger.info(`100m 로직 경로 정제 시작 - walkId: ${walkId}`);
 
     // 1단계: Walk 정보와 연결된 Course의 기준 경로 조회
     const [walkInfo] = await sequelize.query(`
@@ -32,7 +32,7 @@ async function refineWalkPathWith20mLogic(walkId) {
 
     // 2단계: course_id가 없는 경우 (자유 산책) - 기존 경로 유지
     if (!walkInfo.course_id || !walkInfo.course_path) {
-      logger.info(`자유 산책 또는 기준 경로 없음 - walkId: ${walkId}, 20m 로직 스킵`);
+      logger.info(`자유 산책 또는 기준 경로 없음 - walkId: ${walkId}, 100m 로직 스킵`);
       return;
     }
 
@@ -42,7 +42,7 @@ async function refineWalkPathWith20mLogic(walkId) {
       return;
     }
 
-    logger.info(`20m 로직 적용 대상 확인 - walkId: ${walkId}, 좌표 개수: ${walkInfo.raw_coordinates.length}`);
+    logger.info(`100m 로직 적용 대상 확인 - walkId: ${walkId}, 좌표 개수: ${walkInfo.raw_coordinates.length}`);
 
     // 4단계: 20m 이내 좌표 필터링 및 정제된 경로 생성
     await sequelize.query(`
@@ -74,7 +74,7 @@ async function refineWalkPathWith20mLogic(walkId) {
         WHERE ST_Distance(
           ST_SetSRID(ST_MakePoint(lon, lat), 4326)::geography,
           course_info.course_path::geography
-        ) <= 20  -- 20m 이내만 필터링
+        ) <= 100  -- 100m 이내만 필터링
       ),
       refined_line AS (
         SELECT
@@ -133,14 +133,14 @@ async function refineWalkPathWith20mLogic(walkId) {
       type: sequelize.QueryTypes.SELECT
     });
 
-    logger.info(`20m 로직 경로 정제 완료 - walkId: ${walkId}`, {
+    logger.info(`100m 로직 경로 정제 완료 - walkId: ${walkId}`, {
       originalPoints: refinedResult.raw_points,
       refinedPoints: refinedResult.path_points,
       finalDistance: refinedResult.total_distance
     });
 
   } catch (error) {
-    logger.error(`20m 로직 경로 정제 실패 - walkId: ${walkId}`, {
+    logger.error(`100m 로직 경로 정제 실패 - walkId: ${walkId}`, {
       error: error.message,
       stack: error.stack
     });
@@ -149,13 +149,13 @@ async function refineWalkPathWith20mLogic(walkId) {
 }
 
 /**
- * 20m 이탈 구간 분석 (선택적 기능)
+ * 100m 이탈 구간 분석 (선택적 기능)
  * @param {string} walkId - 산책 ID
  * @returns {Promise<Object>} 이탈 구간 통계
  */
-async function analyze20mDeviations(walkId) {
+async function analyze100mDeviations(walkId) {
   try {
-    logger.info(`20m 이탈 구간 분석 시작 - walkId: ${walkId}`);
+    logger.info(`100m 이탈 구간 분석 시작 - walkId: ${walkId}`);
 
     const [deviationStats] = await sequelize.query(`
       WITH coords AS (
@@ -181,7 +181,7 @@ async function analyze20mDeviations(walkId) {
             WHEN ST_Distance(
               ST_SetSRID(ST_MakePoint(lon, lat), 4326)::geography,
               course_info.course_path::geography
-            ) > 20 THEN 1 
+            ) > 100 THEN 1 
             ELSE 0 
           END as is_deviation
         FROM coords, course_info
@@ -199,12 +199,12 @@ async function analyze20mDeviations(walkId) {
       type: sequelize.QueryTypes.SELECT
     });
 
-    logger.info(`20m 이탈 구간 분석 완료 - walkId: ${walkId}`, deviationStats);
+    logger.info(`100m 이탈 구간 분석 완료 - walkId: ${walkId}`, deviationStats);
 
     return deviationStats;
 
   } catch (error) {
-    logger.error(`20m 이탈 구간 분석 실패 - walkId: ${walkId}`, {
+    logger.error(`100m 이탈 구간 분석 실패 - walkId: ${walkId}`, {
       error: error.message,
       stack: error.stack
     });
@@ -213,6 +213,6 @@ async function analyze20mDeviations(walkId) {
 }
 
 module.exports = {
-  refineWalkPathWith20mLogic,
-  analyze20mDeviations
+  refineWalkPathWith100mLogic,
+  analyze100mDeviations
 };
