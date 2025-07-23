@@ -70,10 +70,16 @@ const Walk = sequelize.define('Walk', {
     type: DataTypes.GEOMETRY('LINESTRING', 4326),
     allowNull: true
   },
+
+  // 실시간 GPS 좌표
+   raw_coordinates: {
+    type: DataTypes.JSONB,
+    allowNull: true
+  },
   
   // 상태
   status: {
-    type: DataTypes.ENUM('started', 'completed', 'cancelled'),
+    type: DataTypes.ENUM('started', 'completed', 'cancelled', 'paused', 'resumed'),
     allowNull: false
     // defaultValue 제거하고 애플리케이션에서 처리
   },
