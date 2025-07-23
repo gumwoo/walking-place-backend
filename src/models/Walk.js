@@ -79,7 +79,7 @@ const Walk = sequelize.define('Walk', {
   
   // 상태
   status: {
-    type: DataTypes.ENUM('started', 'completed', 'cancelled'),
+    type: DataTypes.ENUM('started', 'completed', 'cancelled', 'paused', 'resumed'),
     allowNull: false
     // defaultValue 제거하고 애플리케이션에서 처리
   },
