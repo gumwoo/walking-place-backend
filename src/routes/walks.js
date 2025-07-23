@@ -5,45 +5,9 @@ const { analyze100mDeviations } = require('../services/walkPathRefinementService
 const { Walk } = require('../models');
 const ApiResponse = require('../utils/response');
 
-// 좌표 추가
-router.post('/:id/coordinate', async (req, res) => {
-  try {
-    const walk = await Walk.findByPk(req.params.id);
-    if (!walk) return ApiResponse.notFound(res, '산책 기록을 찾을 수 없습니다');
-
-    const { lat, lng, timestamp } = req.body;
-    if (!lat || !lng || !timestamp) {
-      return ApiResponse.validationError(res, null, '좌표(lat, lng, timestamp)가 올바르지 않습니다');
-    }
-
-    const newCoord = { lat, lng, timestamp };
-    const updatedCoords = walk.raw_coordinates ? [...walk.raw_coordinates, newCoord] : [newCoord];
-
-    walk.raw_coordinates = updatedCoords;
-    await walk.save();
-
-    return ApiResponse.updated(res, walk.raw_coordinates, '좌표가 추가되었습니다');
-  } catch (err) {
-    console.error(err);
-    return ApiResponse.serverError(res, '좌표 추가 중 서버 오류가 발생했습니다', err);
-  }
-});
-
-// 산책 중 좌표 조회 (프론트 실시간 폴리라인용)
-router.get('/:id/coordinates', async (req, res) => {
-  try {
-    const walk = await Walk.findByPk(req.params.id);
-    if (!walk) return ApiResponse.notFound(res, '산책 기록을 찾을 수 없습니다');
-
-    return ApiResponse.success(res, walk.raw_coordinates || [], '좌표 조회 성공');
-  } catch (err) {
-    console.error(err);
-    return ApiResponse.serverError(res, '좌표 조회 중 서버 오류가 발생했습니다', err);
-  }
-});
 
 // 산책 종료 + 경로 매칭 알고리즘 실행 API
-router.post('/:id/finish', async (req, res) => {
+router.post('/:id/end', async (req, res) => {
   try {
     const walk = await Walk.findByPk(req.params.id);
     if (!walk) return ApiResponse.notFound(res, '산책 기록을 찾을 수 없습니다');
