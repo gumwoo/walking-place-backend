@@ -154,7 +154,7 @@ CREATE TABLE marking_photozones (
   course_id UUID NOT NULL REFERENCES courses(id),
   name VARCHAR(200) NOT NULL,
   location GEOMETRY(POINT, 4326) NOT NULL,
-  detection_radius INTEGER NOT NULL DEFAULT 20, -- 감지 반경(미터)
+  detection_radius INTEGER NOT NULL DEFAULT 100, -- 감지 반경(미터)
   
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
