@@ -69,19 +69,30 @@
 - `POST /api/v1/marking-photos` - 마킹 사진 업로드
 
 ## ✅ 완료된 작업
-- [x] 프로젝트 초기 설정
-- [x] 기본 Express 서버 구조
-- [x] 패키지 의존성 설치
-- [x] 로깅 시스템 구축
-- [x] 견종 크롤러 구현
+- [x] 프로젝트 초기 설정 (Express 서버, PostgreSQL, Sequelize)
+- [x] 기본 패키지 의존성 설치 (JWT, 카카오 OAuth, 이미지 처리 등)
+- [x] 로깅 시스템 구축 (Winston)
 
-## 🚧 진행 중인 작업
-- [ ] 제공된 스펙에 맞춰 API 구조 전면 수정
-- [ ] ERD 기반 Sequelize 모델 재구성
-- [ ] 카카오 소셜 로그인 구현
-- [ ] GPS 기반 산책 추적 로직 구현
+- [x] 견종 크롤러 구현 및 데이터 수집
+- [x] 포토존 관련 기본 구조 구현 (controller, service, middleware)
+- [x] 이미지 업로드 서비스 구현
+- [x] 프로젝트 문서화 (README, project_plan)
+- [x] 제공된 6개 파일 스펙 완전 분석 및 이해
 
-## 📝 해야 할 작업
+## 🚧 진행 중인 작업 (우선순위 높음)
+- [ ] **제공된 6개 파일 스펙에 맞춰 전면 리팩토링**
+  - [ ] ERD 기반 9개 엔티티 모델 재구성 (User, Location, Breed, WalkRecord, MarkingPhotozone, MarkingPhoto, Course, CourseFeature, Term)
+  - [ ] API 엔드포인트 스펙 완전 재설계 (PDF 3번 문서 기준)
+  - [ ] 플로우차트에 따른 사용자 경험 구현
+- [ ] **카카오 소셜 로그인 완전 구현**
+  - [ ] OAuth 2.0 연동 및 JWT 토큰 시스템
+  - [ ] 온보딩 플로우 (약관동의→위치설정→프로필설정)
+- [ ] **GPS 기반 실시간 산책 추적 시스템**
+  - [ ] pathCoordinates(JSONB) 실시간 업데이트
+  - [ ] 산책 상태 관리 (STARTED, PAUSED, COMPLETED, CANCELED, ABANDONED)
+
+
+## 📝 해야 할 작업 (제공된 스펙 기준)
 1. **데이터베이스 모델 재설계**
    - 제공된 ERD에 맞춰 9개 엔티티 모델 생성
    - 관계 설정 및 중간 테이블 구현
