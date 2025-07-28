@@ -49,24 +49,38 @@
 ## 🔗 API 엔드포인트 구조
 
 ### A. 인증 및 온보딩
-- `POST /api/v1/auth/kakao` - 카카오 로그인
-- `POST /api/v1/users/me/terms` - 약관 동의
-- `GET /api/v1/locations/search` - 위치 검색
-- `PUT /api/v1/users/me/profile` - 프로필 업데이트
-- `GET /api/v1/breeds/search` - 견종 검색
+- `POST /api/v1/auth/kakao` - 카카오 로그인/회원가입
+- `POST /api/v1/users/me/terms` - 사용자 약관 동의 상태 저장
+- `GET /api/v1/locations/search?keyword={keyword}` - 위치 검색
+- `PUT /api/v1/users/me/profile` - 사용자 선택 위치 정보 저장 (사용자 프로필 업데이트)
+- `GET /api/v1/breeds/search?keyword={keyword}` - 견종 검색
+- `PUT /api/v1/users/me/profile` - 사용자 및 반려동물 프로필 정보 등록/업데이트
+- `POST /api/v1/auth/token/refresh` - 만료된 액세스 토큰 갱신
 
 ### B. 산책 기능
-- `GET /api/v1/users/me/summary-profile` - 프로필 요약
-- `GET /api/v1/courses/recommendations` - 추천 코스
-- `POST /api/v1/walk-records` - 산책 시작
-- `PATCH /api/v1/walk-records/{id}/track` - 경로 업데이트
-- `PUT /api/v1/walk-records/{id}/end` - 산책 종료
-- `POST /api/v1/courses` - 새 코스 등록
+- `GET /api/v1/users/me/summary-profile` - 대표 반려동물 이름 및 아이콘 정보 조회
+- `GET /api/v1/courses/recommendations?latitude={lat}&longitude={lon}&radius=2000&sortBy=tailcopterScoreDesc&areaName={name}&petSize={size}` - 우리 동네 추천 코스 요약 목록 조회
+- `GET /api/v1/map/areas?latitude={lat}&longitude={lon}&radius={r}` - 지도 표시 및 주변 정보 조회
+- `GET /api/v1/courses/{course_id}` - 선택된 추천 코스의 상세 정보 조회
+- `POST /api/v1/walk-records` - 산책 기록 시작
+- `PATCH /api/v1/walk-records/{walk_record_id}/track` - 산책 경로 및 데이터 주기적 업데이트
+- `POST /api/v1/marking-photos` - 마킹 사진 업로드
+- `PATCH /api/v1/walk-records/{walk_record_id}/status` - 산책 상태 일시정지/재개
+- `PUT /api/v1/walk-records/{walk_record_id}/end` - 산책 기록 최종 종료 및 전체 데이터 저장
+- `POST /api/v1/courses` - 새로운 코스 등록
+- `GET /api/v1/courses/{course_id}/marking-photozones` - 산책 중인 코스 내 마킹 포토존 정보 조회
 
 ### C. 조회 및 관리
-- `GET /api/v1/users/me/walk-records` - 산책 기록 목록
-- `PUT /api/v1/walk-records/{id}/score` - 꼬리콥터 점수
-- `POST /api/v1/marking-photos` - 마킹 사진 업로드
+- `GET /api/v1/courses/recommendations?latitude={lat}&longitude={lon}&radius=2000&sortBy=tailcopterScoreDesc&page={페이지번호}&size={개수}` - 추천 코스 모두보기 화면 - 코스 목록 조회 (필터링/정렬/페이징 포함)
+- `GET /api/v1/users/me/walk-records?page={페이지번호}&size={개수}&sortBy={정렬기준}` - 사용자의 모든 산책 기록 목록 조회
+- `PUT /api/v1/walk-records/{walk_record_id}/score` - 꼬리콥터 점수 저장
+- `GET /api/v1/courses/new/details` - 새로 생성할 코스의 기본 정보 조회
+- `POST /api/v1/courses/new` - 새로운 코스 정보 최종 등록
+- `GET /api/v1/walk-records/{walk_record_id}/summary` - 산책 요약 정보 조회
+- `GET /api/v1/walk-records/{walk_record_id}/details` - 산책 경로 및 마킹 이미지 등 상세 정보 조회
+- `POST /api/v1/walk-records/{walk_record_id}/save` - 산책 기록 최종 저장 확정
+- `GET /api/v1/users/me/profile` - 사용자 및 반려동물 프로필 정보 조회 (마이 프로필/프로필 편집)
+- `GET /api/v1/breeds` - 전체 견종 목록 조회
 
 ## ✅ 완료된 작업
 - [x] 프로젝트 초기 설정 (Express 서버, PostgreSQL, Sequelize)
