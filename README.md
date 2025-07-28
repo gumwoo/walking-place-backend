@@ -1,78 +1,39 @@
-# 🐕 산책명소 (Walking Places) - 백엔드 API
+# 🐕 산책명소 (Walking Place)
 
-반려견 산책 코스 추천 및 공유 플랫폼의 백엔드 API 서버입니다.
+반려동물 산책 코스 추천 및 공유 플랫폼 백엔드 API
 
-## 📋 프로젝트 개요
+## 📋 프로젝트 소개
 
-- **목적**: 반려견과 함께하는 산책 코스를 추천하고 공유하는 플랫폼
-- **주요 기능**: GPS 기반 코스 추천, 산책 기록, 포토존, 꼬리점수 시스템
-- **개발 기간**: 2025년 7월 ~
+산책명소는 반려동물과 함께하는 산책을 더욱 즐겁고 의미있게 만드는 서비스입니다.
 
-## 🛠 기술 스택
+### 🎯 주요 기능
+- **🔐 카카오 소셜 로그인** - 간편한 회원가입 및 로그인
+- **📍 GPS 산책 추적** - 실시간 경로 기록 및 저장
+- **📸 마킹 포토존** - 특별한 장소에서 반려동물 사진 촬영
+- **🎮 꼬리콥터 게임** - 산책 후 재미있는 미니게임으로 점수 획득
+- **🗺️ 코스 추천** - 주변 추천 코스 및 사용자 생성 코스 공유
+- **🐶 반려동물 프로필** - 견종별 맞춤 추천
+
+## 🛠️ 기술 스택
 
 ### Backend
-- **Runtime**: Node.js
+- **Runtime**: Node.js 16+
 - **Framework**: Express.js
-- **Database**: PostgreSQL + PostGIS
+- **Database**: PostgreSQL
 - **ORM**: Sequelize
-- **Authentication**: Passport.js (JWT, OAuth)
+- **Authentication**: JWT + Kakao OAuth 2.0
 
-### Development Tools
-- **API Documentation**: Swagger UI
+### Infrastructure
+- **File Storage**: Local/Cloud Storage
 - **Logging**: Winston
-- **Code Quality**: ESLint, Prettier
-- **Version Control**: Git (GitHub Flow)
-
-## 🏗 프로젝트 구조
-
-```
-walking-backend/
-├── .github/                    # GitHub 템플릿
-│   ├── ISSUE_TEMPLATE/         # 이슈 템플릿
-│   └── pull_request_template.md
-├── src/
-│   ├── config/                 # 설정 파일
-│   │   ├── database.js
-│   │   ├── logger.js
-│   │   ├── passport.js
-│   │   └── swagger.js
-│   ├── controllers/            # 컨트롤러 (MVC)
-│   ├── middlewares/            # 미들웨어
-│   │   ├── auth.js
-│   │   └── errorHandler.js
-│   ├── models/                 # Sequelize 모델 (9개 테이블)
-│   ├── routes/                 # API 라우트
-│   ├── services/               # 비즈니스 로직
-│   ├── utils/                  # 유틸리티
-│   │   └── response.js
-│   ├── validations/            # 입력 검증
-│   └── app.js                  # Express 앱 설정
-├── logs/                       # 로그 파일
-├── uploads/                    # 업로드된 파일
-├── tests/                      # 테스트 파일
-├── docs/                       # 프로젝트 문서
-└── server.js                   # 서버 진입점
-```
-
-## 🗄 데이터베이스 스키마
-
-총 **9개 테이블**로 구성:
-
-1. **users** - 사용자 (OAuth 인증 + 반려견 정보)
-2. **courses** - 산책 코스
-3. **course_reports** - 코스 신고
-4. **course_features** - 코스 특징 (9가지)
-5. **course_feature_mappings** - 코스-특징 매핑 (N:M)
-6. **walks** - 산책 기록
-7. **walk_photos** - 산책 사진 (경로/마킹)
-8. **marking_photozones** - 마킹포토존
-9. **photozone_photos** - 포토존 사진
+- **API Documentation**: Swagger
+- **Testing**: Jest + Supertest
 
 ## 🚀 설치 및 실행
 
-### 1. 프로젝트 클론
+### 1. 저장소 클론
 ```bash
-git clone https://github.com/your-username/walking-backend.git
+git clone https://github.com/gumwoo/walking-place-backend.git
 cd walking-backend
 ```
 
@@ -85,30 +46,33 @@ npm install
 `.env` 파일을 생성하고 필요한 환경 변수를 설정하세요:
 
 ```env
-# 데이터베이스
+# 서버 설정
+NODE_ENV=development
+PORT=5000
+
+# 데이터베이스 설정
 DB_HOST=localhost
 DB_PORT=5432
-DB_NAME=walking_places
-DB_USER=postgres
+DB_NAME=walking_place
+DB_USERNAME=your_username
 DB_PASSWORD=your_password
 
-# JWT
+# JWT 설정
 JWT_SECRET=your_jwt_secret
-JWT_EXPIRES_IN=7d
+JWT_REFRESH_SECRET=your_jwt_refresh_secret
 
-# OAuth
+# 카카오 OAuth
 KAKAO_CLIENT_ID=your_kakao_client_id
 KAKAO_CLIENT_SECRET=your_kakao_client_secret
-GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_client_secret
 ```
 
 ### 4. 데이터베이스 설정
-PostgreSQL + PostGIS 확장을 설치하고 데이터베이스를 생성하세요:
+```bash
+# 마이그레이션 실행
+npm run db:migrate
 
-```sql
-CREATE DATABASE walking_places;
-CREATE EXTENSION IF NOT EXISTS postgis;
+# 시드 데이터 삽입
+npm run db:seed
 ```
 
 ### 5. 서버 실행
@@ -120,49 +84,77 @@ npm run dev
 npm start
 ```
 
-## 📚 API 문서
+서버가 성공적으로 시작되면 `http://localhost:5000`에서 접근할 수 있습니다.
+
+## 📖 API 문서
 
 서버 실행 후 다음 URL에서 API 문서를 확인할 수 있습니다:
+- **Swagger UI**: `http://localhost:5000/api-docs`
+- **Health Check**: `http://localhost:5000/health`
 
-- **Swagger UI**: http://localhost:5000/api-docs
-- **API 상태**: http://localhost:5000/api/health
+### 주요 API 엔드포인트
 
-## 🔐 인증 시스템
-
-### 지원하는 인증 방식
-- **JWT Bearer Token**: API 접근용
-- **OAuth 2.0**: 소셜 로그인
-  - 카카오 OAuth
-  - 구글 OAuth
-
-### 인증 흐름
-1. OAuth 로그인 → JWT 토큰 발급
-2. API 요청 시 `Authorization: Bearer <token>` 헤더 포함
-3. 토큰 만료 시 리프레시 토큰으로 갱신
-
-## 🧪 브랜치 전략 (GitHub Flow)
-
+#### 🔐 인증
 ```
-1. main 브랜치에서 기능 브랜치 생성
-   git checkout -b feature/api-authentication
-
-2. 기능 개발 후 커밋 & 푸시
-   git add .
-   git commit -m "feat: JWT 인증 시스템 구현"
-   git push origin feature/api-authentication
-
-3. Pull Request 생성 및 코드 리뷰
-
-4. 리뷰 승인 후 main에 머지
-
-5. 기능 브랜치 삭제
+POST /api/v1/auth/kakao           # 카카오 로그인
+POST /api/v1/auth/token/refresh   # 토큰 갱신
 ```
 
-### 브랜치명 규칙
-- `feature/기능명`: 새 기능 개발
-- `fix/버그명`: 버그 수정
-- `refactor/리팩터링명`: 코드 리팩터링
-- `docs/문서명`: 문서 업데이트
+#### 👤 사용자
+```
+GET  /api/v1/users/me/profile            # 프로필 조회
+PUT  /api/v1/users/me/profile            # 프로필 업데이트
+POST /api/v1/users/me/terms              # 약관 동의
+GET  /api/v1/users/me/summary-profile    # 프로필 요약
+```
+
+#### 🚶‍♂️ 산책
+```
+POST   /api/v1/walk-records                    # 산책 시작
+PATCH  /api/v1/walk-records/{id}/track         # 경로 업데이트
+PUT    /api/v1/walk-records/{id}/end           # 산책 종료
+GET    /api/v1/users/me/walk-records           # 산책 기록 목록
+PUT    /api/v1/walk-records/{id}/score         # 꼬리콥터 점수
+```
+
+#### 🗺️ 코스
+```
+GET  /api/v1/courses/recommendations    # 추천 코스 목록
+GET  /api/v1/courses/{id}               # 코스 상세 정보
+POST /api/v1/courses                    # 새 코스 등록
+```
+
+#### 📍 위치 & 견종
+```
+GET /api/v1/locations/search    # 위치 검색
+GET /api/v1/breeds/search       # 견종 검색
+GET /api/v1/breeds              # 전체 견종 목록
+```
+
+## 🗂️ 프로젝트 구조
+
+```
+walking-backend/
+├── docs/                   # 문서
+│   └── project_plan.md     # 프로젝트 계획서
+├── logs/                   # 로그 파일
+├── src/
+│   ├── app.js             # Express 앱 설정
+│   ├── config/            # 설정 파일
+│   │   ├── database.js    # DB 설정
+│   │   └── logger.js      # 로깅 설정
+│   ├── controllers/       # 컨트롤러
+│   ├── models/            # Sequelize 모델
+│   ├── routes/            # API 라우터
+│   ├── services/          # 비즈니스 로직
+│   ├── middlewares/       # 미들웨어
+│   └── utils/             # 유틸리티
+├── tests/                 # 테스트 파일
+├── uploads/               # 업로드 파일
+├── server.js              # 서버 엔트리 포인트
+├── package.json
+└── README.md
+```
 
 ## 🧪 테스트
 
@@ -170,43 +162,56 @@ npm start
 # 전체 테스트 실행
 npm test
 
-# 테스트 커버리지 확인
+# 테스트 감시 모드
+npm run test:watch
+
+# 커버리지 리포트
 npm run test:coverage
-
-# 특정 테스트 파일 실행
-npm test -- --grep "User API"
 ```
 
-## 📝 커밋 메시지 규칙
+## 📊 데이터베이스 스키마
 
+### 주요 엔티티
+- **User**: 사용자 및 반려동물 정보
+- **WalkRecord**: 산책 기록 및 GPS 데이터
+- **Course**: 산책 코스 정보
+- **MarkingPhotozone**: 마킹 포토존
+- **Location**: 위치 정보
+- **Breed**: 견종 정보
+
+자세한 ERD는 `docs/` 폴더의 관련 문서를 참조하세요.
+
+## 🔧 개발 스크립트
+
+```bash
+npm run dev              # 개발 서버 (nodemon)
+npm start               # 프로덕션 서버
+npm test                # 테스트 실행
+npm run lint            # ESLint 검사
+npm run lint:fix        # ESLint 자동 수정
+npm run db:migrate      # DB 마이그레이션
+npm run db:seed         # 시드 데이터 삽입
+npm run crawl:breeds    # 견종 데이터 크롤링
 ```
-feat: 새로운 기능 추가
-fix: 버그 수정
-docs: 문서 수정
-style: 코드 포맷팅, 세미콜론 누락 등
-refactor: 코드 리팩터링
-test: 테스트 코드 추가
-chore: 빌드 업무 수정, 패키지 매니저 설정 등
-```
 
-## 🤝 기여 방법
+## 🤝 기여하기
 
-1. 이슈 생성 또는 기존 이슈 확인
-2. 기능 브랜치 생성
-3. 코드 작성 및 테스트
-4. Pull Request 생성
-5. 코드 리뷰 및 머지
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-## 📞 문의
+## 📝 라이센스
 
-- **Email**: support@walkingplaces.com
-- **Issues**: [GitHub Issues](https://github.com/your-username/walking-backend/issues)
+이 프로젝트는 MIT 라이센스 하에 배포됩니다. 자세한 내용은 `LICENSE` 파일을 참조하세요.
 
-## 📄 라이선스
+## 📞 연락처
 
-This project is licensed under the MIT License.
+프로젝트 관련 문의사항이 있으시면 언제든 연락주세요.
+
+**프로젝트 링크**: [https://github.com/gumwoo/walking-place-backend](https://github.com/gumwoo/walking-place-backend)
 
 ---
 
-**개발팀**: Walking Places Backend Team  
-**최종 업데이트**: 2025-07-03
+**Made with ❤️ for 🐕 by Walking Place Team**

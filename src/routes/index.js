@@ -3,6 +3,11 @@ const ApiResponse = require('../utils/response');
 
 const router = express.Router();
 
+// 라우터 불러오기  
+// const walkRoutes = require('./walks'); // 파일이 없어서 주석 처리
+// const courseRoutes = require('./courses'); // 파일이 없어서 주석 처리
+const photoZoneRoutes = require('./photoZone');
+
 /**
  * @swagger
  * /api:
@@ -66,5 +71,10 @@ router.get('/health', async (req, res) => {
     ApiResponse.serverError(res, '서버 상태 확인 중 오류가 발생했습니다', error);
   }
 });
+
+// 하위 라우터 연결
+// router.use('/walks', walkRoutes); // 파일이 없어서 주석 처리
+// router.use('/courses', courseRoutes); // 파일이 없어서 주석 처리
+router.use('/photo-zone', photoZoneRoutes);
 
 module.exports = router;
