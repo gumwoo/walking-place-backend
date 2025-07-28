@@ -1,80 +1,63 @@
 const express = require('express');
-const ApiResponse = require('../utils/response');
-
 const router = express.Router();
 
-// 라우터 불러오기  
-// const walkRoutes = require('./walks'); // 파일이 없어서 주석 처리
-// const courseRoutes = require('./courses'); // 파일이 없어서 주석 처리
-const photoZoneRoutes = require('./photoZone');
+// 라우터 가져오기
+const authRoutes = require('./auth');
+const userRoutes = require('./users');
+const locationRoutes = require('./locations');
+const breedRoutes = require('./breeds');
+const walkRecordRoutes = require('./walkRecords');
+const courseRoutes = require('./courses');
+const markingPhotoRoutes = require('./markingPhotos');
+const mapRoutes = require('./map');
 
-/**
- * @swagger
- * /api:
- *   get:
- *     summary: API 상태 확인
- *     description: API 서버의 기본 상태를 확인합니다
- *     tags: [System]
- *     responses:
- *       200:
- *         description: API 서버 정상 동작
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ApiResponse'
- *             example:
- *               success: true
- *               message: "산책명소 API 서버가 정상적으로 동작 중입니다"
- *               data:
- *                 version: "1.0.0"
- *                 environment: "development"
- *                 documentation: "/api-docs"
- *               timestamp: "2025-07-03T12:00:00.000Z"
- */
-router.get('/', (req, res) => {
-  ApiResponse.success(res, {
+// API 버전 1 라우팅
+const v1Router = express.Router();
+
+// A. 인증 및 온보딩
+v1Router.use('/auth', authRoutes);                    // 카카오 로그인, 토큰 갱신
+v1Router.use('/users', userRoutes);                   // 사용자 프로필, 약관 동의
+v1Router.use('/locations', locationRoutes);           // 위치 검색
+v1Router.use('/breeds', breedRoutes);                 // 견종 검색
+
+// B. 산책 기능
+v1Router.use('/walk-records', walkRecordRoutes);      // 산책 기록 관련
+v1Router.use('/courses', courseRoutes);               // 코스 관련
+v1Router.use('/marking-photos', markingPhotoRoutes);  // 마킹 사진 업로드
+v1Router.use('/map', mapRoutes);                      // 지도 정보
+
+// C. 조회 및 관리는 위의 라우터들에 포함됨
+
+// 메인 라우터에 버전 1 등록
+router.use('/api/v1', v1Router);
+
+// 헬스 체크 엔드포인트
+router.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'OK',
+    message: '산책명소 백엔드 서버가 정상 작동 중입니다.',
+    timestamp: new Date().toISOString(),
+    version: '1.0.0'
+  });
+});
+
+// API 문서 루트
+router.get('/api', (req, res) => {
+  res.status(200).json({
+    message: '🐕 산책명소 API',
     version: '1.0.0',
-    environment: process.env.NODE_ENV || 'development',
-    documentation: '/api-docs'
-  }, '산책명소 API 서버가 정상적으로 동작 중입니다');
+    documentation: '/api-docs',
+    endpoints: {
+      auth: '/api/v1/auth',
+      users: '/api/v1/users',
+      locations: '/api/v1/locations',
+      breeds: '/api/v1/breeds',
+      walkRecords: '/api/v1/walk-records',
+      courses: '/api/v1/courses',
+      markingPhotos: '/api/v1/marking-photos',
+      map: '/api/v1/map'
+    }
+  });
 });
-
-/**
- * @swagger
- * /api/health:
- *   get:
- *     summary: 헬스 체크
- *     description: 서버와 데이터베이스 연결 상태를 확인합니다
- *     tags: [System]
- *     responses:
- *       200:
- *         description: 서버 상태 정상
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ApiResponse'
- */
-router.get('/health', async (req, res) => {
-  try {
-    // 데이터베이스 연결 상태 확인
-    const { sequelize } = require('../config/database');
-    await sequelize.authenticate();
-
-    ApiResponse.success(res, {
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-      environment: process.env.NODE_ENV || 'development',
-      database: 'connected'
-    }, '서버가 정상적으로 동작 중입니다');
-  } catch (error) {
-    ApiResponse.serverError(res, '서버 상태 확인 중 오류가 발생했습니다', error);
-  }
-});
-
-// 하위 라우터 연결
-// router.use('/walks', walkRoutes); // 파일이 없어서 주석 처리
-// router.use('/courses', courseRoutes); // 파일이 없어서 주석 처리
-router.use('/photo-zone', photoZoneRoutes);
 
 module.exports = router;

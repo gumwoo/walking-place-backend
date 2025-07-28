@@ -1,25 +1,24 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 
-const CourseFeature = sequelize.define('CourseFeature', {
-  featureId: {
+const Breed = sequelize.define('Breed', {
+  breedId: {
     type: DataTypes.UUID,
     primaryKey: true,
     defaultValue: DataTypes.UUIDV4,
     allowNull: false,
-    comment: '코스 특징 고유 ID'
+    comment: '견종 고유 ID'
   },
   name: {
     type: DataTypes.STRING,
     allowNull: false,
     unique: true,
-    comment: '특징명 (예: 물가, 흙길, 벤치, 넓은 공간 등)'
+    comment: '견종명'
   },
-  isCustom: {
-    type: DataTypes.BOOLEAN,
-    allowNull: false,
-    defaultValue: false,
-    comment: '사용자가 직접 입력한 특징인지 여부'
+  iconUrl: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    comment: '견종별 프로필 아이콘 URL'
   },
   createdAt: {
     type: DataTypes.DATE,
@@ -32,18 +31,15 @@ const CourseFeature = sequelize.define('CourseFeature', {
     defaultValue: DataTypes.NOW
   }
 }, {
-  tableName: 'course_features',
+  tableName: 'breeds',
   timestamps: true,
-  comment: '코스 특징 테이블',
+  comment: '견종 정보 테이블',
   indexes: [
     {
       unique: true,
       fields: ['name']
-    },
-    {
-      fields: ['isCustom']
     }
   ]
 });
 
-module.exports = CourseFeature;
+module.exports = Breed;
