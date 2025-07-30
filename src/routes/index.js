@@ -3,6 +3,8 @@ const ApiResponse = require('../utils/response');
 
 // 각 도메인별 라우터 import
 const courseRoutes = require('./courses');
+const markingPhotoRoutes = require('./markingPhotos');
+const markingPhotozoneRoutes = require('./markingPhotozones');
 
 const router = express.Router();
 
@@ -72,5 +74,7 @@ router.get('/health', async (req, res) => {
 
 // 도메인별 라우트 등록
 router.use('/courses', courseRoutes);
+router.use('/marking-photos', markingPhotoRoutes);
+router.use('/marking-photozones', markingPhotozoneRoutes);
 
 module.exports = router;
