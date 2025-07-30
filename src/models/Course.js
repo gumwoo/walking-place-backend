@@ -2,98 +2,71 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 
 const Course = sequelize.define('Course', {
-  id: {
+  courseId: {
     type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
-    allowNull: false
+    defaultValue: DataTypes.UUIDV4,
+    allowNull: false,
+    comment: '코스 고유 ID'
   },
-  
-  creator_id: {
+  creatorUserId: {
     type: DataTypes.UUID,
+    allowNull: true,
+    comment: '생성자 사용자 ID (추천 코스의 경우 NULL)'
+  },
+  courseName: {
+    type: DataTypes.STRING,
     allowNull: false,
-    references: {
-      model: 'users',
-      key: 'id'
-    }
+    comment: '코스명'
   },
-  
-  // 기본 정보
-  thumbnail_image: {
-    type: DataTypes.STRING(500),
-    allowNull: true
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+    comment: '코스 설명'
   },
-  course_image: {
-    type: DataTypes.STRING(500),
-    allowNull: true
-  },
-  title: {
-    type: DataTypes.STRING(200),
-    allowNull: false
-  },
-  distance: {
-    type: DataTypes.DECIMAL(6, 2),
-    allowNull: true
-  },
-  level: {
-    type: DataTypes.ENUM('상', '중', '하'),
-    allowNull: false
-  },
-  recommended_dog_size: {
-    type: DataTypes.ENUM('소형', '중형', '대형'),
-    allowNull: true
-  },
-  
-  // 꼬리점수 관련
-  average_tail_score: {
-    type: DataTypes.DECIMAL(3, 1),
+  difficulty: {
+    type: DataTypes.ENUM('EASY', 'NORMAL', 'HARD'),
     allowNull: false,
-    defaultValue: 0
+    defaultValue: 'NORMAL',
+    comment: '코스 난이도'
   },
-  total_tail_score: {
+  recommendedPetSize: {
+    type: DataTypes.ENUM('SMALL', 'MEDIUM', 'LARGE', 'ALL'),
+    allowNull: false,
+    defaultValue: 'ALL',
+    comment: '추천 견종 크기'
+  },
+  averageTailcopterScore: {
+    type: DataTypes.DECIMAL(5, 2),
+    allowNull: true,
+    comment: '해당 코스 산책 기록의 평균 꼬리콥터 점수'
+  },
+  courseLengthMeters: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    defaultValue: 0
+    comment: '코스 길이(미터)'
   },
-  review_count: {
+  estimatedDurationSeconds: {
     type: DataTypes.INTEGER,
+    allowNull: true,
+    comment: '예상 소요 시간(초)'
+  },
+  coverImageUrl: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    comment: '코스 대표 이미지 URL'
+  },
+  pathCoordinates: {
+    type: DataTypes.JSONB,
     allowNull: false,
-    defaultValue: 0
+    comment: '코스 경로 좌표 리스트'
   },
-  
-  // 신고 관련
-  is_reported: {
-    type: DataTypes.BOOLEAN,
-    allowNull: false,
-    defaultValue: false
-  },
-  report_count: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    defaultValue: 0
-  },
-  is_active: {
-    type: DataTypes.BOOLEAN,
-    allowNull: false,
-    defaultValue: true
-  },
-  
-  // 경로
-  estimated_time: {
-    type: DataTypes.INTEGER,
-    allowNull: true
-  },
-  path_geometry: {
-    type: DataTypes.GEOMETRY('LINESTRING', 4326),
-    allowNull: false
-  },
-  
-  created_at: {
+  createdAt: {
     type: DataTypes.DATE,
     allowNull: false,
     defaultValue: DataTypes.NOW
   },
-  updated_at: {
+  updatedAt: {
     type: DataTypes.DATE,
     allowNull: false,
     defaultValue: DataTypes.NOW
@@ -101,20 +74,25 @@ const Course = sequelize.define('Course', {
 }, {
   tableName: 'courses',
   timestamps: true,
-  createdAt: 'created_at',
-  updatedAt: 'updated_at',
+  comment: '산책 코스 테이블',
   indexes: [
     {
-      fields: ['creator_id']
+      fields: ['creatorUserId']
     },
     {
-      fields: ['average_tail_score']
+      fields: ['difficulty']
     },
     {
-      fields: ['is_active']
+      fields: ['recommendedPetSize']
     },
     {
-      fields: ['is_active', 'average_tail_score']
+      fields: ['averageTailcopterScore']
+    },
+    {
+      fields: ['courseLengthMeters']
+    },
+    {
+      fields: ['createdAt']
     }
   ]
 });

@@ -1,160 +1,188 @@
 const { sequelize } = require('../config/database');
+
+// 모든 모델 가져오기
 const User = require('./User');
-const Course = require('./Course');
-const CourseReport = require('./CourseReport');
-const CourseFeature = require('./CourseFeature');
-const CourseFeatureMapping = require('./CourseFeatureMapping');
-const Walk = require('./Walk');
-const WalkPhoto = require('./WalkPhoto');
+const Location = require('./Location');
+const Breed = require('./Breed');
+const WalkRecord = require('./WalkRecord');
 const MarkingPhotozone = require('./MarkingPhotozone');
-const PhotozonePhoto = require('./PhotozonePhoto');
+const MarkingPhoto = require('./MarkingPhoto');
+const Course = require('./Course');
+const CourseFeature = require('./CourseFeature');
+const Term = require('./Term');
 
-// User와 Course 관계
-User.hasMany(Course, {
-  foreignKey: 'creator_id',
-  as: 'createdCourses'
-});
-Course.belongsTo(User, {
-  foreignKey: 'creator_id',
-  as: 'creator'
-});
+// 중간 테이블
+const UserTermAgreement = require('./UserTermAgreement');
+const CourseCourseFeature = require('./CourseCourseFeature');
+const CourseLocationAssociation = require('./CourseLocationAssociation');
+const WalkRecordMarkingPhotozone = require('./WalkRecordMarkingPhotozone');
 
-// User와 CourseReport 관계
-User.hasMany(CourseReport, {
-  foreignKey: 'user_id',
-  as: 'courseReports'
-});
-CourseReport.belongsTo(User, {
-  foreignKey: 'user_id',
-  as: 'reporter'
-});
+// 관계 설정
+const setupAssociations = () => {
+  console.log('Setting up model associations...');
 
-// Course와 CourseReport 관계
-Course.hasMany(CourseReport, {
-  foreignKey: 'course_id',
-  as: 'reports'
-});
-CourseReport.belongsTo(Course, {
-  foreignKey: 'course_id',
-  as: 'course'
-});
+  // User 관계
+  User.belongsTo(Location, { 
+    foreignKey: 'preferredLocationId', 
+    as: 'preferredLocation',
+    onDelete: 'SET NULL'
+  });
+  Location.hasMany(User, { 
+    foreignKey: 'preferredLocationId', 
+    as: 'users'
+  });
 
-// Course와 CourseFeatureMapping 관계
-Course.hasMany(CourseFeatureMapping, {
-  foreignKey: 'course_id',
-  as: 'featureMappings'
-});
-CourseFeatureMapping.belongsTo(Course, {
-  foreignKey: 'course_id',
-  as: 'course'
-});
+  User.belongsTo(Breed, { 
+    foreignKey: 'breedId', 
+    as: 'breed',
+    onDelete: 'SET NULL'
+  });
+  Breed.hasMany(User, { 
+    foreignKey: 'breedId', 
+    as: 'users'
+  });
 
-// CourseFeature와 CourseFeatureMapping 관계
-CourseFeature.hasMany(CourseFeatureMapping, {
-  foreignKey: 'feature_id',
-  as: 'courseMappings'
-});
-CourseFeatureMapping.belongsTo(CourseFeature, {
-  foreignKey: 'feature_id',
-  as: 'feature'
-});
+  // User - Term (N:M through UserTermAgreement)
+  User.belongsToMany(Term, {
+    through: UserTermAgreement,
+    foreignKey: 'userId',
+    otherKey: 'termId',
+    as: 'agreedTerms'
+  });
+  Term.belongsToMany(User, {
+    through: UserTermAgreement,
+    foreignKey: 'termId',
+    otherKey: 'userId',
+    as: 'users'
+  });
 
-// Course와 CourseFeature Many-to-Many 관계
-Course.belongsToMany(CourseFeature, {
-  through: CourseFeatureMapping,
-  foreignKey: 'course_id',
-  otherKey: 'feature_id',
-  as: 'features'
-});
-CourseFeature.belongsToMany(Course, {
-  through: CourseFeatureMapping,
-  foreignKey: 'feature_id',
-  otherKey: 'course_id',
-  as: 'courses'
-});
+  // WalkRecord 관계
+  User.hasMany(WalkRecord, { 
+    foreignKey: 'userId', 
+    as: 'walkRecords',
+    onDelete: 'CASCADE'
+  });
+  WalkRecord.belongsTo(User, { 
+    foreignKey: 'userId', 
+    as: 'user'
+  });
 
-// User와 Walk 관계
-User.hasMany(Walk, {
-  foreignKey: 'user_id',
-  as: 'walks'
-});
-Walk.belongsTo(User, {
-  foreignKey: 'user_id',
-  as: 'user'
-});
+  Course.hasMany(WalkRecord, { 
+    foreignKey: 'courseId', 
+    as: 'walkRecords',
+    onDelete: 'SET NULL'
+  });
+  WalkRecord.belongsTo(Course, { 
+    foreignKey: 'courseId', 
+    as: 'course'
+  });
 
-// Course와 Walk 관계
-Course.hasMany(Walk, {
-  foreignKey: 'course_id',
-  as: 'walks'
-});
-Walk.belongsTo(Course, {
-  foreignKey: 'course_id',
-  as: 'course'
-});
+  // WalkRecord - MarkingPhotozone (N:M through WalkRecordMarkingPhotozone)
+  WalkRecord.belongsToMany(MarkingPhotozone, {
+    through: WalkRecordMarkingPhotozone,
+    foreignKey: 'walkRecordId',
+    otherKey: 'photozoneId',
+    as: 'visitedPhotozones'
+  });
+  MarkingPhotozone.belongsToMany(WalkRecord, {
+    through: WalkRecordMarkingPhotozone,
+    foreignKey: 'photozoneId',
+    otherKey: 'walkRecordId',
+    as: 'walkRecords'
+  });
 
-// Walk과 WalkPhoto 관계
-Walk.hasMany(WalkPhoto, {
-  foreignKey: 'walk_id',
-  as: 'photos'
-});
-WalkPhoto.belongsTo(Walk, {
-  foreignKey: 'walk_id',
-  as: 'walk'
-});
+  // Course 관계
+  User.hasMany(Course, { 
+    foreignKey: 'creatorUserId', 
+    as: 'createdCourses',
+    onDelete: 'SET NULL'
+  });
+  Course.belongsTo(User, { 
+    foreignKey: 'creatorUserId', 
+    as: 'creator'
+  });
 
-// Course와 MarkingPhotozone 관계
-Course.hasMany(MarkingPhotozone, {
-  foreignKey: 'course_id',
-  as: 'markingPhotozones'
-});
-MarkingPhotozone.belongsTo(Course, {
-  foreignKey: 'course_id',
-  as: 'course'
-});
+  // Course - CourseFeature (N:M through CourseCourseFeature)
+  Course.belongsToMany(CourseFeature, {
+    through: CourseCourseFeature,
+    foreignKey: 'courseId',
+    otherKey: 'featureId',
+    as: 'features'
+  });
+  CourseFeature.belongsToMany(Course, {
+    through: CourseCourseFeature,
+    foreignKey: 'featureId',
+    otherKey: 'courseId',
+    as: 'courses'
+  });
 
-// MarkingPhotozone과 PhotozonePhoto 관계
-MarkingPhotozone.hasMany(PhotozonePhoto, {
-  foreignKey: 'marking_photozone_id',
-  as: 'photos'
-});
-PhotozonePhoto.belongsTo(MarkingPhotozone, {
-  foreignKey: 'marking_photozone_id',
-  as: 'markingPhotozone'
-});
+  // Course - Location (N:M through CourseLocationAssociation)
+  Course.belongsToMany(Location, {
+    through: CourseLocationAssociation,
+    foreignKey: 'courseId',
+    otherKey: 'locationId',
+    as: 'locations'
+  });
+  Location.belongsToMany(Course, {
+    through: CourseLocationAssociation,
+    foreignKey: 'locationId',
+    otherKey: 'courseId',
+    as: 'courses'
+  });
 
-// User와 PhotozonePhoto 관계
-User.hasMany(PhotozonePhoto, {
-  foreignKey: 'user_id',
-  as: 'photozonePhotos'
-});
-PhotozonePhoto.belongsTo(User, {
-  foreignKey: 'user_id',
-  as: 'user'
-});
+  // MarkingPhotozone 관계
+  Course.hasMany(MarkingPhotozone, { 
+    foreignKey: 'courseId', 
+    as: 'markingPhotozones',
+    onDelete: 'SET NULL'
+  });
+  MarkingPhotozone.belongsTo(Course, { 
+    foreignKey: 'courseId', 
+    as: 'course'
+  });
 
-// Walk과 PhotozonePhoto 관계
-Walk.hasMany(PhotozonePhoto, {
-  foreignKey: 'walk_id',
-  as: 'photozonePhotos'
-});
-PhotozonePhoto.belongsTo(Walk, {
-  foreignKey: 'walk_id',
-  as: 'walk'
-});
+  // MarkingPhoto 관계
+  MarkingPhotozone.hasMany(MarkingPhoto, { 
+    foreignKey: 'photozoneId', 
+    as: 'photos',
+    onDelete: 'CASCADE'
+  });
+  MarkingPhoto.belongsTo(MarkingPhotozone, { 
+    foreignKey: 'photozoneId', 
+    as: 'photozone'
+  });
 
-// 모델 객체 내보내기
-const models = {
-  User,
-  Course,
-  CourseReport,
-  CourseFeature,
-  CourseFeatureMapping,
-  Walk,
-  WalkPhoto,
-  MarkingPhotozone,
-  PhotozonePhoto,
-  sequelize
+  User.hasMany(MarkingPhoto, { 
+    foreignKey: 'userId', 
+    as: 'markingPhotos',
+    onDelete: 'CASCADE'
+  });
+  MarkingPhoto.belongsTo(User, { 
+    foreignKey: 'userId', 
+    as: 'user'
+  });
+
+  console.log('Model associations setup completed.');
 };
 
-module.exports = models;
+// 관계 설정 실행
+setupAssociations();
+
+// 모든 모델과 관계 내보내기
+module.exports = {
+  sequelize,
+  User,
+  Location,
+  Breed,
+  WalkRecord,
+  MarkingPhotozone,
+  MarkingPhoto,
+  Course,
+  CourseFeature,
+  Term,
+  UserTermAgreement,
+  CourseCourseFeature,
+  CourseLocationAssociation,
+  WalkRecordMarkingPhotozone,
+  setupAssociations
+};
