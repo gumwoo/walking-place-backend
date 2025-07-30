@@ -113,7 +113,7 @@ const connectDatabase = async () => {
     
     // 개발 환경에서는 sync 실행
     if (process.env.NODE_ENV === 'development') {
-      await sequelize.sync({ force: true }); // force: true로 기존 테이블 삭제 후 재생성
+      //await sequelize.sync({ force: true }); // force: true로 기존 테이블 삭제 후 재생성
       logger.info('데이터베이스 모델 동기화 완료 (기존 테이블 재생성)');
     }
   } catch (error) {

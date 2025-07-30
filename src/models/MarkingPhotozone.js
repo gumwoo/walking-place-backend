@@ -2,44 +2,40 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 
 const MarkingPhotozone = sequelize.define('MarkingPhotozone', {
-  id: {
+  photozoneId: {
     type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
-    allowNull: false
+    defaultValue: DataTypes.UUIDV4,
+    allowNull: false,
+    comment: '마킹 포토존 고유 ID'
   },
-  
-  course_id: {
+  latitude: {
+    type: DataTypes.DECIMAL(10, 8),
+    allowNull: false,
+    comment: '포토존 위도'
+  },
+  longitude: {
+    type: DataTypes.DECIMAL(11, 8),
+    allowNull: false,
+    comment: '포토존 경도'
+  },
+  courseId: {
     type: DataTypes.UUID,
+    allowNull: true,
+    comment: '코스 ID (특정 코스에 속하지 않을 수 있음)'
+  },
+  isRecommended: {
+    type: DataTypes.BOOLEAN,
     allowNull: false,
-    references: {
-      model: 'courses',
-      key: 'id'
-    }
+    defaultValue: false,
+    comment: '추천 포토존 여부'
   },
-  
-  name: {
-    type: DataTypes.STRING(200),
-    allowNull: false
-  },
-  
-  location: {
-    type: DataTypes.GEOMETRY('POINT', 4326),
-    allowNull: false
-  },
-  
-  detection_radius: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    defaultValue: 20
-  },
-  
-  created_at: {
+  createdAt: {
     type: DataTypes.DATE,
     allowNull: false,
     defaultValue: DataTypes.NOW
   },
-  updated_at: {
+  updatedAt: {
     type: DataTypes.DATE,
     allowNull: false,
     defaultValue: DataTypes.NOW
@@ -47,11 +43,19 @@ const MarkingPhotozone = sequelize.define('MarkingPhotozone', {
 }, {
   tableName: 'marking_photozones',
   timestamps: true,
-  createdAt: 'created_at',
-  updatedAt: 'updated_at',
+  comment: '마킹 포토존 테이블',
   indexes: [
     {
       fields: ['course_id']
+    },
+    {
+      fields: ['is_recommended']
+    },
+    {
+      fields: ['latitude', 'longitude']
+    },
+    {
+      fields: ['created_at']
     }
   ]
 });
