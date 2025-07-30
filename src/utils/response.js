@@ -95,6 +95,16 @@ class ApiResponse {
     });
   }
 
+  // 잘못된 요청 응답 (400)
+  static badRequest(res, message = '잘못된 요청입니다.', error = null) {
+    return res.status(400).json({
+      success: false,
+      message,
+      error: error || {},
+      timestamp: new Date().toISOString(),
+    });
+  }
+
   /**
    * 인증 오류 응답 (401)
    * @param {Object} res - Express response 객체
