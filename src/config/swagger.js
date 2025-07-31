@@ -187,7 +187,13 @@ const setupSwagger = (app) => {
   // Swagger UI 엔드포인트
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, swaggerUiOptions));
 
-  console.log(`📚 Swagger UI: http://localhost:${process.env.PORT || 5000}/api-docs`);
+  const port = process.env.PORT || 5000;
+
+  if (process.env.NODE_ENV === "development") {
+    console.log(`📚 Swagger UI: http://localhost:${port}/api-docs`);
+  } else {
+    console.log(`📚 Swagger UI: /api-docs`);
+  }
 };
 
 module.exports = {
