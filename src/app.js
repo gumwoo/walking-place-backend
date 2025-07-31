@@ -111,9 +111,10 @@ const connectDatabase = async () => {
     await sequelize.authenticate();
     logger.info('PostgreSQL 데이터베이스 연결 성공');
     
-    // 개발 환경에서는 sync 실행
-    if (process.env.NODE_ENV === 'development') {
+    // 개발 환경 또는 초기 배포 시에도 sync 수행
+    if (process.env.NODE_ENV !== 'test') {
       //await sequelize.sync({ force: true }); // force: true로 기존 테이블 삭제 후 재생성
+      await sequelize.sync();
       logger.info('데이터베이스 모델 동기화 완료 (기존 테이블 재생성)');
     }
   } catch (error) {
