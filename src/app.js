@@ -10,7 +10,7 @@ const logger = require('./config/logger');
 const { sequelize } = require('./config/database');
 const models = require('./models'); // 새로운 모델들 import
 const { setupSwagger } = require('./config/swagger'); // Swagger 설정
-const { errorHandler, notFoundHandler } = require('./middlewares/errorHandler'); // 에러 핸들러
+const { errorHandler, notFoundHandler } = require('./middlewares/tempHandler'); // 에러 핸들러
 require('./config/passport'); // Passport 설정
 
 // 라우터 import (나중에 생성할 예정)
