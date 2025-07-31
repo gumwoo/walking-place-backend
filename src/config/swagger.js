@@ -178,6 +178,11 @@ const swaggerUiOptions = {
  * @param {Object} app - Express 앱 인스턴스
  */
 const setupSwagger = (app) => {
+
+  if (process.env.NODE_ENV === 'production') {
+    return; // 배포환경에서는 Swagger 등록하지 않음
+  }
+  
   // API 문서 JSON 엔드포인트
   app.get('/api-docs.json', (req, res) => {
     res.setHeader('Content-Type', 'application/json');
