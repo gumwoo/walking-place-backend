@@ -4,6 +4,9 @@ const logger = require('./src/config/logger');
 
 const PORT = process.env.PORT || 5000;
 
+const PORT = process.env.PORT || 5000;
+console.log("✅ 실제 사용 포트:", PORT); // 이 줄 추가
+
 // 서버 시작 함수
 const startServer = async () => {
   try {
