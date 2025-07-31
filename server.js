@@ -1,7 +1,6 @@
 require('dotenv').config();
 const { app, connectDatabase } = require('./src/app');
 const logger = require('./src/config/logger');
-
 const PORT = process.env.PORT || 5000;
 
 console.log("✅ 실제 사용 포트:", PORT); // 이 줄 추가
