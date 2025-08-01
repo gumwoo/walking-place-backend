@@ -12,7 +12,8 @@
     "db:migrate": "npx sequelize-cli db:migrate",
     "db:seed": "npx sequelize-cli db:seed:all",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "crawl:breeds": "node src/dog-breed-crawler/crawler_korean.js"
   },
   "keywords": [
     "walking",
@@ -27,6 +28,7 @@
   "dependencies": {
     "axios": "^1.11.0",
     "bcryptjs": "^2.4.3",
+    "cheerio": "^1.1.2",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
@@ -34,6 +36,7 @@
     "express-rate-limit": "^7.1.5",
     "express-validator": "^7.0.1",
     "helmet": "^7.1.0",
+    "iconv-lite": "^0.6.3",
     "joi": "^17.11.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",

@@ -74,6 +74,8 @@ class MarkingPhotoService {
       return {
         markingPhotoId: markingPhoto.id,
         photozoneId,
+        latitude,
+        longitude,
         uploadedAt: markingPhoto.created_at
       };
 
