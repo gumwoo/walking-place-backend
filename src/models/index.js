@@ -195,5 +195,5 @@ module.exports = {
   CourseCourseFeature,
   CourseLocationAssociation,
   WalkRecordMarkingPhotozone,
-  setupAssociations,
+  setupAssociations
 };
