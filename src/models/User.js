@@ -47,6 +47,17 @@ const User = sequelize.define('User', {
     allowNull: true
   },
   
+  // 선호 위치 정보
+  preferred_location_id: {
+    type: DataTypes.UUID,
+    allowNull: true,
+    references: {
+      model: 'locations',
+      key: 'id'
+    },
+    comment: '선호 위치 ID'
+  },
+  
   created_at: {
     type: DataTypes.DATE,
     allowNull: false,

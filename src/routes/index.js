@@ -5,6 +5,10 @@ const ApiResponse = require('../utils/response');
 const courseRoutes = require('./courses');
 const markingPhotoRoutes = require('./markingPhotos');
 const markingPhotozoneRoutes = require('./markingPhotozones');
+const authRoutes = require('./auth');
+const usersRoutes = require('./users');
+const locationsRoutes = require('./locations');
+const breedsRoutes = require('./breeds');
 
 const router = express.Router();
 
@@ -73,8 +77,12 @@ router.get('/health', async (req, res) => {
 });
 
 // 도메인별 라우트 등록
-router.use('/courses', courseRoutes);
-router.use('/marking-photos', markingPhotoRoutes);
-router.use('/marking-photozones', markingPhotozoneRoutes);
+router.use('/v1/courses', courseRoutes);
+router.use('/v1/marking-photos', markingPhotoRoutes);
+router.use('/v1/marking-photozones', markingPhotozoneRoutes);
+router.use('/v1/auth', authRoutes);
+router.use('/v1/users', usersRoutes);
+router.use('/v1/locations', locationsRoutes);
+router.use('/v1/breeds', breedsRoutes);
 
 module.exports = router;

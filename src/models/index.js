@@ -8,6 +8,10 @@ const Walk = require('./Walk');
 const WalkPhoto = require('./WalkPhoto');
 const MarkingPhotozone = require('./MarkingPhotozone');
 const PhotozonePhoto = require('./PhotozonePhoto');
+const Location = require('./Location');
+const Breed = require('./Breed');
+const Term = require('./Term');
+const UserTermAgreement = require('./UserTermAgreement');
 
 // User와 Course 관계
 User.hasMany(Course, {
@@ -143,6 +147,50 @@ PhotozonePhoto.belongsTo(Walk, {
   as: 'walk'
 });
 
+// User와 Location 관계 (선호 위치)
+User.belongsTo(Location, {
+  foreignKey: 'preferred_location_id',
+  as: 'preferredLocation'
+});
+Location.hasMany(User, {
+  foreignKey: 'preferred_location_id',
+  as: 'users'
+});
+
+// User와 Term 관계 (Many-to-Many through UserTermAgreement)
+User.belongsToMany(Term, {
+  through: UserTermAgreement,
+  foreignKey: 'user_id',
+  otherKey: 'term_id',
+  as: 'agreedTerms'
+});
+Term.belongsToMany(User, {
+  through: UserTermAgreement,
+  foreignKey: 'term_id',
+  otherKey: 'user_id',
+  as: 'users'
+});
+
+// User와 UserTermAgreement 관계
+User.hasMany(UserTermAgreement, {
+  foreignKey: 'user_id',
+  as: 'termAgreements'
+});
+UserTermAgreement.belongsTo(User, {
+  foreignKey: 'user_id',
+  as: 'user'
+});
+
+// Term과 UserTermAgreement 관계
+Term.hasMany(UserTermAgreement, {
+  foreignKey: 'term_id',
+  as: 'userAgreements'
+});
+UserTermAgreement.belongsTo(Term, {
+  foreignKey: 'term_id',
+  as: 'term'
+});
+
 // 모델 객체 내보내기
 const models = {
   User,
@@ -154,6 +202,10 @@ const models = {
   WalkPhoto,
   MarkingPhotozone,
   PhotozonePhoto,
+  Location,
+  Breed,
+  Term,
+  UserTermAgreement,
   sequelize
 };
 
