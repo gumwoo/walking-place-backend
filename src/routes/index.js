@@ -14,8 +14,6 @@ const userRoutes = require('./users');
 const locationRoutes = require('./locations');
 const breedRoutes = require('./breeds');
 const walkRecordRoutes = require('./walkRecords');
-const courseRoutes = require('./courses');
-const markingPhotoRoutes = require('./markingPhotos');
 const mapRoutes = require('./map');
 
 // API 버전 1 라우팅
