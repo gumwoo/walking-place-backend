@@ -2,11 +2,91 @@ const axios = require('axios');
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 const logger = require('../config/logger');
+const qs = require('querystring');
 
 /**
  * 인증 관련 서비스
  */
 class AuthService {
+
+  /**
+   * 카카오 OAuth 콜백 처리 및 로그인
+   * @param {string} code - 카카오에서 받은 인증 코드
+   * @returns {Object} 사용자 정보 및 서비스 토큰
+   */
+  async kakaoCallbackLogin(code) {
+    try {
+      logger.info('카카오 콜백 로그인 서비스 시작');
+
+      // 1. 인증 코드로 액세스 토큰 교환
+      const tokenResponse = await this.exchangeCodeForToken(code);
+      
+      if (!tokenResponse.access_token) {
+        throw new Error('카카오 액세스 토큰 교환에 실패했습니다.');
+      }
+
+      // 2. 카카오 로그인 처리 (기존 kakaoLogin 메소드 재활용)
+      const result = await this.kakaoLogin(tokenResponse.access_token);
+      
+      logger.info('카카오 콜백 로그인 서비스 완료');
+
+      return result;
+    } catch (error) {
+      logger.error('카카오 콜백 로그인 서비스 오류:', error);
+      throw error;
+    }
+  }
+  
+  /**
+   * 카카오 인증 코드를 액세스 토큰으로 교환
+   * @param {string} code - 카카오 인증 코드
+   * @returns {Object} 토큰 응답
+   */
+  async exchangeCodeForToken(code) {
+    try {
+      const tokenParams = {
+        grant_type: 'authorization_code',
+        client_id: process.env.KAKAO_CLIENT_ID,
+        client_secret: process.env.KAKAO_CLIENT_SECRET,
+        redirect_uri: process.env.KAKAO_REDIRECT_URI,
+        code: code
+      };
+
+      logger.info('카카오 토큰 교환 요청 파라미터', {
+        client_id: process.env.KAKAO_CLIENT_ID,
+        redirect_uri: process.env.KAKAO_REDIRECT_URI,
+        hasClientSecret: !!process.env.KAKAO_CLIENT_SECRET,
+        codeLength: code.length
+      });
+
+      const response = await axios.post(
+        'https://kauth.kakao.com/oauth/token',
+        qs.stringify(tokenParams),
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }
+      );
+
+      logger.info('카카오 토큰 교환 응답 수신', {
+        status: response.status,
+        hasAccessToken: !!response.data.access_token,
+        tokenType: response.data.token_type
+      });
+
+      return response.data;
+
+    } catch (error) {
+      logger.error('카카오 토큰 교환 오류:', {
+        message: error.message,
+        responseStatus: error.response?.status,
+        responseData: error.response?.data,
+        stack: error.stack
+      });
+      throw new Error('카카오 액세스 토큰 교환에 실패했습니다.');
+    }
+  }
 
   /**
    * 카카오 로그인/회원가입 처리
@@ -24,7 +104,7 @@ class AuthService {
         throw new Error('카카오 사용자 정보를 가져올 수 없습니다.');
       }
 
-      const { id: socialId, kakao_account } = kakaoUserInfo;
+      const { id: socialId } = kakaoUserInfo;
 
       // 2. 기존 사용자 확인
       let user = await User.findOne({

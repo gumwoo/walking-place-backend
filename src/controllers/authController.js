@@ -143,6 +143,7 @@ class AuthController {
       });
     }
   }
+
   /**
    * 카카오 OAuth 콜백 처리
    * GET /api/v1/auth/kakao/callback
@@ -176,29 +177,15 @@ class AuthController {
 
       logger.info('카카오 인증 코드 수신 성공', { code: code.substring(0, 10) + '...' });
 
-      // 1. 인증 코드로 액세스 토큰 교환
-      logger.info('카카오 토큰 교환 시작');
-      const tokenResponse = await this.exchangeCodeForToken(code);
-      logger.info('카카오 토큰 교환 완료', { 
-        hasAccessToken: !!tokenResponse.access_token,
-        tokenType: tokenResponse.token_type 
-      });
-      
-      if (!tokenResponse.access_token) {
-        throw new Error('카카오 액세스 토큰 교환에 실패했습니다.');
-      }
-
-      // 2. 카카오 로그인 처리
-      logger.info('카카오 로그인 서비스 호출 시작');
-      const result = await authService.kakaoLogin(tokenResponse.access_token);
-      logger.info('카카오 로그인 서비스 호출 완료');
-
+      // 1. 서비스 레이어의 메소드 호출
+      logger.info('카카오 토큰 교환 및 로그인 서비스 호출 시작');
+      const result = await authService.kakaoCallbackLogin(code);
       logger.info('카카오 OAuth 콜백 처리 완료', { 
         userId: result.userId,
         isNewUser: result.isNewUser
       });
 
-      // 3. 프론트엔드로 리다이렉트 (또는 JSON 응답)
+      // 2. 프론트엔드로 리다이렉트 (또는 JSON 응답)
       return res.status(200).json({
         success: true,
         message: '카카오 로그인이 성공적으로 완료되었습니다.',
@@ -218,60 +205,6 @@ class AuthController {
         code: 'KAKAO_CALLBACK_ERROR',
         details: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
-    }
-  }
-
-  /**
-   * 카카오 인증 코드를 액세스 토큰으로 교환
-   * @param {string} code - 카카오 인증 코드
-   * @returns {Object} 토큰 응답
-   */
-  async exchangeCodeForToken(code) {
-    try {
-      const axios = require('axios');
-      const qs = require('querystring');
-
-      const tokenParams = {
-        grant_type: 'authorization_code',
-        client_id: process.env.KAKAO_CLIENT_ID,
-        client_secret: process.env.KAKAO_CLIENT_SECRET,
-        redirect_uri: process.env.KAKAO_REDIRECT_URI,
-        code: code
-      };
-
-      logger.info('카카오 토큰 교환 요청 파라미터', {
-        client_id: process.env.KAKAO_CLIENT_ID,
-        redirect_uri: process.env.KAKAO_REDIRECT_URI,
-        hasClientSecret: !!process.env.KAKAO_CLIENT_SECRET,
-        codeLength: code.length
-      });
-
-      const response = await axios.post(
-        'https://kauth.kakao.com/oauth/token',
-        qs.stringify(tokenParams),
-        {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          }
-        }
-      );
-
-      logger.info('카카오 토큰 교환 응답 수신', {
-        status: response.status,
-        hasAccessToken: !!response.data.access_token,
-        tokenType: response.data.token_type
-      });
-
-      return response.data;
-
-    } catch (error) {
-      logger.error('카카오 토큰 교환 오류:', {
-        message: error.message,
-        responseStatus: error.response?.status,
-        responseData: error.response?.data,
-        stack: error.stack
-      });
-      throw new Error('카카오 액세스 토큰 교환에 실패했습니다.');
     }
   }
 }
