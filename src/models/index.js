@@ -1,211 +1,180 @@
 const { sequelize } = require('../config/database');
+
+// ERD 기준 모델들 임포트
 const User = require('./User');
-const Course = require('./Course');
-const CourseReport = require('./CourseReport');
-const CourseFeature = require('./CourseFeature');
-const CourseFeatureMapping = require('./CourseFeatureMapping');
-const Walk = require('./Walk');
-const WalkPhoto = require('./WalkPhoto');
-const MarkingPhotozone = require('./MarkingPhotozone');
-const PhotozonePhoto = require('./PhotozonePhoto');
 const Location = require('./Location');
 const Breed = require('./Breed');
+const WalkRecord = require('./WalkRecord');
+const MarkingPhotozone = require('./MarkingPhotozone');
+const MarkingPhoto = require('./MarkingPhoto');
+const Course = require('./Course');
+const CourseFeature = require('./CourseFeature');
 const Term = require('./Term');
+
+// 연결 테이블들
 const UserTermAgreement = require('./UserTermAgreement');
+const CourseCourseFeature = require('./CourseCourseFeature');
+const CourseLocationAssociation = require('./CourseLocationAssociation');
+const WalkRecordMarkingPhotozone = require('./WalkRecordMarkingPhotozone');
 
-// User와 Course 관계
-User.hasMany(Course, {
-  foreignKey: 'creator_id',
-  as: 'createdCourses'
-});
-Course.belongsTo(User, {
-  foreignKey: 'creator_id',
-  as: 'creator'
-});
+// ====== ERD 기준 관계 설정 ======
 
-// User와 CourseReport 관계
-User.hasMany(CourseReport, {
-  foreignKey: 'user_id',
-  as: 'courseReports'
-});
-CourseReport.belongsTo(User, {
-  foreignKey: 'user_id',
-  as: 'reporter'
-});
-
-// Course와 CourseReport 관계
-Course.hasMany(CourseReport, {
-  foreignKey: 'course_id',
-  as: 'reports'
-});
-CourseReport.belongsTo(Course, {
-  foreignKey: 'course_id',
-  as: 'course'
-});
-
-// Course와 CourseFeatureMapping 관계
-Course.hasMany(CourseFeatureMapping, {
-  foreignKey: 'course_id',
-  as: 'featureMappings'
-});
-CourseFeatureMapping.belongsTo(Course, {
-  foreignKey: 'course_id',
-  as: 'course'
-});
-
-// CourseFeature와 CourseFeatureMapping 관계
-CourseFeature.hasMany(CourseFeatureMapping, {
-  foreignKey: 'feature_id',
-  as: 'courseMappings'
-});
-CourseFeatureMapping.belongsTo(CourseFeature, {
-  foreignKey: 'feature_id',
-  as: 'feature'
-});
-
-// Course와 CourseFeature Many-to-Many 관계
-Course.belongsToMany(CourseFeature, {
-  through: CourseFeatureMapping,
-  foreignKey: 'course_id',
-  otherKey: 'feature_id',
-  as: 'features'
-});
-CourseFeature.belongsToMany(Course, {
-  through: CourseFeatureMapping,
-  foreignKey: 'feature_id',
-  otherKey: 'course_id',
-  as: 'courses'
-});
-
-// User와 Walk 관계
-User.hasMany(Walk, {
-  foreignKey: 'user_id',
-  as: 'walks'
-});
-Walk.belongsTo(User, {
-  foreignKey: 'user_id',
-  as: 'user'
-});
-
-// Course와 Walk 관계
-Course.hasMany(Walk, {
-  foreignKey: 'course_id',
-  as: 'walks'
-});
-Walk.belongsTo(Course, {
-  foreignKey: 'course_id',
-  as: 'course'
-});
-
-// Walk과 WalkPhoto 관계
-Walk.hasMany(WalkPhoto, {
-  foreignKey: 'walk_id',
-  as: 'photos'
-});
-WalkPhoto.belongsTo(Walk, {
-  foreignKey: 'walk_id',
-  as: 'walk'
-});
-
-// Course와 MarkingPhotozone 관계
-Course.hasMany(MarkingPhotozone, {
-  foreignKey: 'course_id',
-  as: 'markingPhotozones'
-});
-MarkingPhotozone.belongsTo(Course, {
-  foreignKey: 'course_id',
-  as: 'course'
-});
-
-// MarkingPhotozone과 PhotozonePhoto 관계
-MarkingPhotozone.hasMany(PhotozonePhoto, {
-  foreignKey: 'marking_photozone_id',
-  as: 'photos'
-});
-PhotozonePhoto.belongsTo(MarkingPhotozone, {
-  foreignKey: 'marking_photozone_id',
-  as: 'markingPhotozone'
-});
-
-// User와 PhotozonePhoto 관계
-User.hasMany(PhotozonePhoto, {
-  foreignKey: 'user_id',
-  as: 'photozonePhotos'
-});
-PhotozonePhoto.belongsTo(User, {
-  foreignKey: 'user_id',
-  as: 'user'
-});
-
-// Walk과 PhotozonePhoto 관계
-Walk.hasMany(PhotozonePhoto, {
-  foreignKey: 'walk_id',
-  as: 'photozonePhotos'
-});
-PhotozonePhoto.belongsTo(Walk, {
-  foreignKey: 'walk_id',
-  as: 'walk'
-});
-
-// User와 Location 관계 (선호 위치)
+// User - Location (N:1, preferredLocationId)
 User.belongsTo(Location, {
-  foreignKey: 'preferred_location_id',
+  foreignKey: 'preferredLocationId',
   as: 'preferredLocation'
 });
 Location.hasMany(User, {
-  foreignKey: 'preferred_location_id',
+  foreignKey: 'preferredLocationId',
   as: 'users'
 });
 
-// User와 Term 관계 (Many-to-Many through UserTermAgreement)
+// User - Breed (N:1, breedId)
+User.belongsTo(Breed, {
+  foreignKey: 'breedId',
+  as: 'breed'
+});
+Breed.hasMany(User, {
+  foreignKey: 'breedId',
+  as: 'users'
+});
+
+// User - Term (N:M through UserTermAgreement)
 User.belongsToMany(Term, {
   through: UserTermAgreement,
-  foreignKey: 'user_id',
-  otherKey: 'term_id',
+  foreignKey: 'userId',
+  otherKey: 'termId',
   as: 'agreedTerms'
 });
 Term.belongsToMany(User, {
   through: UserTermAgreement,
-  foreignKey: 'term_id',
-  otherKey: 'user_id',
+  foreignKey: 'termId',
+  otherKey: 'userId',
   as: 'users'
 });
 
-// User와 UserTermAgreement 관계
-User.hasMany(UserTermAgreement, {
-  foreignKey: 'user_id',
-  as: 'termAgreements'
+// User - WalkRecord (1:N)
+User.hasMany(WalkRecord, {
+  foreignKey: 'userId',
+  as: 'walkRecords'
 });
-UserTermAgreement.belongsTo(User, {
-  foreignKey: 'user_id',
+WalkRecord.belongsTo(User, {
+  foreignKey: 'userId',
   as: 'user'
 });
 
-// Term과 UserTermAgreement 관계
-Term.hasMany(UserTermAgreement, {
-  foreignKey: 'term_id',
-  as: 'userAgreements'
+// User - Course (1:N, creatorUserId)
+User.hasMany(Course, {
+  foreignKey: 'creatorUserId',
+  as: 'createdCourses'
 });
-UserTermAgreement.belongsTo(Term, {
-  foreignKey: 'term_id',
-  as: 'term'
+Course.belongsTo(User, {
+  foreignKey: 'creatorUserId',
+  as: 'creator'
 });
 
-// 모델 객체 내보내기
+// User - MarkingPhoto (1:N)
+User.hasMany(MarkingPhoto, {
+  foreignKey: 'userId',
+  as: 'markingPhotos'
+});
+MarkingPhoto.belongsTo(User, {
+  foreignKey: 'userId',
+  as: 'user'
+});
+
+// Course - WalkRecord (1:N)
+Course.hasMany(WalkRecord, {
+  foreignKey: 'courseId',
+  as: 'walkRecords'
+});
+WalkRecord.belongsTo(Course, {
+  foreignKey: 'courseId',
+  as: 'course'
+});
+
+// Course - MarkingPhotozone (1:N)
+Course.hasMany(MarkingPhotozone, {
+  foreignKey: 'courseId',
+  as: 'markingPhotozones'
+});
+MarkingPhotozone.belongsTo(Course, {
+  foreignKey: 'courseId',
+  as: 'course'
+});
+
+// MarkingPhotozone - MarkingPhoto (1:N)
+MarkingPhotozone.hasMany(MarkingPhoto, {
+  foreignKey: 'photozoneId',
+  as: 'markingPhotos'
+});
+MarkingPhoto.belongsTo(MarkingPhotozone, {
+  foreignKey: 'photozoneId',
+  as: 'photozone'
+});
+
+// Course - CourseFeature (N:M through CourseCourseFeature)
+Course.belongsToMany(CourseFeature, {
+  through: CourseCourseFeature,
+  foreignKey: 'courseId',
+  otherKey: 'featureId',
+  as: 'features'
+});
+CourseFeature.belongsToMany(Course, {
+  through: CourseCourseFeature,
+  foreignKey: 'featureId',
+  otherKey: 'courseId',
+  as: 'courses'
+});
+
+// Course - Location (N:M through CourseLocationAssociation)
+Course.belongsToMany(Location, {
+  through: CourseLocationAssociation,
+  foreignKey: 'courseId',
+  otherKey: 'locationId',
+  as: 'locations'
+});
+Location.belongsToMany(Course, {
+  through: CourseLocationAssociation,
+  foreignKey: 'locationId',
+  otherKey: 'courseId',
+  as: 'courses'
+});
+
+// WalkRecord - MarkingPhotozone (N:M through WalkRecordMarkingPhotozone)
+WalkRecord.belongsToMany(MarkingPhotozone, {
+  through: WalkRecordMarkingPhotozone,
+  foreignKey: 'walkRecordId',
+  otherKey: 'photozoneId',
+  as: 'markingPhotozones'
+});
+MarkingPhotozone.belongsToMany(WalkRecord, {
+  through: WalkRecordMarkingPhotozone,
+  foreignKey: 'photozoneId',
+  otherKey: 'walkRecordId',
+  as: 'walkRecords'
+});
+
+// ====== 모델 내보내기 ======
 const models = {
+  // 주 엔티티
   User,
-  Course,
-  CourseReport,
-  CourseFeature,
-  CourseFeatureMapping,
-  Walk,
-  WalkPhoto,
-  MarkingPhotozone,
-  PhotozonePhoto,
   Location,
   Breed,
+  WalkRecord,
+  MarkingPhotozone,
+  MarkingPhoto,
+  Course,
+  CourseFeature,
   Term,
+  
+  // 연결 테이블
   UserTermAgreement,
+  CourseCourseFeature,
+  CourseLocationAssociation,
+  WalkRecordMarkingPhotozone,
+  
+  // Sequelize 인스턴스
   sequelize
 };
 

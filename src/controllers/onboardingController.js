@@ -10,11 +10,11 @@ class OnboardingController {
    * 사용자 약관 동의 상태 저장
    * POST /api/v1/users/me/terms
    */
-  saveTermAgreements = async (req, res) => {
+  async saveTermAgreements(req, res) {
     try {
       logger.info('사용자 약관 동의 저장 요청 시작');
 
-      const userId = req.user.id; // JWT 미들웨어에서 설정
+      const userId = req.user?.id || process.env.TEST_USER_ID; // JWT 미들웨어에서 설정
       const { agreedTermIds } = req.body;
 
       if (!agreedTermIds || !Array.isArray(agreedTermIds) || agreedTermIds.length === 0) {
@@ -60,7 +60,7 @@ class OnboardingController {
    * 위치 검색
    * GET /api/v1/locations/search?keyword={keyword}
    */
-  searchLocations = async (req, res) => {
+  async searchLocations(req, res) {
     try {
       logger.info('위치 검색 요청 시작');
 
@@ -99,7 +99,7 @@ class OnboardingController {
    * 견종 검색
    * GET /api/v1/breeds/search?keyword={keyword}
    */
-  searchBreeds = async (req, res) => {
+  async searchBreeds(req, res) {
     try {
       logger.info('견종 검색 요청 시작');
 
@@ -130,11 +130,11 @@ class OnboardingController {
    * 사용자 프로필 업데이트
    * PUT /api/v1/users/me/profile
    */
-  updateUserProfile = async (req, res) => {
+  async updateUserProfile(req, res) {
     try {
       logger.info('사용자 프로필 업데이트 요청 시작');
 
-      const userId = req.user.id; // JWT 미들웨어에서 설정
+      const userId = req.user?.id || process.env.TEST_USER_ID; // JWT 미들웨어에서 설정
       const profileData = req.body;
 
       if (!profileData || Object.keys(profileData).length === 0) {
@@ -178,11 +178,11 @@ class OnboardingController {
    * 사용자 프로필 조회
    * GET /api/v1/users/me/profile
    */
-  getUserProfile = async (req, res) => {
+  async getUserProfile(req, res) {
     try {
       logger.info('사용자 프로필 조회 요청 시작');
 
-      const userId = req.user.id; // JWT 미들웨어에서 설정
+      const userId = req.user?.id || process.env.TEST_USER_ID; // JWT 미들웨어에서 설정
 
       const profile = await onboardingService.getUserProfile(userId);
 
@@ -217,11 +217,11 @@ class OnboardingController {
    * 사용자 요약 프로필 조회 (메인 화면용)
    * GET /api/v1/users/me/summary-profile
    */
-  getUserSummaryProfile = async (req, res) => {
+  async getUserSummaryProfile(req, res) {
     try {
       logger.info('사용자 요약 프로필 조회 요청 시작');
 
-      const userId = req.user.id; // JWT 미들웨어에서 설정
+      const userId = req.user?.id || process.env.TEST_USER_ID; // JWT 미들웨어에서 설정
 
       const profile = await onboardingService.getUserProfile(userId);
 

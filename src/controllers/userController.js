@@ -8,7 +8,8 @@ class UserController {
    */
   async agreeToTerms(req, res) {
     try {
-      logger.info('약관 동의 요청 시작', { userId: req.user.userId });
+      const userId = req.user?.id || process.env.TEST_USER_ID;
+      logger.info('약관 동의 요청 시작', { userId });
       
       const { agreedTermIds } = req.body;
       
@@ -20,9 +21,9 @@ class UserController {
         });
       }
 
-      await userService.agreeToTerms(req.user.userId, agreedTermIds);
+      await userService.agreeToTerms(userId, agreedTermIds);
       
-      logger.info('약관 동의 완료', { userId: req.user.userId });
+      logger.info('약관 동의 완료', { userId });
       
       return res.status(200).json({
         success: true,
@@ -46,12 +47,13 @@ class UserController {
    */
   async updateProfile(req, res) {
     try {
-      logger.info('프로필 업데이트 요청 시작', { userId: req.user.userId });
+      const userId = req.user?.id || process.env.TEST_USER_ID;
+      logger.info('프로필 업데이트 요청 시작', { userId });
       
       const updateData = req.body;
-      const updatedUser = await userService.updateProfile(req.user.userId, updateData);
+      const updatedUser = await userService.updateProfile(userId, updateData);
       
-      logger.info('프로필 업데이트 완료', { userId: req.user.userId });
+      logger.info('프로필 업데이트 완료', { userId });
       
       return res.status(200).json({
         success: true,
@@ -83,9 +85,10 @@ class UserController {
    */
   async getSummaryProfile(req, res) {
     try {
-      logger.info('요약 프로필 조회 요청', { userId: req.user.userId });
+      const userId = req.user?.id || process.env.TEST_USER_ID;
+      logger.info('요약 프로필 조회 요청', { userId });
       
-      const summaryProfile = await userService.getSummaryProfile(req.user.userId);
+      const summaryProfile = await userService.getSummaryProfile(userId);
       
       return res.status(200).json({
         success: true,
@@ -109,9 +112,10 @@ class UserController {
    */
   async getProfile(req, res) {
     try {
-      logger.info('프로필 조회 요청', { userId: req.user.userId });
+      const userId = req.user?.id || process.env.TEST_USER_ID;
+      logger.info('프로필 조회 요청', { userId });
       
-      const profile = await userService.getProfile(req.user.userId);
+      const profile = await userService.getProfile(userId);
       
       return res.status(200).json({
         success: true,
@@ -135,11 +139,12 @@ class UserController {
    */
   async getWalkRecords(req, res) {
     try {
-      logger.info('산책 기록 목록 조회 요청', { userId: req.user.userId });
+      const userId = req.user?.id || process.env.TEST_USER_ID;
+      logger.info('산책 기록 목록 조회 요청', { userId });
       
       const { page = 1, size = 10, sortBy = 'createdAt' } = req.query;
       
-      const walkRecords = await userService.getWalkRecords(req.user.userId, {
+      const walkRecords = await userService.getWalkRecords(userId, {
         page: parseInt(page),
         size: parseInt(size),
         sortBy

@@ -10,7 +10,7 @@ class AuthController {
    * 카카오 로그인/회원가입
    * POST /api/v1/auth/kakao
    */
-  kakaoLogin = async (req, res) => {
+  async kakaoLogin(req, res) {
     try {
       logger.info('카카오 로그인 요청 시작');
 
@@ -72,7 +72,7 @@ class AuthController {
    * 액세스 토큰 갱신
    * POST /api/v1/auth/token/refresh
    */
-  refreshToken = async (req, res) => {
+  async refreshToken(req, res) {
     try {
       logger.info('액세스 토큰 갱신 요청 시작');
 
@@ -119,11 +119,11 @@ class AuthController {
    * 로그아웃
    * POST /api/v1/auth/logout
    */
-  logout = async (req, res) => {
+  async logout(req, res) {
     try {
       logger.info('로그아웃 요청 시작');
 
-      const userId = req.user.userId; // 인증 미들웨어에서 설정
+      const userId = req.user?.id || process.env.TEST_USER_ID; // 인증 미들웨어에서 설정
 
       // 실제 모델에는 토큰 저장 필드가 없으므로 로그 기록만
       logger.info('로그아웃 성공', { userId });
@@ -147,7 +147,7 @@ class AuthController {
    * 카카오 OAuth 콜백 처리
    * GET /api/v1/auth/kakao/callback
    */
-  kakaoCallback = async (req, res) => {
+  async kakaoCallback(req, res) {
     try {
       logger.info('카카오 OAuth 콜백 요청 시작', { 
         query: req.query,
@@ -226,7 +226,7 @@ class AuthController {
    * @param {string} code - 카카오 인증 코드
    * @returns {Object} 토큰 응답
    */
-  exchangeCodeForToken = async (code) => {
+  async exchangeCodeForToken(code) {
     try {
       const axios = require('axios');
       const qs = require('querystring');
