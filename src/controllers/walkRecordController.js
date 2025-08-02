@@ -412,6 +412,29 @@ async getDetails(req, res) {
   }
 },
 
+// ===== 라우터 매핑용 함수들 =====
+// 라우터에서 요구하는 함수명으로 기존 함수들을 매핑
+
+// POST /api/v1/walk-records - 산책 기록 시작
+startWalkRecord: async function(req, res) {
+  return this.startWalk(req, res);
+},
+
+// PUT /api/v1/walk-records/{walk_record_id}/end - 산책 기록 최종 종료
+endWalkRecord: async function(req, res) {
+  return this.endWalk(req, res);
+},
+
+// PUT /api/v1/walk-records/{walk_record_id}/score - 꼬리콥터 점수 저장
+updateScore: async function(req, res) {
+  return this.updateTailcopterScore(req, res);
+},
+
+// POST /api/v1/walk-records/{walk_record_id}/save - 산책 기록 최종 저장 확정
+saveRecord: async function(req, res) {
+  return this.saveWalkRecord(req, res);
+},
+
 };
 
 module.exports = walkRecordController;
