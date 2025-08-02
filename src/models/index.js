@@ -191,9 +191,15 @@ module.exports = {
   Course,
   CourseFeature,
   Term,
+  
+  // 연결 테이블
   UserTermAgreement,
   CourseCourseFeature,
   CourseLocationAssociation,
   WalkRecordMarkingPhotozone,
-  setupAssociations
+  
+  // Sequelize 인스턴스
+  sequelize
 };
+
+module.exports = models;

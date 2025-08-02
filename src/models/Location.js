@@ -2,23 +2,25 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 
 const Location = sequelize.define('Location', {
-  locationId: {
+  id: {
     type: DataTypes.UUID,
-    primaryKey: true,
     defaultValue: DataTypes.UUIDV4,
-    allowNull: false,
-    comment: '위치 고유 ID'
+    primaryKey: true,
+    allowNull: false
   },
-  addressName: {
-    type: DataTypes.STRING,
+  
+  address_name: {
+    type: DataTypes.STRING(200),
     allowNull: false,
     comment: '지번/도로명 주소'
   },
+  
   latitude: {
     type: DataTypes.DECIMAL(10, 8),
     allowNull: false,
     comment: '위도'
   },
+  
   longitude: {
     type: DataTypes.DECIMAL(11, 8),
     allowNull: false,
@@ -30,22 +32,26 @@ const Location = sequelize.define('Location', {
     comment: '동네 이름',
     field: 'area_name'
   },
+  
   city: {
-    type: DataTypes.STRING,
-    allowNull: false,
+    type: DataTypes.STRING(50),
+    allowNull: true,
     comment: '시/군/구'
   },
+  
   province: {
-    type: DataTypes.STRING,
-    allowNull: false,
+    type: DataTypes.STRING(50),
+    allowNull: true,
     comment: '도/특별시'
   },
-  createdAt: {
+  
+  created_at: {
     type: DataTypes.DATE,
     allowNull: false,
     defaultValue: DataTypes.NOW
   },
-  updatedAt: {
+  
+  updated_at: {
     type: DataTypes.DATE,
     allowNull: false,
     defaultValue: DataTypes.NOW
@@ -53,19 +59,17 @@ const Location = sequelize.define('Location', {
 }, {
   tableName: 'locations',
   timestamps: true,
-  comment: '위치 정보 테이블',
+  createdAt: 'created_at',
+  updatedAt: 'updated_at',
   indexes: [
+    {
+      fields: ['address_name']
+    },
     {
       fields: ['area_name']
     },
     {
       fields: ['city']
-    },
-    {
-      fields: ['province']
-    },
-    {
-      fields: ['latitude', 'longitude']
     }
   ]
 });

@@ -2,79 +2,70 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 
 const User = sequelize.define('User', {
-  userId: {
+  id: {
     type: DataTypes.UUID,
-    primaryKey: true,
     defaultValue: DataTypes.UUIDV4,
+    primaryKey: true,
     allowNull: false,
     comment: '사용자 고유 ID',
     field: 'user_id'
   },
-  socialId: {
-    type: DataTypes.STRING,
+  
+  // OAuth 인증 (필수)
+  oauth_provider: {
+    type: DataTypes.STRING(20),
     allowNull: false,
     unique: true,
     comment: '카카오에서 제공하는 사용자 고유 ID',
     field: 'social_id'
   },
-  socialType: {
-    type: DataTypes.ENUM('KAKAO'),
-    allowNull: false,
-    defaultValue: 'KAKAO',
-    comment: '소셜 로그인 타입'
+  oauth_id: {
+    type: DataTypes.STRING(100),
+    allowNull: false
   },
-  accessToken: {
-    type: DataTypes.TEXT,
+  
+  // 반려견 정보 (모두 선택사항!)
+  dog_name: {
+    type: DataTypes.STRING(100),
+    allowNull: true
+  },
+  dog_breed: {
+    type: DataTypes.STRING(100),
+    allowNull: true
+  },
+  dog_birth_year: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
+  dog_size: {
+    type: DataTypes.STRING(20),
     allowNull: true,
-    comment: '서비스 자체 JWT 액세스 토큰'
+    validate: {
+      isIn: [['소형', '중형', '대형']]
+    }
   },
-  refreshToken: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-    comment: '서비스 자체 JWT 리프레시 토큰'
+  dog_image: {
+    type: DataTypes.STRING(500),
+    allowNull: true
   },
-  isTermsAgreed: {
-    type: DataTypes.BOOLEAN,
-    allowNull: false,
-    defaultValue: false,
-    comment: '약관 동의 여부'
-  },
-  preferredLocationId: {
+  
+  // 선호 위치 정보
+  preferred_location_id: {
     type: DataTypes.UUID,
     allowNull: true,
-    comment: '선호 위치 ID (온보딩 후 설정 또는 변경 가능)'
+    references: {
+      model: 'locations',
+      key: 'id'
+    },
+    comment: '선호 위치 ID'
   },
-  petName: {
-    type: DataTypes.STRING,
-    allowNull: true,
-    comment: '반려동물 이름'
-  },
-  breedId: {
-    type: DataTypes.UUID,
-    allowNull: true,
-    comment: '견종 ID'
-  },
-  petBirthDate: {
-    type: DataTypes.DATEONLY,
-    allowNull: true,
-    comment: '반려동물 생년월일'
-  },
-  petSize: {
-    type: DataTypes.ENUM('SMALL', 'MEDIUM', 'LARGE'),
-    allowNull: true,
-    comment: '반려동물 크기'
-  },
-  petProfileImageUrl: {
-    type: DataTypes.STRING,
-    allowNull: true,
-    comment: '반려동물 프로필 아이콘 URL'
-  },
-  createdAt: {
+  
+  created_at: {
     type: DataTypes.DATE,
     allowNull: false,
     defaultValue: DataTypes.NOW
   },
-  updatedAt: {
+  updated_at: {
     type: DataTypes.DATE,
     allowNull: false,
     defaultValue: DataTypes.NOW
@@ -82,7 +73,8 @@ const User = sequelize.define('User', {
 }, {
   tableName: 'users',
   timestamps: true,
-  comment: '사용자 및 반려동물 정보 통합 테이블',
+  createdAt: 'created_at',
+  updatedAt: 'updated_at',
   indexes: [
     {
       unique: true,

@@ -2,45 +2,53 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 
 const Term = sequelize.define('Term', {
-  termId: {
+  id: {
     type: DataTypes.UUID,
-    primaryKey: true,
     defaultValue: DataTypes.UUIDV4,
-    allowNull: false,
-    comment: '약관 고유 ID'
+    primaryKey: true,
+    allowNull: false
   },
+  
   title: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(200),
     allowNull: false,
     comment: '약관 제목'
   },
+  
   content: {
     type: DataTypes.TEXT,
     allowNull: false,
     comment: '약관 내용'
   },
-  isRequired: {
+  
+  is_required: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
     defaultValue: true,
     comment: '필수 약관 여부'
   },
+  
   version: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(10),
     allowNull: false,
+    defaultValue: '1.0',
     comment: '약관 버전'
   },
-  effectiveDate: {
+  
+  effective_date: {
     type: DataTypes.DATE,
     allowNull: false,
-    comment: '약관 시행일'
+    defaultValue: DataTypes.NOW,
+    comment: '시행일'
   },
-  createdAt: {
+  
+  created_at: {
     type: DataTypes.DATE,
     allowNull: false,
     defaultValue: DataTypes.NOW
   },
-  updatedAt: {
+  
+  updated_at: {
     type: DataTypes.DATE,
     allowNull: false,
     defaultValue: DataTypes.NOW
@@ -48,7 +56,8 @@ const Term = sequelize.define('Term', {
 }, {
   tableName: 'terms',
   timestamps: true,
-  comment: '이용약관 테이블',
+  createdAt: 'created_at',
+  updatedAt: 'updated_at',
   indexes: [
     {
       fields: ['is_required']

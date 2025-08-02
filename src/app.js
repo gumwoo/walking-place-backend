@@ -4,6 +4,7 @@ const helmet = require('helmet');
 const compression = require('compression');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const passport = require('passport');
 const path = require('path');
 
 const logger = require('./config/logger');
@@ -13,13 +14,8 @@ const { setupSwagger } = require('./config/swagger'); // Swagger 설정
 const { errorHandler, notFoundHandler } = require('./middlewares/errorHandler'); // 에러 핸들러
 require('./config/passport'); // Passport 설정
 
-// 라우터 import (나중에 생성할 예정)
-// const authRoutes = require('./routes/auth');
-// const userRoutes = require('./routes/users');
-// const courseRoutes = require('./routes/courses');
-// const walkRoutes = require('./routes/walks');
-// const photoRoutes = require('./routes/photos');
-// const markingSpotRoutes = require('./routes/markingSpots');
+// 라우터 import
+const routes = require('./routes');
 
 const app = express();
 
@@ -54,6 +50,11 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+
+// Passport 미들웨어
+app.use(passport.initialize());
+
+app.use(passport.initialize());
 // 정적 파일 서빙 (업로드된 이미지)
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
@@ -69,16 +70,8 @@ app.use('/api/', limiter);
 setupSwagger(app);
 
 // API 라우트
-const apiRoutes = require('./routes');
-app.use('/api', apiRoutes);
-
-// API 라우트 (나중에 활성화)
-// app.use('/api/auth', authRoutes);
-// app.use('/api/users', userRoutes);
-// app.use('/api/courses', courseRoutes);
-// app.use('/api/walks', walkRoutes);
-// app.use('/api/photos', photoRoutes);
-// app.use('/api/marking-spots', markingSpotRoutes);
+app.use('/api/v1', routes);
+app.use('/api/v1', routes);
 
 // 헬스 체크 엔드포인트
 app.get('/health', (req, res) => {

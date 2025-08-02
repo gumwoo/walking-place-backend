@@ -2,30 +2,32 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 
 const Breed = sequelize.define('Breed', {
-  breedId: {
+  id: {
     type: DataTypes.UUID,
-    primaryKey: true,
     defaultValue: DataTypes.UUIDV4,
-    allowNull: false,
-    comment: '견종 고유 ID'
+    primaryKey: true,
+    allowNull: false
   },
+  
   name: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(100),
     allowNull: false,
-    unique: true,
     comment: '견종명'
   },
-  iconUrl: {
-    type: DataTypes.STRING,
+  
+  icon_url: {
+    type: DataTypes.STRING(500),
     allowNull: true,
     comment: '견종별 프로필 아이콘 URL'
   },
-  createdAt: {
+  
+  created_at: {
     type: DataTypes.DATE,
     allowNull: false,
     defaultValue: DataTypes.NOW
   },
-  updatedAt: {
+  
+  updated_at: {
     type: DataTypes.DATE,
     allowNull: false,
     defaultValue: DataTypes.NOW
@@ -33,10 +35,10 @@ const Breed = sequelize.define('Breed', {
 }, {
   tableName: 'breeds',
   timestamps: true,
-  comment: '견종 정보 테이블',
+  createdAt: 'created_at',
+  updatedAt: 'updated_at',
   indexes: [
     {
-      unique: true,
       fields: ['name']
     }
   ]
