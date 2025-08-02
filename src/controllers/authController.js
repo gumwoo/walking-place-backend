@@ -123,7 +123,7 @@ class AuthController {
     try {
       logger.info('로그아웃 요청 시작');
 
-      const userId = req.user?.id || process.env.TEST_USER_ID; // 인증 미들웨어에서 설정
+      const userId = req.user?.userId || process.env.TEST_USER_ID; // 인증 미들웨어에서 설정
 
       // 실제 모델에는 토큰 저장 필드가 없으므로 로그 기록만
       logger.info('로그아웃 성공', { userId });

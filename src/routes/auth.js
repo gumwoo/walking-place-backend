@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
-const { authenticateJWT } = require('../middlewares/auth');
+const { authenticateToken } = require('../middlewares/auth');
 
 // POST /api/v1/auth/kakao - 카카오 로그인/회원가입
 router.post('/kakao', authController.kakaoLogin);
@@ -13,6 +13,6 @@ router.get('/kakao/callback', authController.kakaoCallback);
 router.post('/token/refresh', authController.refreshToken);
 
 // POST /api/v1/auth/logout - 로그아웃
-router.post('/logout', authenticateJWT, authController.logout);
+router.post('/logout', authenticateToken, authController.logout);
 
 module.exports = router;
