@@ -1,86 +1,178 @@
-const fs = require('fs');
-const path = require('path');
+const breedService = require('../services/breedService');
+const logger = require('../config/logger');
 
 /**
- * ✅ [GET] /api/v1/breeds?search=...
- * 전체 견종 목록 조회 (검색어 필터 포함)
+ * 견종 관련 컨트롤러
+ * API 스펙 기준으로 구현
  */
-const getAllBreeds = async (req, res) => {
-  try {
-    const { search } = req.query;
+class BreedController {
 
-    const filePath = path.join(__dirname, '../dog-breed-crawler/korean_dog_breeds.json');
-
-    if (!search || search.trim() === '') {
-      return res.status(400).json({
-        success: false,
-        message: '검색어(search)를 입력해주세요.',
-        code: 'MISSING_QUERY'
-      });
-    }
-
-    // 파일 존재 여부 확인
-    if (!fs.existsSync(filePath)) {
-      return res.status(500).json({
-        success: false,
-        message: '견종 정보 파일이 존재하지 않습니다.',
-        code: 'FILE_NOT_FOUND'
-      });
-    }
-
-    // 파일 읽기
-    const rawData = fs.readFileSync(filePath, 'utf8');
-
-    // JSON 파싱
-    let breedData;
+  /**
+   * 견종 검색
+   * GET /api/v1/breeds/search?keyword={keyword}
+   */
+  async searchBreeds(req, res) {
     try {
-      breedData = JSON.parse(rawData);
-    } catch (parseErr) {
-      return res.status(500).json({
-        success: false,
-        message: '견종 정보 파싱에 실패했습니다.',
-        code: 'JSON_PARSE_ERROR'
-      });
-    }
-
-    // 데이터 유효성 확인
-    if (!breedData || !Array.isArray(breedData.all_breeds)) {
-      return res.status(500).json({
-        success: false,
-        message: '올바르지 않은 견종 데이터 형식입니다.',
-        code: 'INVALID_DATA_FORMAT'
-      });
-    }
-
-    // 검색어 적용
-    let filteredBreeds = breedData.all_breeds;
-    if (search && search.trim() !== '') {
-      const keyword = search.trim().toLowerCase();
-      filteredBreeds = filteredBreeds.filter(breed =>
-        breed.toLowerCase().includes(keyword)
-      );
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: '견종 목록 조회 성공',
-      data: {
-        total: filteredBreeds.length,
-        breeds: filteredBreeds
+      logger.info('견종 검색 요청 시작');
+      
+      const { keyword } = req.query;
+      
+      if (!keyword || keyword.trim().length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: '검색 키워드가 필요합니다.',
+          code: 'MISSING_KEYWORD'
+        });
       }
-    });
 
-  } catch (err) {
-    console.error('견종 정보 조회 실패:', err);
-    return res.status(500).json({
-      success: false,
-      message: '견종 정보를 불러오는 중 알 수 없는 오류가 발생했습니다.',
-      code: 'INTERNAL_SERVER_ERROR',
-      error: err.message
-    });
+      if (keyword.length < 1) {
+        return res.status(400).json({
+          success: false,
+          message: '검색 키워드는 최소 1자 이상 입력해주세요.',
+          code: 'KEYWORD_TOO_SHORT'
+        });
+      }
+
+      const breeds = await breedService.searchBreeds(keyword);
+      
+      logger.info('견종 검색 성공', { 
+        keyword,
+        count: breeds.length 
+      });
+      
+      return res.status(200).json({
+        success: true,
+        message: '견종 검색을 성공적으로 완료했습니다.',
+        data: breeds
+      });
+
+    } catch (error) {
+      logger.error('견종 검색 실패:', error);
+      
+      return res.status(500).json({
+        success: false,
+        message: '견종 검색 중 오류가 발생했습니다.',
+        code: 'BREED_SEARCH_ERROR'
+      });
+    }
   }
-};
 
-module.exports = {
-  getAllBreeds
-};
+  /**
+   * 전체 견종 목록 조회
+   * GET /api/v1/breeds
+   */
+  async getAllBreeds(req, res) {
+    try {
+      logger.info('전체 견종 목록 조회 요청 시작');
+      
+      const { page = 1, size = 50 } = req.query;
+
+      const result = await breedService.getAllBreeds({
+        page: parseInt(page),
+        size: parseInt(size)
+      });
+      
+      logger.info('전체 견종 목록 조회 성공', { 
+        count: result.breeds.length,
+        totalCount: result.totalCount
+      });
+      
+      return res.status(200).json({
+        success: true,
+        message: '전체 견종 목록을 성공적으로 조회했습니다.',
+        data: result
+      });
+
+    } catch (error) {
+      logger.error('전체 견종 목록 조회 실패:', error);
+      
+      return res.status(500).json({
+        success: false,
+        message: '전체 견종 목록 조회 중 오류가 발생했습니다.',
+        code: 'ALL_BREEDS_ERROR'
+      });
+    }
+  }
+
+  /**
+   * 특정 견종 상세 정보 조회
+   * GET /api/v1/breeds/{breedId}
+   */
+  async getBreedDetails(req, res) {
+    try {
+      logger.info('견종 상세 정보 조회 요청 시작');
+      
+      const { breedId } = req.params;
+      
+      if (!breedId) {
+        return res.status(400).json({
+          success: false,
+          message: '견종 ID가 필요합니다.',
+          code: 'MISSING_BREED_ID'
+        });
+      }
+
+      const breed = await breedService.getBreedById(breedId);
+      
+      logger.info('견종 상세 정보 조회 성공', { breedId });
+      
+      return res.status(200).json({
+        success: true,
+        message: '견종 상세 정보를 성공적으로 조회했습니다.',
+        data: breed
+      });
+
+    } catch (error) {
+      logger.error('견종 상세 정보 조회 실패:', error);
+      
+      if (error.message.includes('견종을 찾을 수 없습니다')) {
+        return res.status(404).json({
+          success: false,
+          message: error.message,
+          code: 'BREED_NOT_FOUND'
+        });
+      }
+      
+      return res.status(500).json({
+        success: false,
+        message: '견종 상세 정보 조회 중 오류가 발생했습니다.',
+        code: 'BREED_DETAILS_ERROR'
+      });
+    }
+  }
+
+  /**
+   * 인기 견종 목록 조회
+   * GET /api/v1/breeds/popular
+   */
+  async getPopularBreeds(req, res) {
+    try {
+      logger.info('인기 견종 목록 조회 요청 시작');
+      
+      const { limit = 10 } = req.query;
+
+      const breeds = await breedService.getPopularBreeds(parseInt(limit));
+      
+      logger.info('인기 견종 목록 조회 성공', { 
+        count: breeds.length
+      });
+      
+      return res.status(200).json({
+        success: true,
+        message: '인기 견종 목록을 성공적으로 조회했습니다.',
+        data: breeds
+      });
+
+    } catch (error) {
+      logger.error('인기 견종 목록 조회 실패:', error);
+      
+      return res.status(500).json({
+        success: false,
+        message: '인기 견종 목록 조회 중 오류가 발생했습니다.',
+        code: 'POPULAR_BREEDS_ERROR'
+      });
+    }
+  }
+}
+
+module.exports = new BreedController();
