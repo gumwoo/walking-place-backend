@@ -86,22 +86,22 @@ class UserController {
   async getSummaryProfile(req, res) {
     try {
       const userId = req.user?.id || process.env.TEST_USER_ID;
-      logger.info('요약 프로필 조회 요청', { userId });
-      
+
+      logger.info("요약 프로필 조회 요청", { userId });
+
       const summaryProfile = await userService.getSummaryProfile(userId);
-      
+
       return res.status(200).json({
         success: true,
-        data: summaryProfile
+        data: summaryProfile,
       });
-
     } catch (error) {
-      logger.error('요약 프로필 조회 실패:', error);
-      
+      logger.error("요약 프로필 조회 실패:", error);
+
       return res.status(500).json({
         success: false,
-        message: '프로필 정보 조회 중 오류가 발생했습니다.',
-        code: 'SUMMARY_PROFILE_ERROR'
+        message: "프로필 정보 조회 중 오류가 발생했습니다.",
+        code: "SUMMARY_PROFILE_ERROR",
       });
     }
   }
@@ -113,22 +113,21 @@ class UserController {
   async getProfile(req, res) {
     try {
       const userId = req.user?.id || process.env.TEST_USER_ID;
-      logger.info('프로필 조회 요청', { userId });
-      
+      logger.info("프로필 조회 요청", { userId });
+
       const profile = await userService.getProfile(userId);
-      
+
       return res.status(200).json({
         success: true,
-        data: profile
+        data: profile,
       });
-
     } catch (error) {
-      logger.error('프로필 조회 실패:', error);
-      
+      logger.error("프로필 조회 실패:", error);
+
       return res.status(500).json({
         success: false,
-        message: '프로필 정보 조회 중 오류가 발생했습니다.',
-        code: 'PROFILE_GET_ERROR'
+        message: "프로필 정보 조회 중 오류가 발생했습니다.",
+        code: "PROFILE_GET_ERROR",
       });
     }
   }
@@ -147,21 +146,20 @@ class UserController {
       const walkRecords = await userService.getWalkRecords(userId, {
         page: parseInt(page),
         size: parseInt(size),
-        sortBy
-      });
-      
-      return res.status(200).json({
-        success: true,
-        data: walkRecords
+        sortBy,
       });
 
+      return res.status(200).json({
+        success: true,
+        data: walkRecords,
+      });
     } catch (error) {
-      logger.error('산책 기록 목록 조회 실패:', error);
-      
+      logger.error("산책 기록 목록 조회 실패:", error);
+
       return res.status(500).json({
         success: false,
-        message: '산책 기록 조회 중 오류가 발생했습니다.',
-        code: 'WALK_RECORDS_GET_ERROR'
+        message: "산책 기록 조회 중 오류가 발생했습니다.",
+        code: "WALK_RECORDS_GET_ERROR",
       });
     }
   }

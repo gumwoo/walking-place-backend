@@ -1,8 +1,9 @@
 require('dotenv').config();
 const { app, connectDatabase } = require('./src/app');
 const logger = require('./src/config/logger');
-
 const PORT = process.env.PORT || 5000;
+
+console.log("✅ 실제 사용 포트:", PORT); // 이 줄 추가
 
 // 서버 시작 함수
 const startServer = async () => {
@@ -11,7 +12,7 @@ const startServer = async () => {
     await connectDatabase();
     
     // 서버 시작
-    const server = app.listen(PORT, () => {
+    const server = app.listen(PORT, '0.0.0.0', () => {
       logger.info(`🚀 서버가 포트 ${PORT}에서 실행 중입니다.`);
       logger.info(`🌍 환경: ${process.env.NODE_ENV || 'development'}`);
       logger.info(`📍 URL: http://localhost:${PORT}`);

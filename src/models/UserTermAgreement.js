@@ -54,14 +54,15 @@ const UserTermAgreement = sequelize.define('UserTermAgreement', {
   updatedAt: 'updated_at',
   indexes: [
     {
-      unique: true,
-      fields: ['user_id', 'term_id']
+      unique: true   
     },
-    {
       fields: ['user_id']
     },
     {
       fields: ['term_id']
+    },
+    {
+      fields: ['agreed_at']
     }
   ]
 });

@@ -20,10 +20,10 @@ const CourseCourseFeature = sequelize.define('CourseCourseFeature', {
   comment: '코스-특징 연결 테이블',
   indexes: [
     {
-      fields: ['courseId']
+      fields: ['course_id']
     },
     {
-      fields: ['featureId']
+      fields: ['feature_id']
     }
   ]
 });

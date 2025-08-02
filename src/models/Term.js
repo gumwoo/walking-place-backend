@@ -63,6 +63,9 @@ const Term = sequelize.define('Term', {
       fields: ['is_required']
     },
     {
+      fields: ['version']
+    },
+    {
       fields: ['effective_date']
     }
   ]

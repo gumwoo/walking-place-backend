@@ -117,3 +117,6 @@ coverage/
 
 # Local development
 .local
+
+# Test folder
+src/test/

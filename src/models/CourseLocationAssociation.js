@@ -18,7 +18,8 @@ const CourseLocationAssociation = sequelize.define('CourseLocationAssociation', 
     type: DataTypes.BOOLEAN,
     allowNull: false,
     defaultValue: false,
-    comment: '해당 위치가 코스 시작점인지 여부'
+    comment: '해당 위치가 코스 시작점인지 여부',
+    field: 'is_startpoint'
   }
 }, {
   tableName: 'course_location_associations',
@@ -26,13 +27,13 @@ const CourseLocationAssociation = sequelize.define('CourseLocationAssociation', 
   comment: '코스-위치 연관 테이블',
   indexes: [
     {
-      fields: ['courseId']
+      fields: ['course_id']
     },
     {
-      fields: ['locationId']
+      fields: ['location_id']
     },
     {
-      fields: ['isStartPoint']
+      fields: ['is_startpoint']
     }
   ]
 });

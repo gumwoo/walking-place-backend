@@ -26,11 +26,11 @@ const Location = sequelize.define('Location', {
     allowNull: false,
     comment: '경도'
   },
-  
-  area_name: {
-    type: DataTypes.STRING(100),
-    allowNull: true,
-    comment: '동네 이름'
+  areaName: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    comment: '동네 이름',
+    field: 'area_name'
   },
   
   city: {

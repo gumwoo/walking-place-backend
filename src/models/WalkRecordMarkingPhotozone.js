@@ -26,13 +26,13 @@ const WalkRecordMarkingPhotozone = sequelize.define('WalkRecordMarkingPhotozone'
   comment: '산책 기록-마킹 포토존 연결 테이블',
   indexes: [
     {
-      fields: ['walkRecordId']
+      fields: ['walk_record_id']
     },
     {
-      fields: ['photozoneId']
+      fields: ['photozone_id']
     },
     {
-      fields: ['visitedAt']
+      fields: ['visited_at']
     }
   ]
 });

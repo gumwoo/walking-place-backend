@@ -6,16 +6,18 @@ const User = sequelize.define('User', {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
-    allowNull: false
+    allowNull: false,
+    comment: '사용자 고유 ID',
+    field: 'user_id'
   },
   
   // OAuth 인증 (필수)
   oauth_provider: {
     type: DataTypes.STRING(20),
     allowNull: false,
-    validate: {
-      isIn: [['kakao', 'google']]
-    }
+    unique: true,
+    comment: '카카오에서 제공하는 사용자 고유 ID',
+    field: 'social_id'
   },
   oauth_id: {
     type: DataTypes.STRING(100),
@@ -76,7 +78,16 @@ const User = sequelize.define('User', {
   indexes: [
     {
       unique: true,
-      fields: ['oauth_provider', 'oauth_id']
+      fields: ['social_id']
+    },
+    {
+      fields: ['preferred_location_id']
+    },
+    {
+      fields: ['breed_id']
+    },
+    {
+      fields: ['created_at']
     }
   ]
 });

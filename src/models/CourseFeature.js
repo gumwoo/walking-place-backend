@@ -41,7 +41,7 @@ const CourseFeature = sequelize.define('CourseFeature', {
       fields: ['name']
     },
     {
-      fields: ['isCustom']
+      fields: ['is_custom']
     }
   ]
 });

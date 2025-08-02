@@ -77,22 +77,22 @@ const Course = sequelize.define('Course', {
   comment: '산책 코스 테이블',
   indexes: [
     {
-      fields: ['creatorUserId']
+      fields: ['creator_user_id']
     },
     {
       fields: ['difficulty']
     },
     {
-      fields: ['recommendedPetSize']
+      fields: ['recommended_pet_size']
     },
     {
-      fields: ['averageTailcopterScore']
+      fields: ['average_tailcopter_score']
     },
     {
-      fields: ['courseLengthMeters']
+      fields: ['course_length_meters']
     },
     {
-      fields: ['createdAt']
+      fields: ['created_at']
     }
   ]
 });

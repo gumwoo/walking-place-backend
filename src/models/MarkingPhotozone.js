@@ -46,16 +46,16 @@ const MarkingPhotozone = sequelize.define('MarkingPhotozone', {
   comment: '마킹 포토존 테이블',
   indexes: [
     {
-      fields: ['courseId']
+      fields: ['course_id']
     },
     {
-      fields: ['isRecommended']
+      fields: ['is_recommended']
     },
     {
       fields: ['latitude', 'longitude']
     },
     {
-      fields: ['createdAt']
+      fields: ['created_at']
     }
   ]
 });
