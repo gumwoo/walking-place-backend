@@ -125,55 +125,6 @@ class OnboardingController {
       });
     }
   }
-
-  /**
-   * 사용자 프로필 업데이트
-   * PUT /api/v1/users/me/profile
-   */
-  async updateUserProfile(req, res) {
-    try {
-      logger.info('사용자 프로필 업데이트 요청 시작');
-
-      const userId = req.user?.userId || process.env.TEST_USER_ID; // JWT 미들웨어에서 설정
-      const profileData = req.body;
-
-      if (!profileData || Object.keys(profileData).length === 0) {
-        return res.status(400).json({
-          success: false,
-          message: '업데이트할 프로필 데이터가 필요합니다.',
-          code: 'MISSING_PROFILE_DATA'
-        });
-      }
-
-      const updatedProfile = await onboardingService.updateUserProfile(userId, profileData);
-
-      logger.info('사용자 프로필 업데이트 성공', { userId });
-
-      return res.status(200).json({
-        success: true,
-        message: '프로필이 성공적으로 업데이트되었습니다.',
-        data: updatedProfile
-      });
-
-    } catch (error) {
-      logger.error('사용자 프로필 업데이트 실패:', error);
-
-      if (error.message.includes('사용자를 찾을 수 없습니다')) {
-        return res.status(404).json({
-          success: false,
-          message: '사용자를 찾을 수 없습니다.',
-          code: 'USER_NOT_FOUND'
-        });
-      }
-
-      return res.status(500).json({
-        success: false,
-        message: '프로필 업데이트 중 오류가 발생했습니다.',
-        code: 'PROFILE_UPDATE_ERROR'
-      });
-    }
-  }
-
   /**
    * 사용자 프로필 조회
    * GET /api/v1/users/me/profile

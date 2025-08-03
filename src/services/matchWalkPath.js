@@ -93,4 +93,4 @@ async function matchWalkPath(walkId) {
   }
 }
 
-module.exports = { matchWalkPath };
+module.exports = matchWalkPath;

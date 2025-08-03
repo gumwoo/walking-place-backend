@@ -76,7 +76,7 @@ class OnboardingService {
             { city: { [Op.iLike]: `%${keyword}%` } }
           ]
         },
-        attributes: ['id', 'address_name', 'area_name', 'city', 'province'],
+        attributes: ['location_id', 'address_name', 'area_name', 'city', 'province'],
         limit: limit,
         order: [['address_name', 'ASC']]
       });
@@ -104,130 +104,53 @@ class OnboardingService {
    * @returns {Array} 견종 목록
    */
   async searchBreeds(keyword, limit = 20) {
-    try {
-      logger.info('견종 검색 시작', { keyword, limit });
+  try {
+    logger.info('견종 검색 시작', { keyword, limit });
 
-      if (!keyword || keyword.trim().length < 1) {
-        // 키워드가 없으면 전체 견종 목록 반환
-        const breeds = await Breed.findAll({
-          attributes: ['id', 'name', 'icon_url'],
-          limit: limit,
-          order: [['name', 'ASC']]
-        });
+    const attributes = [
+      ['breed_id', 'breedId'],
+      'name',
+      ['icon_url', 'iconUrl']
+    ];
 
-        return breeds.map(breed => ({
-          breedId: breed.id,
-          name: breed.name,
-          iconUrl: breed.icon_url
-        }));
-      }
-
+    // 키워드가 없거나 빈 문자열인 경우 → 전체 목록 일부 반환
+    if (!keyword || keyword.trim().length < 1) {
       const breeds = await Breed.findAll({
-        where: {
-          name: { [Op.iLike]: `%${keyword}%` }
-        },
-        attributes: ['breed_id', 'name', 'icon_url'],
-        limit: limit,
+        attributes,
+        limit,
         order: [['name', 'ASC']]
       });
 
-      logger.info('견종 검색 완료', { keyword, resultCount: breeds.length });
-
       return breeds.map(breed => ({
-        breedId: breed.id,
+        breedId: breed.breedId,
         name: breed.name,
-        iconUrl: breed.icon_url
+        iconUrl: breed.iconUrl
       }));
-
-    } catch (error) {
-      logger.error('견종 검색 오류:', error);
-      throw error;
     }
+
+    // 키워드 검색
+    const breeds = await Breed.findAll({
+      where: {
+        name: { [Op.iLike]: `%${keyword}%` }
+      },
+      attributes,
+      limit,
+      order: [['name', 'ASC']]
+    });
+
+    logger.info('견종 검색 완료', { keyword, resultCount: breeds.length });
+
+    return breeds.map(breed => ({
+      breedId: breed.breedId,
+      name: breed.name,
+      iconUrl: breed.iconUrl
+    }));
+
+  } catch (error) {
+    logger.error('견종 검색 오류:', error);
+    throw new Error('견종 검색 중 오류가 발생했습니다.');
   }
-
-  /**
-   * 사용자 프로필 업데이트
-   * @param {string} userId - 사용자 ID
-   * @param {Object} profileData - 프로필 데이터
-   * @returns {Object} 업데이트된 사용자 정보
-   */
-  async updateUserProfile(userId, profileData) {
-    try {
-      logger.info('사용자 프로필 업데이트 시작', { userId, fields: Object.keys(profileData) });
-
-      const user = await User.findByPk(userId);
-      if (!user) {
-        throw new Error('사용자를 찾을 수 없습니다.');
-      }
-
-      // 필드 매핑 (API 필드명 -> DB 필드명)
-      const fieldMapping = {
-        preferredLocationId: 'preferred_location_id',
-        petName: 'dog_name',
-        breedId: 'dog_breed', // 실제로는 breed ID가 아닌 breed name을 저장하는 구조
-        petBirthDate: 'dog_birth_year', // Date -> Year로 변환 필요
-        petSize: 'dog_size',
-        petProfileImageUrl: 'dog_image'
-      };
-
-      const updateData = {};
-
-      // 필드별 데이터 변환 및 검증
-      for (const [apiField, dbField] of Object.entries(fieldMapping)) {
-        if (profileData[apiField] !== undefined) {
-          if (apiField === 'petBirthDate' && profileData[apiField]) {
-            // 날짜를 연도로 변환
-            const birthDate = new Date(profileData[apiField]);
-            updateData[dbField] = birthDate.getFullYear();
-          } else if (apiField === 'breedId' && profileData[apiField]) {
-            // breedId로 breed name 조회
-            const breed = await Breed.findByPk(profileData[apiField]);
-            if (breed) {
-              updateData[dbField] = breed.name;
-            }
-          } else {
-            updateData[dbField] = profileData[apiField];
-          }
-        }
-      }
-
-      // 업데이트 실행
-      await user.update(updateData);
-
-      // 업데이트된 사용자 정보 조회 (관계 포함)
-      const updatedUser = await User.findByPk(userId, {
-        include: [
-          {
-            model: Location,
-            as: 'preferredLocation',
-            attributes: ['id', 'address_name', 'area_name', 'city']
-          }
-        ]
-      });
-
-      logger.info('사용자 프로필 업데이트 완료', { userId });
-
-      return {
-        userId: updatedUser.id,
-        petName: updatedUser.dog_name,
-        breedName: updatedUser.dog_breed,
-        petBirthYear: updatedUser.dog_birth_year,
-        petSize: updatedUser.dog_size,
-        petProfileImageUrl: updatedUser.dog_image,
-        preferredLocation: updatedUser.preferredLocation ? {
-          locationId: updatedUser.preferredLocation.id,
-          addressName: updatedUser.preferredLocation.address_name,
-          areaName: updatedUser.preferredLocation.area_name,
-          city: updatedUser.preferredLocation.city
-        } : null
-      };
-
-    } catch (error) {
-      logger.error('사용자 프로필 업데이트 오류:', error);
-      throw error;
-    }
-  }
-
+}
   /**
    * 사용자 프로필 조회
    * @param {string} userId - 사용자 ID

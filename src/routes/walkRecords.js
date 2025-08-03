@@ -4,7 +4,7 @@ const walkRecordController = require('../controllers/walkRecordController');
 const { authenticateToken } = require('../middlewares/auth');
 
 // POST /api/v1/walk-records - 산책 기록 시작
-router.post('/', authenticateToken, walkRecordController.startWalkRecord);
+router.post('/', authenticateToken, walkRecordController.startWalk);
 
 // PATCH /api/v1/walk-records/{walk_record_id}/track - 산책 경로 및 데이터 주기적 업데이트
 router.patch('/:walkRecordId/track', authenticateToken, walkRecordController.updateTrack);

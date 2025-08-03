@@ -53,46 +53,47 @@ class BreedService {
    * @param {number} params.size - 페이지 크기
    * @returns {Object} 견종 목록 및 페이징 정보
    */
-  async getAllBreeds({ page, size }) {
-    try {
-      logger.debug('전체 견종 목록 조회 서비스 시작', { page, size });
+ async getAllBreeds({ page, size }) {
+  try {
+    logger.debug('전체 견종 목록 조회 서비스 시작', { page, size });
 
-      const offset = (page - 1) * size;
+    const offset = (page - 1) * size;
 
-      const { count, rows } = await Breed.findAndCountAll({
-        attributes: [
-          'breedId',
-          'name',
-          'iconUrl'
-        ],
-        limit: size,
-        offset: offset,
-        order: [['name', 'ASC']]
-      });
+    const { count, rows } = await Breed.findAndCountAll({
+      attributes: [
+        ['breed_id', 'breedId'],
+        'name',
+        ['icon_url', 'iconUrl']
+      ],
+      limit: size,
+      offset: offset,
+      order: [['name', 'ASC']]
+    });
 
-      logger.debug('전체 견종 목록 조회 서비스 완료', { 
-        resultCount: rows.length,
-        totalCount: count
-      });
+    logger.debug('전체 견종 목록 조회 서비스 완료', {
+      resultCount: rows.length,
+      totalCount: count
+    });
 
-      return {
-        breeds: rows.map(breed => ({
-          breedId: breed.breedId,
-          name: breed.name,
-          iconUrl: breed.iconUrl
-        })),
-        totalCount: count,
-        currentPage: page,
-        totalPages: Math.ceil(count / size),
-        hasNext: page < Math.ceil(count / size),
-        hasPrev: page > 1
-      };
+    return {
+      breeds: rows.map(breed => ({
+        breedId: breed.breedId,
+        name: breed.name,
+        iconUrl: breed.iconUrl
+      })),
+      totalCount: count,
+      currentPage: page,
+      totalPages: Math.ceil(count / size),
+      hasNext: page < Math.ceil(count / size),
+      hasPrev: page > 1
+    };
 
-    } catch (error) {
-      logger.error('전체 견종 목록 조회 서비스 오류:', error);
-      throw new Error('전체 견종 목록 조회 중 오류가 발생했습니다.');
-    }
+  } catch (error) {
+    logger.error('전체 견종 목록 조회 서비스 오류:', error);
+    throw new Error('전체 견종 목록 조회 중 오류가 발생했습니다.');
   }
+}
+
 
   /**
    * 견종 ID로 상세 정보 조회
