@@ -79,12 +79,11 @@ class AuthService {
 
     } catch (error) {
       logger.error('카카오 토큰 교환 오류:', {
-        message: error.message,
         responseStatus: error.response?.status,
-        responseData: error.response?.data,
-        stack: error.stack
+        responseData: error.response?.data
       });
-      throw new Error('카카오 액세스 토큰 교환에 실패했습니다.');
+      const detail = JSON.stringify(error.response?.data);
+      throw new Error(`카카오 액세스 토큰 교환 실패: ${detail}`);
     }
   }
 
