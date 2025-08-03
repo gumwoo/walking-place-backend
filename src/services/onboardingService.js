@@ -126,7 +126,7 @@ class OnboardingService {
         where: {
           name: { [Op.iLike]: `%${keyword}%` }
         },
-        attributes: ['id', 'name', 'icon_url'],
+        attributes: ['breed_id', 'name', 'icon_url'],
         limit: limit,
         order: [['name', 'ASC']]
       });

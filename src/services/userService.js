@@ -31,8 +31,8 @@ class userService {
     logger.info("요약 프로필 조회", { userId });
 
     const user = await User.findOne({
-      where: { userId },
-      attributes: ["petName", "petProfileImageUrl"],
+      where: { id: userId },
+      attributes: ["dog_name", "dog_image"],
     });
 
     if (!user) {
@@ -40,8 +40,8 @@ class userService {
     }
 
     return {
-      petName: user.petName,
-      petProfileImageUrl: user.petProfileImageUrl,
+      petName: user.dog_name,
+      petProfileImageUrl: user.dog_image,
     };
   }
 
