@@ -8,7 +8,12 @@ class UserController {
    */
   async agreeToTerms(req, res) {
     try {
-      const userId = req.user?.id || process.env.TEST_USER_ID;
+      // 디버깅용 로그 추가
+      console.log('🔍 DEBUG - req.user:', req.user);
+      console.log('🔍 DEBUG - process.env.TEST_USER_ID:', process.env.TEST_USER_ID);
+      
+      const userId = req.user?.user_id || process.env.TEST_USER_ID;  // snake_case 사용
+      console.log('🔍 DEBUG - 최종 userId:', userId);
       logger.info('약관 동의 요청 시작', { userId });
       
       const { agreedTermIds } = req.body;
@@ -46,8 +51,8 @@ class UserController {
    * PUT /api/v1/users/me/profile
    */
   async updateProfile(req, res) {
-    try {
-      const userId = req.user?.id || process.env.TEST_USER_ID;
+   try {
+     const userId = req.user?.user_id || process.env.TEST_USER_ID;  // snake_case 통일
       logger.info('프로필 업데이트 요청 시작', { userId });
       
       const updateData = req.body;
@@ -85,7 +90,7 @@ class UserController {
    */
   async getSummaryProfile(req, res) {
     try {
-      const userId = req.user?.id || process.env.TEST_USER_ID;
+      const userId = req.user?.user_id || process.env.TEST_USER_ID;  // snake_case
 
       logger.info("요약 프로필 조회 요청", { userId });
 
@@ -112,7 +117,7 @@ class UserController {
    */
   async getProfile(req, res) {
     try {
-      const userId = req.user?.id || process.env.TEST_USER_ID;
+      const userId = req.user?.userId || process.env.TEST_USER_ID;
       logger.info("프로필 조회 요청", { userId });
 
       const profile = await userService.getProfile(userId);
@@ -134,32 +139,30 @@ class UserController {
 
   /**
    * 사용자의 모든 산책 기록 목록 조회
-   * GET /api/v1/users/me/walk-records
+   const userId = req.user?.user_id || process.env.TEST_USER_ID;  // snake_case
    */
   async getWalkRecords(req, res) {
     try {
-      const userId = req.user?.id || process.env.TEST_USER_ID;
-      logger.info('산책 기록 목록 조회 요청', { userId });
-      
+      const userId = req.user?.userId || process.env.TEST_USER_ID;
       const { page = 1, size = 10, sortBy = 'createdAt' } = req.query;
-      
-      const walkRecords = await userService.getWalkRecords(userId, {
-        page: parseInt(page),
-        size: parseInt(size),
+
+      const result = await userService.getWalkRecords(userId, {
+        page: parseInt(page, 10),
+        size: parseInt(size, 10),
         sortBy,
       });
 
       return res.status(200).json({
         success: true,
-        data: walkRecords,
+        data: result,
       });
     } catch (error) {
-      logger.error("산책 기록 목록 조회 실패:", error);
+      logger.error('산책 기록 목록 조회 실패', { error: error.message });
 
       return res.status(500).json({
         success: false,
-        message: "산책 기록 조회 중 오류가 발생했습니다.",
-        code: "WALK_RECORDS_GET_ERROR",
+        message: '산책 기록 조회 중 오류가 발생했습니다.',
+        code: 'WALK_RECORDS_GET_ERROR',
       });
     }
   }

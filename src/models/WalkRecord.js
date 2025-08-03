@@ -4,22 +4,25 @@ const { sequelize } = require("../config/database");
 const WalkRecord = sequelize.define(
   "WalkRecord",
   {
-    walkRecordId: {
+    walk_record_id: {
       type: DataTypes.UUID,
       primaryKey: true,
       defaultValue: DataTypes.UUIDV4,
       allowNull: false,
       comment: "산책 기록 고유 ID",
+      field: 'walk_record_id'
     },
-    userId: {
+    user_id: {
       type: DataTypes.UUID,
       allowNull: false,
       comment: "사용자 ID",
+      field: 'user_id'
     },
-    courseId: {
+    course_id: {
       type: DataTypes.UUID,
       allowNull: true,
       comment: "코스 ID (새 코스 산책 시 NULL)",
+      field: 'course_id'
     },
     status: {
       type: DataTypes.ENUM(
@@ -33,71 +36,80 @@ const WalkRecord = sequelize.define(
       defaultValue: "STARTED",
       comment: "산책 상태",
     },
-    startTime: {
+    start_time: {
       type: DataTypes.DATE,
       allowNull: false,
       comment: "산책 시작 시간",
+      field: 'start_time'
     },
-    endTime: {
+    end_time: {
       type: DataTypes.DATE,
       allowNull: true,
       comment: "산책 종료 시간 (STARTED 또는 PAUSED 상태일 때는 NULL)",
+      field: 'end_time'
     },
-    durationSeconds: {
+    duration_seconds: {
       type: DataTypes.INTEGER,
       allowNull: true,
       comment: "산책 시간(초) - COMPLETED 상태에서 최종 계산",
+      field: 'duration_seconds'
     },
-    distanceMeters: {
+    distance_meters: {
       type: DataTypes.INTEGER,
       allowNull: true,
       comment: "산책 거리(미터) - COMPLETED 상태에서 최종 계산",
+      field: 'distance_meters'
     },
-    pathCoordinates: {
+    path_coordinates: {
       type: DataTypes.JSONB,
       allowNull: true,
       comment: "산책 경로 좌표 리스트 - 산책 중 지속 업데이트",
+      field: 'path_coordinates'
     },
-    pathImageUrl: {
+    path_image_url: {
       type: DataTypes.STRING(500),
       allowNull: true,
-      comment: "실제 산책 경로 기반 이미지 URL", //산책일지의 경로 이미지
+      comment: "실제 산책 경로 기반 이미지 URL", // 산책일지의 경로 이미지
+      field: 'path_image_url'
     },
     title: {
       type: DataTypes.STRING(200),
       allowNull: true,
       comment: "산책 일지 제목 - 자동 생성 또는 사용자 입력",
     },
-    markingCount: {
+    marking_count: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
       comment: "마킹 횟수",
+      field: 'marking_count'
     },
-    tailcopterScore: {
+    tailcopter_score: {
       type: DataTypes.INTEGER,
       allowNull: true,
       comment: "꼬리콥터 점수",
+      field: 'tailcopter_score'
     },
-    isCourseRegistered: {
+    is_course_registered: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,
       comment: "코스 등록 여부",
+      field: 'is_course_registered'
     },
-    isRecordSaved: {
+    is_record_saved: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,
-      comment:
-        "산책 일지 최종 저장 여부 (true: 저장 완료, false: 진행 중 또는 오류)",
+      comment: "산책 일지 최종 저장 여부 (true: 저장 완료, false: 진행 중 또는 오류)",
+      field: 'is_record_saved'
     },
-    createdAt: {
+    created_at: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW,
     },
-    updatedAt: {
+    updated_at: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW,
@@ -106,6 +118,8 @@ const WalkRecord = sequelize.define(
   {
     tableName: "walk_records",
     timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     comment: "산책 기록 테이블",
     indexes: [
       {

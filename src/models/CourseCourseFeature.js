@@ -2,17 +2,19 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 
 const CourseCourseFeature = sequelize.define('CourseCourseFeature', {
-  courseId: {
+  course_id: {
     type: DataTypes.UUID,
     primaryKey: true,
     allowNull: false,
-    comment: '코스 ID'
+    comment: '코스 ID',
+    field: 'course_id'
   },
-  featureId: {
+  feature_id: {
     type: DataTypes.UUID,
     primaryKey: true,
     allowNull: false,
-    comment: '특징 ID'
+    comment: '특징 ID',
+    field: 'feature_id'
   }
 }, {
   tableName: 'course_course_features',

@@ -1,0 +1,288 @@
+{
+  "tasks": [
+    {
+      "id": "dd705f6a-fd08-404c-be34-e90f35e5b23a",
+      "name": "WalkRecord 모델 snake_case 통일",
+      "description": "WalkRecord.js 모델의 모든 camelCase 속성명을 snake_case로 변경. walkRecordId → walk_record_id, userId → user_id, courseId → course_id 등 모든 필드를 User 모델 패턴에 맞춰 수정하고 field 매핑 추가.",
+      "notes": "User 모델의 field 매핑 패턴을 정확히 따라야 함. 데이터베이스 테이블과 컬럼은 이미 snake_case이므로 field 매핑으로 연결.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2025-08-03T10:52:56.205Z",
+      "updatedAt": "2025-08-03T10:56:10.636Z",
+      "relatedFiles": [
+        {
+          "path": "C:\\walking-backend\\src\\models\\WalkRecord.js",
+          "type": "TO_MODIFY",
+          "description": "camelCase를 snake_case로 변경할 주요 모델 파일"
+        },
+        {
+          "path": "C:\\walking-backend\\src\\models\\User.js",
+          "type": "REFERENCE",
+          "description": "올바른 snake_case 패턴의 참조 모델"
+        }
+      ],
+      "implementationGuide": "1. WalkRecord.js 파일 열기\n2. 모든 camelCase 속성명을 snake_case로 변경:\n   - walkRecordId → walk_record_id\n   - userId → user_id\n   - courseId → course_id\n   - startTime → start_time\n   - endTime → end_time\n   - durationSeconds → duration_seconds\n   - distanceMeters → distance_meters\n   - pathCoordinates → path_coordinates\n   - pathImageUrl → path_image_url\n   - markingCount → marking_count\n   - tailcopterScore → tailcopter_score\n   - isCourseRegistered → is_course_registered\n   - isRecordSaved → is_record_saved\n   - createdAt → created_at\n   - updatedAt → updated_at\n3. 각 필드에 field 속성 추가 (User 모델 패턴 따름)\n4. 인덱스 필드명이 이미 snake_case인지 확인",
+      "verificationCriteria": "1. 모든 속성명이 snake_case로 변경됨 2. field 매핑이 올바르게 추가됨 3. 기존 tableName과 timestamps 설정 유지 4. 인덱스 필드명 확인됨 5. User 모델과 일관된 패턴 적용됨",
+      "analysisResult": "walking-backend 프로젝트의 모든 camelCase를 snake_case로 통일하여 naming convention 일관성을 확보. User 모델의 올바른 snake_case 패턴을 템플릿으로 활용하여 WalkRecord, Course 등 나머지 모델들과 컨트롤러, 서비스 전체를 수정.",
+      "summary": "WalkRecord 모델의 모든 camelCase 속성명을 snake_case로 성공적으로 변경 완료. walkRecordId → walk_record_id, userId → user_id, courseId → course_id 등 모든 필드가 User 모델 패턴에 맞춰 수정되었으며, field 매핑이 추가됨. timestamps 설정도 createdAt: 'created_at', updatedAt: 'updated_at'로 올바르게 설정됨. 인덱스 필드명은 이미 snake_case로 되어 있어 그대로 유지됨.",
+      "completedAt": "2025-08-03T10:56:10.633Z"
+    },
+    {
+      "id": "c9f60579-947b-4126-bae1-5d855a1f6278",
+      "name": "Course 및 관련 모델들 snake_case 통일",
+      "description": "Course.js, CourseFeature.js, CourseCourseFeature.js, CourseLocationAssociation.js 모델들의 모든 camelCase 속성명을 snake_case로 변경하고 field 매핑 추가.",
+      "notes": "여러 모델을 함께 수정하되 각각의 특성에 맞춰 적용. 연결 테이블들은 상대적으로 단순하므로 함께 처리 가능.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "dd705f6a-fd08-404c-be34-e90f35e5b23a"
+        }
+      ],
+      "createdAt": "2025-08-03T10:52:56.205Z",
+      "updatedAt": "2025-08-03T10:59:10.619Z",
+      "relatedFiles": [
+        {
+          "path": "C:\\walking-backend\\src\\models\\Course.js",
+          "type": "TO_MODIFY",
+          "description": "Course 모델 수정"
+        },
+        {
+          "path": "C:\\walking-backend\\src\\models\\CourseFeature.js",
+          "type": "TO_MODIFY",
+          "description": "CourseFeature 모델 수정"
+        },
+        {
+          "path": "C:\\walking-backend\\src\\models\\CourseCourseFeature.js",
+          "type": "TO_MODIFY",
+          "description": "Course-CourseFeature 연결 테이블"
+        },
+        {
+          "path": "C:\\walking-backend\\src\\models\\CourseLocationAssociation.js",
+          "type": "TO_MODIFY",
+          "description": "Course-Location 연결 테이블"
+        }
+      ],
+      "implementationGuide": "1. Course.js 수정:\n   - courseId → course_id\n   - creatorUserId → creator_user_id\n   - courseName → course_name\n   - recommendedPetSize → recommended_pet_size\n   - averageTailcopterScore → average_tailcopter_score\n   - courseLengthMeters → course_length_meters\n   - estimatedDurationSeconds → estimated_duration_seconds\n   - coverImageUrl → cover_image_url\n   - pathCoordinates → path_coordinates\n   - createdAt → created_at\n   - updatedAt → updated_at\n2. CourseFeature.js 수정:\n   - featureId → feature_id\n   - isCustom → is_custom\n3. 연결 테이블들도 동일하게 적용\n4. 각 모델에 field 매핑 추가",
+      "verificationCriteria": "1. 모든 Course 관련 모델들의 속성명이 snake_case로 변경됨 2. field 매핑이 추가됨 3. 연결 테이블들도 일관성 있게 수정됨 4. 기존 관계 설정 유지됨",
+      "analysisResult": "walking-backend 프로젝트의 모든 camelCase를 snake_case로 통일하여 naming convention 일관성을 확보. User 모델의 올바른 snake_case 패턴을 템플릿으로 활용하여 WalkRecord, Course 등 나머지 모델들과 컨트롤러, 서비스 전체를 수정.",
+      "summary": "Course 및 관련 모델들의 모든 camelCase 속성명을 snake_case로 성공적으로 변경 완료. Course.js의 courseId → course_id, creatorUserId → creator_user_id, courseName → course_name 등 주요 속성들과 CourseFeature.js의 featureId → feature_id, isCustom → is_custom, 그리고 연결 테이블들의 courseId → course_id, featureId → feature_id, locationId → location_id, isStartPoint → is_start_point 등이 모두 변경됨. 모든 모델에 적절한 field 매핑과 timestamps 설정이 추가되어 일관성 확보됨.",
+      "completedAt": "2025-08-03T10:59:10.618Z"
+    },
+    {
+      "id": "b0a39493-981f-46fd-b29b-2695c95b14e9",
+      "name": "Marking 관련 모델들 snake_case 통일",
+      "description": "MarkingPhoto.js, MarkingPhotozone.js, WalkRecordMarkingPhotozone.js 모델들의 camelCase 속성명을 snake_case로 변경하고 field 매핑 추가.",
+      "notes": "Marking 관련 모델들은 상호 연관성이 높으므로 함께 수정하여 일관성 확보.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "dd705f6a-fd08-404c-be34-e90f35e5b23a"
+        }
+      ],
+      "createdAt": "2025-08-03T10:52:56.205Z",
+      "updatedAt": "2025-08-03T11:04:24.278Z",
+      "relatedFiles": [
+        {
+          "path": "C:\\walking-backend\\src\\models\\MarkingPhoto.js",
+          "type": "TO_MODIFY",
+          "description": "MarkingPhoto 모델 수정"
+        },
+        {
+          "path": "C:\\walking-backend\\src\\models\\MarkingPhotozone.js",
+          "type": "TO_MODIFY",
+          "description": "MarkingPhotozone 모델 수정"
+        },
+        {
+          "path": "C:\\walking-backend\\src\\models\\WalkRecordMarkingPhotozone.js",
+          "type": "TO_MODIFY",
+          "description": "WalkRecord-MarkingPhotozone 연결 테이블"
+        }
+      ],
+      "implementationGuide": "1. MarkingPhoto.js 수정:\n   - photoId → photo_id\n   - photozoneId → photozone_id\n   - userId → user_id\n   - imageUrl → image_url\n   - takenAt → taken_at\n2. MarkingPhotozone.js 수정:\n   - photozoneId → photozone_id\n   - courseId → course_id\n   - isRecommended → is_recommended\n   - createdAt → created_at\n   - updatedAt → updated_at\n3. WalkRecordMarkingPhotozone.js 수정:\n   - walkRecordId → walk_record_id\n   - photozoneId → photozone_id\n   - visitedAt → visited_at\n4. 각 모델에 field 매핑 추가",
+      "verificationCriteria": "1. 모든 Marking 관련 모델들의 속성명이 snake_case로 변경됨 2. field 매핑이 추가됨 3. 연결 테이블 일관성 유지됨 4. 관계 설정 보존됨",
+      "analysisResult": "walking-backend 프로젝트의 모든 camelCase를 snake_case로 통일하여 naming convention 일관성을 확보. User 모델의 올바른 snake_case 패턴을 템플릿으로 활용하여 WalkRecord, Course 등 나머지 모델들과 컨트롤러, 서비스 전체를 수정.",
+      "summary": "Marking 관련 모델들의 모든 camelCase 속성명을 snake_case로 성공적으로 변경 완료. MarkingPhoto.js의 photoId → photo_id, photozoneId → photozone_id, userId → user_id, imageUrl → image_url, takenAt → taken_at과 MarkingPhotozone.js의 photozoneId → photozone_id, courseId → course_id, isRecommended → is_recommended, 그리고 WalkRecordMarkingPhotozone.js의 walkRecordId → walk_record_id, photozoneId → photozone_id, visitedAt → visited_at 등이 모두 변경됨. 모든 모델에 적절한 field 매핑과 timestamps 설정이 추가되어 일관성이 확보됨.",
+      "completedAt": "2025-08-03T11:04:24.275Z"
+    },
+    {
+      "id": "bce9d849-c4d3-48ed-85e8-f83a4b037ee6",
+      "name": "기타 모델들 snake_case 통일",
+      "description": "Breed.js, Location.js, Term.js, UserTermAgreement.js 모델들의 camelCase 속성명을 snake_case로 변경하고 field 매핑 추가. 이미 일부는 올바를 수 있으므로 확인 후 수정.",
+      "notes": "일부 모델은 이미 올바를 수 있으므로 불필요한 변경 방지. User 모델 패턴과 일치시키는 것이 목표.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "dd705f6a-fd08-404c-be34-e90f35e5b23a"
+        }
+      ],
+      "createdAt": "2025-08-03T10:52:56.205Z",
+      "updatedAt": "2025-08-03T11:08:10.490Z",
+      "relatedFiles": [
+        {
+          "path": "C:\\walking-backend\\src\\models\\Breed.js",
+          "type": "TO_MODIFY",
+          "description": "Breed 모델 확인 및 수정"
+        },
+        {
+          "path": "C:\\walking-backend\\src\\models\\Location.js",
+          "type": "TO_MODIFY",
+          "description": "Location 모델 확인 및 수정"
+        },
+        {
+          "path": "C:\\walking-backend\\src\\models\\Term.js",
+          "type": "TO_MODIFY",
+          "description": "Term 모델 확인 및 수정"
+        },
+        {
+          "path": "C:\\walking-backend\\src\\models\\UserTermAgreement.js",
+          "type": "TO_MODIFY",
+          "description": "UserTermAgreement 모델 확인 및 수정"
+        }
+      ],
+      "implementationGuide": "1. 각 모델 파일 확인:\n   - Breed.js: breedId → breed_id, iconUrl → icon_url\n   - Location.js: locationId → location_id, addressName → address_name, areaName → area_name\n   - Term.js: termId → term_id, isRequired → is_required, effectiveDate → effective_date\n   - UserTermAgreement.js: userId → user_id, termId → term_id, agreedAt → agreed_at\n2. 이미 올바른 것은 그대로 유지\n3. field 매핑 추가\n4. 일관성 확인",
+      "verificationCriteria": "1. 모든 기타 모델들이 snake_case로 통일됨 2. 불필요한 변경 방지됨 3. field 매핑 일관성 확보됨 4. User 모델과 동일한 패턴 적용됨",
+      "analysisResult": "walking-backend 프로젝트의 모든 camelCase를 snake_case로 통일하여 naming convention 일관성을 확보. User 모델의 올바른 snake_case 패턴을 템플릿으로 활용하여 WalkRecord, Course 등 나머지 모델들과 컨트롤러, 서비스 전체를 수정.",
+      "summary": "기타 모델들의 모든 camelCase 속성명을 snake_case로 성공적으로 변경 완료. Breed.js의 id → breed_id, Location.js의 id → location_id와 areaName → area_name, Term.js의 id → term_id, UserTermAgreement.js의 id → agreement_id 등이 모두 변경됨. 이미 올바른 snake_case 속성들은 유지하고 필요한 부분만 수정하여 불필요한 변경을 방지함. 모든 모델에 적절한 field 매핑과 comment가 추가되어 User 모델과 동일한 패턴으로 일관성이 확보됨.",
+      "completedAt": "2025-08-03T11:08:10.489Z"
+    },
+    {
+      "id": "147a9934-5188-4e66-8bda-ff76f20bfaa8",
+      "name": "WalkRecord 컨트롤러 snake_case 통일",
+      "description": "walkRecordController.js의 모든 변수명, 속성명, API 응답을 snake_case로 변경. 가장 복잡한 컨트롤러이므로 우선 처리하여 패턴 확립.",
+      "notes": "13KB 파일이므로 3-4개 섹션으로 나누어 수정 필요. 가장 복잡한 컨트롤러이므로 이 패턴을 다른 컨트롤러에 적용.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "dd705f6a-fd08-404c-be34-e90f35e5b23a"
+        },
+        {
+          "taskId": "b0a39493-981f-46fd-b29b-2695c95b14e9"
+        }
+      ],
+      "createdAt": "2025-08-03T10:52:56.205Z",
+      "updatedAt": "2025-08-03T10:52:56.205Z",
+      "relatedFiles": [
+        {
+          "path": "C:\\walking-backend\\src\\controllers\\walkRecordController.js",
+          "type": "TO_MODIFY",
+          "description": "가장 복잡한 컨트롤러, 우선 수정하여 패턴 확립"
+        },
+        {
+          "path": "C:\\walking-backend\\src\\models\\WalkRecord.js",
+          "type": "DEPENDENCY",
+          "description": "수정된 WalkRecord 모델 의존"
+        }
+      ],
+      "implementationGuide": "1. 변수명 변경:\n   - userId → user_id\n   - courseId → course_id\n   - walkRecordId → walk_record_id\n   - startTime → start_time\n   - endTime → end_time\n   등 모든 camelCase 변수\n2. 객체 속성 변경 (req.body, API 응답):\n   - newWalk.walkRecordId → newWalk.walk_record_id\n   - 모든 JSON 응답을 snake_case로\n3. 모델 호출 시 snake_case 속성 사용\n4. 파일 크기가 클 경우 섹션별로 나누어 수정",
+      "verificationCriteria": "1. 모든 변수명이 snake_case로 변경됨 2. API 응답 JSON이 snake_case로 통일됨 3. 모델 호출 시 올바른 속성명 사용됨 4. 기능 동작 유지됨 5. 다른 컨트롤러 수정의 템플릿 역할 가능",
+      "analysisResult": "walking-backend 프로젝트의 모든 camelCase를 snake_case로 통일하여 naming convention 일관성을 확보. User 모델의 올바른 snake_case 패턴을 템플릿으로 활용하여 WalkRecord, Course 등 나머지 모델들과 컨트롤러, 서비스 전체를 수정."
+    },
+    {
+      "id": "4e950584-a7ff-4532-b55e-121ee8ee8870",
+      "name": "나머지 컨트롤러들 snake_case 통일",
+      "description": "authController.js, userController.js, courseController.js, locationController.js, breedController.js, mapController.js, markingPhotoController.js, onboardingController.js의 모든 변수명과 API 응답을 snake_case로 변경.",
+      "notes": "walkRecordController에서 확립된 패턴을 일관성 있게 적용. 각 컨트롤러의 특성에 맞춰 수정하되 전체적인 일관성 유지.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "147a9934-5188-4e66-8bda-ff76f20bfaa8"
+        }
+      ],
+      "createdAt": "2025-08-03T10:53:34.973Z",
+      "updatedAt": "2025-08-03T10:53:34.973Z",
+      "relatedFiles": [
+        {
+          "path": "C:\\walking-backend\\src\\controllers\\authController.js",
+          "type": "TO_MODIFY",
+          "description": "인증 관련 컨트롤러"
+        },
+        {
+          "path": "C:\\walking-backend\\src\\controllers\\userController.js",
+          "type": "TO_MODIFY",
+          "description": "사용자 관련 컨트롤러"
+        },
+        {
+          "path": "C:\\walking-backend\\src\\controllers\\courseController.js",
+          "type": "TO_MODIFY",
+          "description": "코스 관련 컨트롤러"
+        },
+        {
+          "path": "C:\\walking-backend\\src\\controllers\\locationController.js",
+          "type": "TO_MODIFY",
+          "description": "위치 관련 컨트롤러"
+        }
+      ],
+      "implementationGuide": "1. walkRecordController.js에서 확립된 패턴 적용\n2. 각 컨트롤러별 주요 변경사항:\n   - authController: userId, accessToken → user_id, access_token\n   - userController: petName, breedId → pet_name, breed_id\n   - courseController: courseId, courseName → course_id, course_name\n   - locationController: locationId, addressName → location_id, address_name\n   - breedController: breedId → breed_id\n   - markingPhotoController: photoId, photozoneId → photo_id, photozone_id\n3. 모든 API 응답을 snake_case로 통일\n4. req.body에서 받는 속성명도 snake_case로 변경\n5. 파일 크기에 따라 섹션별 수정",
+      "verificationCriteria": "1. 모든 컨트롤러의 변수명이 snake_case로 통일됨 2. API 응답이 일관성 있게 snake_case로 변경됨 3. req.body 속성명도 snake_case로 변경됨 4. walkRecordController 패턴과 일치함 5. 각 컨트롤러의 기능이 정상 동작함",
+      "analysisResult": "walking-backend 프로젝트의 모든 camelCase를 snake_case로 통일하여 naming convention 일관성을 확보. User 모델의 올바른 snake_case 패턴을 템플릿으로 활용하여 WalkRecord, Course 등 나머지 모델들과 컨트롤러, 서비스 전체를 수정."
+    },
+    {
+      "id": "607442e9-2f22-43e0-865b-45a09af19442",
+      "name": "서비스 파일들 및 기타 파일들 snake_case 통일",
+      "description": "services 폴더의 모든 서비스 파일들과 routes, middlewares, utils 등의 관련 파일들에서 사용되는 변수명과 속성명을 snake_case로 통일.",
+      "notes": "컨트롤러와 모델 수정이 완료된 후 진행하여 일관성 확보. 누락된 파일이 없도록 전체적으로 점검.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "4e950584-a7ff-4532-b55e-121ee8ee8870"
+        }
+      ],
+      "createdAt": "2025-08-03T10:53:34.973Z",
+      "updatedAt": "2025-08-03T10:53:34.973Z",
+      "relatedFiles": [
+        {
+          "path": "C:\\walking-backend\\src\\services",
+          "type": "TO_MODIFY",
+          "description": "모든 서비스 파일들"
+        },
+        {
+          "path": "C:\\walking-backend\\src\\routes",
+          "type": "TO_MODIFY",
+          "description": "라우터 파일들"
+        },
+        {
+          "path": "C:\\walking-backend\\src\\middlewares",
+          "type": "TO_MODIFY",
+          "description": "미들웨어 파일들"
+        },
+        {
+          "path": "C:\\walking-backend\\src\\utils",
+          "type": "TO_MODIFY",
+          "description": "유틸리티 파일들"
+        }
+      ],
+      "implementationGuide": "1. services 폴더 확인 및 수정:\n   - 모든 서비스 파일의 변수명을 snake_case로 변경\n   - 모델 호출 시 snake_case 속성 사용\n2. routes 폴더 확인:\n   - 라우터에서 사용되는 매개변수명 확인 및 수정\n3. middlewares 확인:\n   - 인증 미들웨어 등에서 사용되는 속성명 수정\n4. utils 폴더 확인:\n   - 유틸리티 함수들의 매개변수 및 반환값 수정\n5. 기타 설정 파일들 확인",
+      "verificationCriteria": "1. 모든 서비스 파일의 변수명이 snake_case로 통일됨 2. 라우터에서 사용되는 매개변수명이 일관됨 3. 미들웨어와 유틸리티의 속성명이 통일됨 4. 전체 시스템의 일관성이 확보됨 5. 누락된 파일이 없음",
+      "analysisResult": "walking-backend 프로젝트의 모든 camelCase를 snake_case로 통일하여 naming convention 일관성을 확보. User 모델의 올바른 snake_case 패턴을 템플릿으로 활용하여 WalkRecord, Course 등 나머지 모델들과 컨트롤러, 서비스 전체를 수정."
+    },
+    {
+      "id": "2576d874-3262-4037-9555-80b6cd865ee2",
+      "name": "프로젝트 문서 업데이트 및 최종 검증",
+      "description": "project_plan.md 파일을 업데이트하여 snake_case 통일 작업 완료를 기록하고, 전체 시스템의 일관성을 최종 검증.",
+      "notes": "전체 작업의 마무리 단계로, 일관성 검증과 문서 업데이트가 주요 목표. 향후 개발자들이 참조할 수 있도록 가이드라인 제시.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "607442e9-2f22-43e0-865b-45a09af19442"
+        }
+      ],
+      "createdAt": "2025-08-03T10:53:34.973Z",
+      "updatedAt": "2025-08-03T10:53:34.973Z",
+      "relatedFiles": [
+        {
+          "path": "C:\\walking-backend\\docs\\project_plan.md",
+          "type": "TO_MODIFY",
+          "description": "프로젝트 계획서 업데이트"
+        },
+        {
+          "path": "C:\\walking-backend\\src",
+          "type": "REFERENCE",
+          "description": "전체 소스 코드 검증"
+        }
+      ],
+      "implementationGuide": "1. project_plan.md 업데이트:\n   - 완료된 작업에 snake_case 통일 작업 추가\n   - 현재 상태를 '네이밍 컨벤션 통일 완료'로 업데이트\n   - 다음 단계에 API 테스트 추가\n2. 최종 검증:\n   - 모든 모델 파일의 snake_case 적용 확인\n   - 모든 컨트롤러의 일관성 확인\n   - API 응답 형식 통일 확인\n   - 서비스 및 기타 파일들 점검\n3. 간단한 문서화:\n   - 변경된 주요 속성명 목록 정리\n   - 주의사항 및 향후 개발 가이드라인 작성",
+      "verificationCriteria": "1. project_plan.md가 최신 상태로 업데이트됨 2. 모든 파일의 snake_case 통일 확인됨 3. 주요 변경사항이 문서화됨 4. 향후 개발 가이드라인이 제시됨 5. 전체 시스템의 일관성이 검증됨",
+      "analysisResult": "walking-backend 프로젝트의 모든 camelCase를 snake_case로 통일하여 naming convention 일관성을 확보. User 모델의 올바른 snake_case 패턴을 템플릿으로 활용하여 WalkRecord, Course 등 나머지 모델들과 컨트롤러, 서비스 전체를 수정."
+    }
+  ]
+}

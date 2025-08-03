@@ -2,11 +2,13 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 
 const Location = sequelize.define('Location', {
-  id: {
+  location_id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
-    allowNull: false
+    allowNull: false,
+    comment: '위치 고유 ID',
+    field: 'location_id'
   },
   
   address_name: {
@@ -26,11 +28,11 @@ const Location = sequelize.define('Location', {
     allowNull: false,
     comment: '경도'
   },
-  areaName: {
+  
+  area_name: {
     type: DataTypes.STRING,
     allowNull: false,
-    comment: '동네 이름',
-    field: 'area_name'
+    comment: '동네 이름'
   },
   
   city: {

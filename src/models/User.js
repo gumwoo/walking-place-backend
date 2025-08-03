@@ -15,13 +15,12 @@ const User = sequelize.define('User', {
   oauth_provider: {
     type: DataTypes.STRING(20),
     allowNull: false,
-    unique: true,
-    comment: '카카오에서 제공하는 사용자 고유 ID',
-    field: 'social_id'
+    comment: 'OAuth 제공업체 (kakao, google 등)'
   },
   oauth_id: {
     type: DataTypes.STRING(100),
-    allowNull: false
+    allowNull: false,
+    comment: 'OAuth 제공업체에서 제공하는 사용자 고유 ID'
   },
   
   // 반려견 정보 (모두 선택사항!)
@@ -78,7 +77,7 @@ const User = sequelize.define('User', {
   indexes: [
     {
       unique: true,
-      fields: ['social_id']
+      fields: ['oauth_id']
     },
     {
       fields: ['preferred_location_id']

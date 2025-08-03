@@ -92,15 +92,15 @@ const authenticateToken = async (req, res, next) => {
       });
     }
 
-    // 요청 객체에 사용자 정보 추가
+    // 요청 객체에 사용자 정보 추가 (snake_case 통일)
     req.user = {
-      userId: user.user_id,
-      socialId: user.social_id,
-      socialType: user.social_type,
-      petName: user.pet_name,
-      breedId: user.breed_id,
-      petSize: user.pet_size,
-      preferredLocationId: user.preferred_location_id
+      user_id: user.id,  // DB의 user_id 컴럼과 일치
+      social_id: user.oauth_id,
+      social_type: user.oauth_provider,
+      pet_name: user.dog_name,
+      breed_id: user.dog_breed,
+      pet_size: user.dog_size,
+      preferred_location_id: user.preferred_location_id
     };
 
     logger.debug('인증 성공', { 

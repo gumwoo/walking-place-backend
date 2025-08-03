@@ -2,12 +2,13 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 
 const MarkingPhotozone = sequelize.define('MarkingPhotozone', {
-  photozoneId: {
+  photozone_id: {
     type: DataTypes.UUID,
     primaryKey: true,
     defaultValue: DataTypes.UUIDV4,
     allowNull: false,
-    comment: '마킹 포토존 고유 ID'
+    comment: '마킹 포토존 고유 ID',
+    field: 'photozone_id'
   },
   latitude: {
     type: DataTypes.DECIMAL(10, 8),
@@ -19,23 +20,25 @@ const MarkingPhotozone = sequelize.define('MarkingPhotozone', {
     allowNull: false,
     comment: '포토존 경도'
   },
-  courseId: {
+  course_id: {
     type: DataTypes.UUID,
     allowNull: true,
-    comment: '코스 ID (특정 코스에 속하지 않을 수 있음)'
+    comment: '코스 ID (특정 코스에 속하지 않을 수 있음)',
+    field: 'course_id'
   },
-  isRecommended: {
+  is_recommended: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
     defaultValue: false,
-    comment: '추천 포토존 여부'
+    comment: '추천 포토존 여부',
+    field: 'is_recommended'
   },
-  createdAt: {
+  created_at: {
     type: DataTypes.DATE,
     allowNull: false,
     defaultValue: DataTypes.NOW
   },
-  updatedAt: {
+  updated_at: {
     type: DataTypes.DATE,
     allowNull: false,
     defaultValue: DataTypes.NOW
@@ -43,6 +46,8 @@ const MarkingPhotozone = sequelize.define('MarkingPhotozone', {
 }, {
   tableName: 'marking_photozones',
   timestamps: true,
+  createdAt: 'created_at',
+  updatedAt: 'updated_at',
   comment: '마킹 포토존 테이블',
   indexes: [
     {

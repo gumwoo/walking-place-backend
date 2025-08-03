@@ -2,11 +2,13 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 
 const Breed = sequelize.define('Breed', {
-  id: {
+  breed_id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
-    allowNull: false
+    allowNull: false,
+    comment: '견종 고유 ID',
+    field: 'breed_id'
   },
   
   name: {

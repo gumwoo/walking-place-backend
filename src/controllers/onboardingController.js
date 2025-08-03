@@ -14,7 +14,7 @@ class OnboardingController {
     try {
       logger.info('사용자 약관 동의 저장 요청 시작');
 
-      const userId = req.user?.id || process.env.TEST_USER_ID; // JWT 미들웨어에서 설정
+      const userId = req.user?.userId || process.env.TEST_USER_ID; // JWT 미들웨어에서 설정
       const { agreedTermIds } = req.body;
 
       if (!agreedTermIds || !Array.isArray(agreedTermIds) || agreedTermIds.length === 0) {
@@ -134,7 +134,7 @@ class OnboardingController {
     try {
       logger.info('사용자 프로필 업데이트 요청 시작');
 
-      const userId = req.user?.id || process.env.TEST_USER_ID; // JWT 미들웨어에서 설정
+      const userId = req.user?.userId || process.env.TEST_USER_ID; // JWT 미들웨어에서 설정
       const profileData = req.body;
 
       if (!profileData || Object.keys(profileData).length === 0) {
@@ -182,7 +182,7 @@ class OnboardingController {
     try {
       logger.info('사용자 프로필 조회 요청 시작');
 
-      const userId = req.user?.id || process.env.TEST_USER_ID; // JWT 미들웨어에서 설정
+      const userId = req.user?.userId || process.env.TEST_USER_ID; // JWT 미들웨어에서 설정
 
       const profile = await onboardingService.getUserProfile(userId);
 
@@ -221,7 +221,7 @@ class OnboardingController {
     try {
       logger.info('사용자 요약 프로필 조회 요청 시작');
 
-      const userId = req.user?.id || process.env.TEST_USER_ID; // JWT 미들웨어에서 설정
+      const userId = req.user?.userId || process.env.TEST_USER_ID; // JWT 미들웨어에서 설정
 
       const profile = await onboardingService.getUserProfile(userId);
 

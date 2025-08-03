@@ -2,11 +2,13 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 
 const UserTermAgreement = sequelize.define('UserTermAgreement', {
-  id: {
+  agreement_id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
-    allowNull: false
+    allowNull: false,
+    comment: '약관 동의 고유 ID',
+    field: 'agreement_id'
   },
   
   user_id: {

@@ -2,11 +2,13 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 
 const Term = sequelize.define('Term', {
-  id: {
+  term_id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
-    allowNull: false
+    allowNull: false,
+    comment: '약관 고유 ID',
+    field: 'term_id'
   },
   
   title: {

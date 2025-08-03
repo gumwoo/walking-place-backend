@@ -1,40 +1,28 @@
-const { User, Term, UserTermAgreement } = require("../models");
+const { User, Term, UserTermAgreement, WalkRecord } = require('../models');
 const logger = require("../config/logger");
 
 class userService {
   // ✅ [GET] /api/v1/users/me/walk-records?page=&size=&sortBy=
-  async getWalkRecords(req, res) {
+  async getWalkRecords(userId, { page = 1, size = 10, sortBy = 'createdAt' } = {}) {
     try {
-      const userId = req.user?.id || process.env.TEST_USER_ID;
-      const page = parseInt(req.query.page) || 1;
-      const size = parseInt(req.query.size) || 10;
-      const sortBy = req.query.sortBy || "tailcopterScore";
+      logger.info('산책일지 목록 조회', { userId, page, size, sortBy });
 
       const offset = (page - 1) * size;
-
       const { count, rows } = await WalkRecord.findAndCountAll({
-        where: { userId, status: "COMPLETED" },
-        order: [[sortBy, "DESC"]],
+        where: { userId, status: 'COMPLETED' },
+        order: [[sortBy, 'DESC']],
         offset,
         limit: size,
       });
 
-      return ApiResponse.success(
-        res,
-        {
-          totalCount: count,
-          currentPage: page,
-          walkRecords: rows,
-        },
-        "산책일지 목록 조회 성공"
-      );
+      return {
+        totalCount: count,
+        currentPage: page,
+        walkRecords: rows,
+      };
     } catch (err) {
-      console.error("산책일지 목록 조회 오류:", err);
-      return ApiResponse.serverError(
-        res,
-        "산책일지 목록 조회 중 오류가 발생했습니다.",
-        err
-      );
+      logger.error('산책일지 목록 조회 오류', { error: err.message, userId });
+      throw err; // 컨트롤러가 catch 하도록 예외만 던짐
     }
   }
 
@@ -97,8 +85,8 @@ class userService {
   
       // 약관 ID들이 실제로 존재하는지 확인
       const existingTerms = await Term.findAll({
-        where: { id: agreedTermIds },
-        attributes: ['id', 'title', 'isRequired']
+        where: { term_id: agreedTermIds },
+        attributes: ['term_id', 'title', 'is_required']
       });
   
       if (existingTerms.length !== agreedTermIds.length) {
@@ -106,9 +94,9 @@ class userService {
       }
   
       // 필수 약관이 모두 포함되어 있는지 확인
-      const requiredTerms = existingTerms.filter(term => term.isRequired);
+      const requiredTerms = existingTerms.filter(term => term.is_required);
       const agreedRequiredTerms = requiredTerms.filter(term => 
-        agreedTermIds.includes(term.id)
+        agreedTermIds.includes(term.term_id)
       );
   
       if (requiredTerms.length !== agreedRequiredTerms.length) {
@@ -117,14 +105,14 @@ class userService {
   
       // 기존 약관 동의 기록 삭제 (재동의 시)
       await UserTermAgreement.destroy({
-        where: { userId }
+        where: { user_id: userId }
       });
   
       // 새로운 약관 동의 기록 생성
       const agreements = agreedTermIds.map(termId => ({
-        userId,
-        termId,
-        agreedAt: new Date()
+        user_id: userId,
+        term_id: termId,
+        agreed_at: new Date()
       }));
   
       await UserTermAgreement.bulkCreate(agreements);
@@ -132,7 +120,7 @@ class userService {
       // 사용자의 약관 동의 상태 업데이트
       await User.update(
         { isTermsAgreed: true },
-        { where: { userId } }
+        { where: { id: userId } }
       );
   
       logger.info("약관 동의 저장 완료", { userId, agreementCount: agreements.length });

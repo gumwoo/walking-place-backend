@@ -4,46 +4,51 @@ const { sequelize } = require("../config/database");
 const MarkingPhoto = sequelize.define(
   "MarkingPhoto",
   {
-    photoId: {
+    photo_id: {
       type: DataTypes.UUID,
       primaryKey: true,
       defaultValue: DataTypes.UUIDV4,
       allowNull: false,
       comment: "마킹 사진 고유 ID",
+      field: 'photo_id'
     },
-    photozoneId: {
+    photozone_id: {
       type: DataTypes.UUID,
       allowNull: false,
       comment: "마킹 포토존 ID",
+      field: 'photozone_id'
     },
-    userId: {
+    user_id: {
       type: DataTypes.UUID,
       allowNull: false,
       comment: "사용자 ID",
+      field: 'user_id'
     },
-    walkRecordId: {
+    walk_record_id: {
       type: DataTypes.UUID,
       allowNull: false,
       comment: "산책 기록 ID",
+      field: 'walk_record_id'
     },
-
-    imageUrl: {
+    image_url: {
       type: DataTypes.STRING,
       allowNull: false,
       comment: "이미지 URL",
+      field: 'image_url'
     },
-    takenAt: {
+    taken_at: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW,
       comment: "사진 촬영 시간",
+      field: 'taken_at'
     },
-    createdAt: {
+    created_at: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW,
     },
-    updatedAt: {
+    updated_at: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW,
@@ -52,6 +57,8 @@ const MarkingPhoto = sequelize.define(
   {
     tableName: "marking_photos",
     timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     comment: "마킹 사진 테이블",
     indexes: [
       {

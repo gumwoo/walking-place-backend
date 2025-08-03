@@ -12,7 +12,7 @@ const walkRecordController = {
   // ✅ 산책 시작 API (NEW_COURSE or 자유 산책)
   async startWalk(req, res) {
     try {
-      const userId = req.user?.id || process.env.TEST_USER_ID;
+      const userId = req.user?.userId || process.env.TEST_USER_ID;
       const { walkType, courseId } = req.body;
 
       const startTime = new Date();
@@ -108,7 +108,7 @@ const walkRecordController = {
   async updateStatus(req, res) {
     try {
       const walkRecordId = req.params.walkRecordId;
-      const userId = req.user?.id || process.env.TEST_USER_ID;
+      const userId = req.user?.userId || process.env.TEST_USER_ID;
       const { status } = req.body;
 
       // 1. userId 유효성 검사
@@ -169,7 +169,7 @@ const walkRecordController = {
   // ✅ [PUT] /api/v1/walk-records/:walkRecordId/end (산책 종료)
   async endWalkRecord(req, res) {
     const { walkRecordId } = req.params;
-    const userId = req.user?.id || process.env.TEST_USER_ID;
+    const userId = req.user?.userId || process.env.TEST_USER_ID;
 
     logger.info(`산책 종료 요청 - walkRecordId: ${walkRecordId}`, {
       ip: req.ip,
@@ -221,7 +221,7 @@ const walkRecordController = {
   // ✅ [PUT] 꼬리콥터 점수 저장
   async updateScore(req, res) {
     try {
-      const userId = req.user?.id || process.env.TEST_USER_ID;
+      const userId = req.user?.userId || process.env.TEST_USER_ID;
       const walkRecordId = req.params.walkRecordId;
       const { tailcopterScore } = req.body;
 
@@ -272,7 +272,7 @@ const walkRecordController = {
   // ✅ [POST] /api/v1/walk-records/:walkRecordId/save - 산책기록 최종 저장 (산책일지 저장)
   async saveRecord(req, res) {
     try {
-      const userId = req.user?.id || process.env.TEST_USER_ID;
+      const userId = req.user?.userId || process.env.TEST_USER_ID;
       const walkRecordId = req.params.walkRecordId;
 
       const {
@@ -364,7 +364,7 @@ const walkRecordController = {
 async getDetails(req, res) {
   try {
     const walkRecordId = req.params.walkRecordId;
-    const userId = req.user?.id || process.env.TEST_USER_ID;
+    const userId = req.user?.userId || process.env.TEST_USER_ID;
 
     const walkRecord = await WalkRecord.findOne({
       where: {
