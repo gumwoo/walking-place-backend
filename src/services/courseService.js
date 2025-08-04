@@ -45,52 +45,43 @@ class CourseService {
         size,
       });
 
-      // 1. 검색 조건 설정
       const whereConditions = {};
 
       // 반려동물 크기 필터링
       if (petSize && petSize !== "ALL") {
-        whereConditions.recommendedPetSize = {
+        whereConditions.recommended_pet_size = {
           [Op.in]: [petSize, "ALL"],
         };
       }
 
-      // 2. 정렬 조건 설정
-      let orderCondition;
-      switch (sortBy) {
-        case "tailcopterScoreDesc":
-          orderCondition = [["averageTailcopterScore", "DESC"]];
-          break;
-        case "tailcopterScoreAsc":
-          orderCondition = [["averageTailcopterScore", "ASC"]];
-          break;
-        case "lengthDesc":
-          orderCondition = [["courseLengthMeters", "DESC"]];
-          break;
-        case "lengthAsc":
-          orderCondition = [["courseLengthMeters", "ASC"]];
-          break;
-        case "newest":
-          orderCondition = [["createdAt", "DESC"]];
-          break;
-        case "oldest":
-          orderCondition = [["createdAt", "ASC"]];
-          break;
-        default:
-          orderCondition = [["averageTailcopterScore", "DESC"]];
-      }
+      // 정렬 조건 설정
+      const orderCondition = (() => {
+        switch (sortBy) {
+          case "tailcopterScoreAsc":
+            return [["average_tailcopter_score", "ASC"]];
+          case "lengthDesc":
+            return [["course_length_meters", "DESC"]];
+          case "lengthAsc":
+            return [["course_length_meters", "ASC"]];
+          case "newest":
+            return [["created_at", "DESC"]];
+          case "oldest":
+            return [["created_at", "ASC"]];
+          case "tailcopterScoreDesc":
+          default:
+            return [["average_tailcopter_score", "DESC"]];
+        }
+      })();
 
-      // 3. 페이지네이션 계산
       const offset = (page - 1) * size;
 
-      // 4. 코스 목록 조회 (위치 기반 필터링은 단순화)
       const { count, rows: courses } = await Course.findAndCountAll({
         where: whereConditions,
         include: [
           {
             model: User,
             as: "creator",
-            attributes: ["petName", "petBirthDate"],
+            attributes: ["user_id", "dog_name", "dog_birth_year", "dog_image"],
             include: [
               {
                 model: Breed,
@@ -106,58 +97,48 @@ class CourseService {
             as: "features",
             through: { attributes: [] },
             attributes: ["name"],
-            required: false,
+            
           },
+      
         ],
         order: orderCondition,
         limit: size,
         offset,
       });
 
-      // 5. 결과 포맷팅
+      // 코스 포맷 변환
       const formattedCourses = courses.map((course) => {
         // 반려견 나이 계산
         let petAge = null;
-        if (course.creator && course.creator.petBirthDate) {
-          const birthDate = new Date(course.creator.petBirthDate);
-          const today = new Date();
-          petAge = today.getFullYear() - birthDate.getFullYear();
-
-          // 생일이 지났는지 확인
-          const monthDiff = today.getMonth() - birthDate.getMonth();
-          if (
-            monthDiff < 0 ||
-            (monthDiff === 0 && today.getDate() < birthDate.getDate())
-          ) {
-            petAge--;
-          }
+        if (course.creator?.dog_birth_year) {
+          const now = new Date();
+          petAge = now.getFullYear() - course.creator.dog_birth_year;
         }
 
         return {
-          courseId: course.courseId,
-          courseName: course.courseName,
+          courseId: course.course_id,
+          courseName: course.course_name,
           description: course.description,
           difficulty: course.difficulty,
-          recommendedPetSize: course.recommendedPetSize,
-          averageTailcopterScore: course.averageTailcopterScore,
-          courseLengthMeters: course.courseLengthMeters,
-          estimatedDurationSeconds: course.estimatedDurationSeconds,
-          coverImageUrl: course.coverImageUrl,
-          features: course.features.map((feature) => feature.name),
+          recommendedPetSize: course.recommended_pet_size,
+          averageTailcopterScore: course.average_tailcopter_score,
+          courseLengthMeters: course.course_length_meters,
+          estimatedDurationSeconds: course.estimated_duration_seconds,
+          coverImageUrl: course.cover_image_url,
+          features: course.features?.map((f) => f.name),
           creator: course.creator
             ? {
-                petName: course.creator.petName,
-                petAge: petAge,
-                breedName: course.creator.breed
-                  ? course.creator.breed.name
-                  : null,
+                petName: course.creator.dog_name,
+                petAge,
+                breedName: course.creator.dog_breed || null,
+                petProfileImageUrl: course.creator.dog_image,
               }
             : null,
-          createdAt: course.createdAt,
+          createdAt: course.created_at,
         };
       });
 
-      const result = {
+      return {
         courses: formattedCourses,
         pagination: {
           currentPage: page,
@@ -176,13 +157,6 @@ class CourseService {
           petSize,
         },
       };
-
-      logger.info("추천 코스 목록 조회 서비스 완료", {
-        count,
-        searchRadius: radius,
-      });
-
-      return result;
     } catch (error) {
       logger.error("추천 코스 목록 조회 서비스 오류:", error);
       throw error;
