@@ -17,7 +17,6 @@ class MarkingPhotoController {
     try {
       logger.info('새로운 마킹 포인트 등록 요청 시작');
       
-      // 인증 미들웨어에서 설정된 user_id를 올바르게 가져옵니다.
       const userId = req.user.user_id;
       const { walkRecordId, latitude, longitude, photoUrl } = req.body;
       
@@ -76,7 +75,6 @@ class MarkingPhotoController {
       logger.info('마킹 포토존 상세 정보 조회 요청 시작');
       
       const { photozoneId } = req.params;
-      // 인증 미들웨어에서 설정된 user_id를 올바르게 가져옵니다.
       const userId = req.user.user_id; 
       
       if (!photozoneId) {
@@ -125,21 +123,21 @@ class MarkingPhotoController {
       logger.info('기존 포토존에 사진 추가 요청 시작');
       
       const { photozoneId } = req.params;
-      const { photoUrl } = req.body;
-      // 인증 미들웨어에서 설정된 user_id를 올바르게 가져옵니다.
+      const { photoUrl, walkRecordId } = req.body; // walkRecordId를 req.body에서 추출
       const userId = req.user.user_id;
       
-      if (!photozoneId || !photoUrl) {
+      if (!photozoneId || !photoUrl || !walkRecordId) {
         return res.status(400).json({
           success: false,
-          message: '포토존 ID와 사진 URL이 필요합니다.',
+          message: '포토존 ID, 사진 URL, 산책 기록 ID가 필요합니다.',
           code: 'MISSING_REQUIRED_FIELDS'
         });
       }
 
       const result = await markingPhotozoneService.addPhotoToPhotozone(
         photozoneId, 
-        photoUrl, 
+        photoUrl,
+        walkRecordId,
         userId
       );
       

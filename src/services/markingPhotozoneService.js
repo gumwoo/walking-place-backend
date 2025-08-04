@@ -1,8 +1,8 @@
 // C:\walking-backend\src\services\markingPhotozoneService.js
 
-const { MarkingPhotozone, MarkingPhoto, User, Breed } = require('../models');
+const { MarkingPhotozone, MarkingPhoto, User, Breed, WalkRecord } = require('../models');
 const logger = require('../config/logger');
-const { Op } = require('sequelize'); // Op 객체를 가져옵니다.
+const { Op } = require('sequelize');
 
 /**
  * 마킹 포토존 관련 서비스
@@ -27,17 +27,17 @@ class MarkingPhotozoneService {
 
       // 2. 해당 포토존의 모든 사진 조회 (최신순, 업로더 정보 포함)
       const photos = await MarkingPhoto.findAll({
-        where: { photozoneId },
+        where: { photozone_id: photozoneId },
         include: [
           {
             model: User,
-            as: 'user', // 별칭을 'user'로 수정
+            as: 'user',
             attributes: ['dog_name', 'dog_birth_year', 'dog_image', 'dog_breed'],
             required: true
           }
         ],
-        attributes: ['photoId', 'imageUrl', 'takenAt', 'userId'],
-        order: [['takenAt', 'DESC']]
+        attributes: ['photo_id', 'image_url', 'taken_at', 'user_id'],
+        order: [['taken_at', 'DESC']]
       });
 
       // 3. engagementTextData 계산
@@ -54,13 +54,13 @@ class MarkingPhotozoneService {
         }
 
         return {
-          photoId: photo.photoId,
-          photoUrl: photo.imageUrl,
-          uploadedAt: photo.takenAt,
+          photoId: photo.photo_id,
+          photoUrl: photo.image_url,
+          uploadedAt: photo.taken_at,
           uploader: {
             profileImageUrl: photo.user.dog_image,
             petName: photo.user.dog_name,
-            petBreed: photo.user.dog_breed, // dog_breed 속성 사용
+            petBreed: photo.user.dog_breed,
             petAge: petAge
           }
         };
@@ -72,7 +72,7 @@ class MarkingPhotozoneService {
       });
 
       return {
-        id: photozone.photozoneId,
+        id: photozone.photozone_id,
         latitude: photozone.latitude,
         longitude: photozone.longitude,
         photos: formattedPhotos,
@@ -89,34 +89,42 @@ class MarkingPhotozoneService {
    * 기존 포토존에 사진 추가
    * @param {string} photozoneId - 포토존 ID
    * @param {string} photoUrl - 사진 URL
+   * @param {string} walkRecordId - 산책 기록 ID (추가된 매개변수)
    * @param {string} userId - 사용자 ID
    * @returns {Object} 추가된 사진 정보
    */
-  async addPhotoToPhotozone(photozoneId, photoUrl, userId) {
+  async addPhotoToPhotozone(photozoneId, photoUrl, walkRecordId, userId) {
     try {
-      logger.info('기존 포토존에 사진 추가 서비스 시작', { photozoneId, userId });
+      logger.info('기존 포토존에 사진 추가 서비스 시작', { photozoneId, userId, walkRecordId });
 
       // 1. 포토존 존재 여부 확인
       const photozone = await MarkingPhotozone.findByPk(photozoneId);
       if (!photozone) {
         throw new Error('지정된 마킹 포토존을 찾을 수 없습니다.');
       }
+      
+      // 2. 산책 기록 존재 여부 확인 (추가)
+      const walkRecord = await WalkRecord.findByPk(walkRecordId);
+      if (!walkRecord) {
+        throw new Error('지정된 산책 기록을 찾을 수 없습니다.');
+      }
 
-      // 2. 새로운 마킹 사진 생성
+      // 3. 새로운 마킹 사진 생성
       const newPhoto = await MarkingPhoto.create({
-        photozoneId,
-        userId,
-        imageUrl: photoUrl,
-        takenAt: new Date()
+        photozone_id: photozoneId,
+        user_id: userId,
+        walk_record_id: walkRecordId, // walkRecordId 추가
+        image_url: photoUrl,
+        taken_at: new Date()
       });
 
       logger.info('기존 포토존에 사진 추가 서비스 완료', {
         photozoneId,
-        photoId: newPhoto.photoId
+        photoId: newPhoto.photo_id
       });
 
       return {
-        photoId: newPhoto.photoId,
+        photoId: newPhoto.photo_id,
         photozoneId: photozoneId
       };
 
@@ -137,18 +145,18 @@ class MarkingPhotozoneService {
       // 현재 사용자를 제외한 가장 최근 방문자 찾기
       const recentVisitor = await MarkingPhoto.findOne({
         where: {
-          photozoneId: photozoneId,
-          userId: { [Op.ne]: currentUserId }
+          photozone_id: photozoneId,
+          user_id: { [Op.ne]: currentUserId }
         },
         include: [
           {
             model: User,
-            as: 'user', // 별칭을 'user'로 수정
-            attributes: ['dog_name'], // 'petName'을 'dog_name'으로 수정
+            as: 'user',
+            attributes: ['dog_name'],
             required: true
           }
         ],
-        order: [['takenAt', 'DESC']] // created_at 대신 takenAt 사용
+        order: [['taken_at', 'DESC']]
       });
 
       if (!recentVisitor) {
@@ -160,7 +168,7 @@ class MarkingPhotozoneService {
 
       // 시간 차이 계산
       const now = new Date();
-      const visitTime = new Date(recentVisitor.takenAt); // takenAt 사용
+      const visitTime = new Date(recentVisitor.taken_at);
       const diffMs = now - visitTime;
       const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
       const diffDays = Math.floor(diffHours / 24);
@@ -177,7 +185,7 @@ class MarkingPhotozoneService {
       }
 
       return {
-        previousVisitorPetName: recentVisitor.user.dog_name, // uploader 별칭에 맞춰 수정
+        previousVisitorPetName: recentVisitor.user.dog_name,
         previousVisitTimeAgo: timeAgo
       };
 
@@ -191,5 +199,4 @@ class MarkingPhotozoneService {
   }
 }
 
-// 클래스 정의 중복 제거
 module.exports = new MarkingPhotozoneService();
