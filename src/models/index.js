@@ -157,6 +157,18 @@ MarkingPhotozone.belongsToMany(WalkRecord, {
   as: 'walkRecords'
 });
 
+// WalkRecord - MarkingPhoto (1:N)
+WalkRecord.hasMany(MarkingPhoto, {
+  foreignKey: 'walk_record_id',
+  sourceKey: 'walk_record_id',
+  as: 'markingPhotos'
+});
+MarkingPhoto.belongsTo(WalkRecord, {
+  foreignKey: 'walk_record_id',
+  targetKey: 'walk_record_id',
+  as: 'walkRecord'
+});
+
 // ====== 모델 내보내기 ======
 module.exports = {
   // 주 엔티티
