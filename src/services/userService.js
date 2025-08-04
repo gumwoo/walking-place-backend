@@ -19,7 +19,7 @@ class userService {
 
       const offset = (page - 1) * size;
       const { count, rows } = await WalkRecord.findAndCountAll({
-        where: { userId, status: "COMPLETED" },
+        where: { user_id: userId, status: "COMPLETED" },
         order: [[sortBy, "DESC"]],
         offset,
         limit: size,

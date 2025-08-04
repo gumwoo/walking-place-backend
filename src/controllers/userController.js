@@ -143,8 +143,8 @@ class UserController {
    */
   async getWalkRecords(req, res) {
     try {
-      const userId = req.user?.userId || process.env.TEST_USER_ID;
-      const { page = 1, size = 10, sortBy = 'createdAt' } = req.query;
+      const userId = req.user?.user_id || process.env.TEST_USER_ID;
+      const { page = 1, size = 10, sortBy = 'created_at' } = req.query;
 
       const result = await userService.getWalkRecords(userId, {
         page: parseInt(page, 10),
@@ -154,6 +154,7 @@ class UserController {
 
       return res.status(200).json({
         success: true,
+        message: '산책 기록 목록이 조회되었습니다.',
         data: result,
       });
     } catch (error) {
