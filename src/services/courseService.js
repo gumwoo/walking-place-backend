@@ -408,15 +408,15 @@ class CourseService {
 
       // 3. 코스 생성 (산책 기록의 좌표와 데이터 사용)
       const course = await Course.create({
-        creatorUserId,
-        courseName,
+        creator_user_id: creatorUserId,
+        course_name: courseName,
         difficulty,
-        recommendedPetSize,
-        pathCoordinates: walkRecord.pathCoordinates, // 산책 기록의 좌표 사용
-        courseLengthMeters: walkRecord.distanceMeters, // 산책 기록의 거리 사용
-        estimatedDurationSeconds: walkRecord.durationSeconds, // 산책 기록의 소요 시간 사용
-        coverImageUrl,
-        averageTailcopterScore: walkRecord.tailcopterScore || 0 // 산책 기록의 꼬리콥터 점수 초기값으로 사용
+        recommended_pet_size: recommendedPetSize,
+        path_coordinates: walkRecord.path_coordinates, // 산책 기록의 좌표 사용
+        course_length_meters: walkRecord.distance_meters, // 산책 기록의 거리 사용
+        estimated_duration_seconds: walkRecord.duration_seconds, // 산책 기록의 소요 시간 사용
+        cover_image_url: coverImageUrl,
+        average_tailcopter_score: walkRecord.tailcopter_score || 0 // 산책 기록의 꼬리콥터 점수 초기값으로 사용
       });
 
       // 4. 코스 특징 처리 및 연결

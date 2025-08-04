@@ -264,6 +264,14 @@ class CourseController {
         });
       }
       
+      // ← 여기에 추가! (265번째 줄 다음)
+      const difficultyMap = {
+        '하': 'EASY',
+        '중': 'NORMAL', 
+        '상': 'HARD'
+      };
+      const mappedDifficulty = difficultyMap[difficulty] || difficulty;
+
       if (!recommendedPetSize || !['SMALL', 'MEDIUM', 'LARGE'].includes(recommendedPetSize)) {
         return res.status(400).json({
           success: false,
@@ -296,6 +304,7 @@ class CourseController {
       
       const courseData = {
         ...req.body,
+        difficulty: mappedDifficulty,
         creatorUserId: userId
       };
 
