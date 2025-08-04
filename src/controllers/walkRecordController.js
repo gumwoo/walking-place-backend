@@ -13,7 +13,7 @@ const walkRecordController = {
   async startWalk(req, res) {
     try {
       const userId = req.user?.user_id || process.env.TEST_USER_ID;
-      
+
       if (!userId) {
         return ApiResponse.unauthorized(res, "유효한 사용자 ID가 없습니다.");
       }
@@ -61,11 +61,11 @@ const walkRecordController = {
   async updateTrack(req, res) {
     try {
       const { walkRecordId } = req.params;
-      const { 
-      currentPathCoordinates, 
-      currentDistanceMeters, 
-      currentDurationSeconds 
-    } = req.body;
+      const {
+        currentPathCoordinates,
+        currentDistanceMeters,
+        currentDurationSeconds,
+      } = req.body;
       const userId = req.user?.user_id || process.env.TEST_USER_ID;
 
       // 유효성 검사 강화: 배열 + 각 요소가 [number, number]인지 확인
@@ -105,10 +105,10 @@ const walkRecordController = {
       return ApiResponse.updated(
         res,
         {
-        coordinates: walkRecord.path_coordinates,
-        distance: walkRecord.distance_meters,
-        duration: walkRecord.duration_seconds
-      },
+          coordinates: walkRecord.path_coordinates,
+          distance: walkRecord.distance_meters,
+          duration: walkRecord.duration_seconds,
+        },
         "좌표가 성공적으로 저장되었습니다."
       );
     } catch (error) {
@@ -206,15 +206,19 @@ const walkRecordController = {
       // 실제 경로 분석 함수 호출 (예: PostGIS 기반 등)
       await matchWalkPath(walkRecordId);
 
-      const { finalDurationSeconds, finalDistanceMeters, finalPathCoordinates } = req.body;
-      
+      const {
+        finalDurationSeconds,
+        finalDistanceMeters,
+        finalPathCoordinates,
+      } = req.body;
+
       // 종료 상태 업데이트
       await walkRecord.update({
         status: "COMPLETED",
         end_time: new Date(),
         duration_seconds: finalDurationSeconds,
         distance_meters: finalDistanceMeters,
-        path_coordinates: finalPathCoordinates
+        path_coordinates: finalPathCoordinates,
       });
 
       logger.info(
@@ -247,7 +251,6 @@ const walkRecordController = {
       const userId = req.user?.user_id || process.env.TEST_USER_ID;
       const walkRecordId = req.params.walkRecordId;
       const { tailcopterScore } = req.body;
-
 
       if (typeof tailcopterScore !== "number" || tailcopterScore < 0) {
         return ApiResponse.validationError(
@@ -301,9 +304,9 @@ const walkRecordController = {
       } = req.body;
 
       const walkRecord = await WalkRecord.findOne({
-        where: { walkRecordId, userId },
+        where: { walk_record_id: walkRecordId, user_id: userId },
         include: [
-          { model: Course, as: "course", attributes: ["courseName"] },
+          { model: Course, as: "course", attributes: ["course_name"] },
           { model: User, as: "user", attributes: ["dog_name"] },
         ],
       });
@@ -330,17 +333,17 @@ const walkRecordController = {
       await WalkRecord.update(
         {
           status: "COMPLETED",
-          endTime: new Date(),
-          distanceMeters,
-          markingCount,
-          tailcopterScore,
+          end_time: new Date(),
+          distance_meters: distanceMeters,
+          marking_count: markingCount, 
+          tailcopter_score: tailcopterScore,
           title: generatedTitle,
-          walkDate: walkDate || walkRecord.walkDate,
-          pathImageUrl: pathImageUrl || walkRecord.pathImageUrl,
-          isRecordSaved: true,
+          walk_date: walkDate || walkRecord.get("walk_date"), 
+          path_image_url: pathImageUrl || walkRecord.get("path_image_url"),
+          is_record_saved: true,
         },
         {
-          where: { walkRecordId, userId },
+          where: { walk_record_id: walkRecordId, user_id: userId },
         }
       );
 
@@ -371,10 +374,10 @@ const walkRecordController = {
 
       const walkRecord = await WalkRecord.findOne({
         where: {
-          walkRecordId,
-          userId,
+          walk_record_id: walkRecordId,
+          user_id: userId,
           status: "COMPLETED",
-          isRecordSaved: true,
+          is_record_saved: true,
         },
         include: [
           {
@@ -400,7 +403,10 @@ const walkRecordController = {
         return ApiResponse.notFound(res, "해당 산책 일지를 찾을 수 없습니다.");
       }
 
-      if (!walkRecord.pathImageUrl || walkRecord.pathImageUrl.trim() === "") {
+      if (
+        !walkRecord.path_image_url ||
+        walkRecord.path_image_url.trim() === ""
+      ) {
         return ApiResponse.badRequest(
           res,
           "산책 경로 이미지가 존재하지 않습니다."
