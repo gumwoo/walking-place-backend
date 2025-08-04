@@ -54,34 +54,32 @@ class userService {
       dog_image: user.dog_image,
     };
   }
+async getProfile(userId) {
+  try {
+    const user = await User.findByPk(userId, {
+      attributes: [
+        "id", // 실제 PK
+        "oauth_provider", // 소셜 타입
+        "preferred_location_id",
+        "dog_name",
+        "dog_breed",
+        "dog_birth_year",
+        "dog_size",
+        "dog_image",
+        "created_at",
+        "updated_at",
+      ],
+    });
 
-  async getProfile(userId) {
-    try {
-      const user = await User.findByPk(userId, {
-        attributes: [
-          "user_id",
-          "social_type",
-          "is_terms_agreed",
-          "preferred_location_id",
-          "pet_name",
-          "breed_id",
-          "pet_birth_date",
-          "pet_size",
-          "pet_profile_image_url",
-          "created_at",
-          "updated_at",
-        ],
-      });
-
-      if (!user) {
-        throw new Error("사용자 정보를 찾을 수 없습니다.");
-      }
-
-      return user;
-    } catch (err) {
-      throw err;
+    if (!user) {
+      throw new Error("사용자 정보를 찾을 수 없습니다.");
     }
+
+    return user;
+  } catch (err) {
+    throw err;
   }
+}
 
   // 약관 동의 저장
   async agreeToTerms(userId, agreedTermIds) {

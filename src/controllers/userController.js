@@ -117,7 +117,7 @@ class UserController {
    */
   async getProfile(req, res) {
     try {
-      const userId = req.user?.userId || process.env.TEST_USER_ID;
+      const userId = req.user?.user_id || process.env.TEST_USER_ID;
       logger.info("프로필 조회 요청", { userId });
 
       const profile = await userService.getProfile(userId);
