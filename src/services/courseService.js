@@ -11,6 +11,7 @@ const {
 const { Op, Sequelize } = require("sequelize");
 const logger = require("../config/logger");
 const Breed = require("../models/Breed");
+const { MarkingPhoto } = require("../models");
 
 /**
  * 코스 관련 서비스
@@ -305,15 +306,15 @@ class CourseService {
         where: { course_id: courseId },
         include: [
           {
-            model: PhotozonePhoto,
-            as: "photos", // 모델 관계에서 설정한 alias
-            attributes: ["file_url", "created_at"],
+            model: MarkingPhoto,
+            as: "markingPhotos", // 모델 관계에서 설정한 alias
+            attributes: ["image_url", "created_at"],
             order: [["created_at", "DESC"]],
             limit: 1, // 가장 최근 사진만
             required: false,
           },
         ],
-        attributes: ["id", "location", "created_at"],
+        attributes: ["photozone_id", "latitude", "longitude", "created_at"],
         order: [["created_at", "ASC"]],
       });
 
@@ -323,20 +324,18 @@ class CourseService {
       });
 
       return photozones.map((zone) => {
-        // PostGIS Point에서 좌표 추출
-        let latitude = null;
-        let longitude = null;
-        if (zone.location && zone.location.coordinates) {
-          [longitude, latitude] = zone.location.coordinates;
-        }
+        // 가장 최근 사진만 추출
+        const sortedPhotos = zone.markingPhotos?.sort(
+          (a, b) => new Date(b.created_at) - new Date(a.created_at)
+        );
 
         return {
-          id: zone.id,
-          latitude: latitude,
-          longitude: longitude,
+          id: zone.photozone_id,
+          latitude: zone.latitude,
+          longitude: zone.longitude,
           representativeImageUrl:
-            zone.photos && zone.photos.length > 0
-              ? zone.photos[0].file_url
+            sortedPhotos && sortedPhotos.length > 0
+              ? sortedPhotos[0].image_url
               : null,
         };
       });
@@ -430,6 +429,7 @@ class CourseService {
 
       // 4. 코스 특징 처리 및 연결
       const featureIds = [];
+      console.log("✅ featureIds 확인:", featureIds);
 
       for (const featureName of selectedFeatures) {
         // 기존 특징인지 확인
@@ -450,13 +450,13 @@ class CourseService {
           });
         }
 
-        featureIds.push(existingFeature.featureId);
+        featureIds.push(existingFeature.feature_id);
       }
 
       // 5. 코스-특징 연결
       if (featureIds.length > 0) {
         const featureAssociations = featureIds.map((featureId) => ({
-          courseId: course.courseId,
+          courseId: course.course_id,
           featureId,
         }));
 
