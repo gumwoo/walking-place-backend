@@ -352,10 +352,10 @@ class CourseService {
 
       // 2. 기본 정보 반환
       const result = {
-        walkRecordId: walkRecord.walkRecordId,
-        courseLengthMeters: walkRecord.distanceMeters,
-        pathCoordinates: walkRecord.pathCoordinates,
-        estimatedDurationSeconds: walkRecord.durationSeconds
+        walkRecordId: walkRecord.walk_record_id,
+        courseLengthMeters: walkRecord.distance_meters,
+        pathCoordinates: walkRecord.path_coordinates,
+        estimatedDurationSeconds: walkRecord.duration_seconds
       };
 
       logger.info('새 코스 기본 정보 조회 서비스 완료', { walkRecordId });

@@ -206,10 +206,15 @@ const walkRecordController = {
       // 실제 경로 분석 함수 호출 (예: PostGIS 기반 등)
       await matchWalkPath(walkRecordId);
 
+      const { finalDurationSeconds, finalDistanceMeters, finalPathCoordinates } = req.body;
+      
       // 종료 상태 업데이트
       await walkRecord.update({
         status: "COMPLETED",
         end_time: new Date(),
+        duration_seconds: finalDurationSeconds,
+        distance_meters: finalDistanceMeters,
+        path_coordinates: finalPathCoordinates
       });
 
       logger.info(
