@@ -32,6 +32,10 @@ Location.hasMany(User, {
 });
 
 // User - Breed 관계는 현재 구조에서 제거 (dog_breed 문자열 사용)
+User.belongsTo(Breed, {
+  foreignKey: 'breed_id',     // User 테이블에 존재하는 외래키 컬럼명
+  as: 'breed',                // include할 때 사용하는 별칭
+});
 
 // User - Term (N:M through UserTermAgreement)
 User.belongsToMany(Term, {

@@ -10,6 +10,7 @@ const {
 } = require("../models");
 const { Op, Sequelize } = require("sequelize");
 const logger = require("../config/logger");
+const Breed = require("../models/Breed");
 
 /**
  * 코스 관련 서비스
@@ -196,17 +197,17 @@ class CourseService {
     try {
       logger.info("코스 상세 정보 조회 서비스 시작", { courseId });
 
-      // 1. 코스 상세 정보 조회 (관련 정보 포함)
+      // 1. 코스 상세 정보 조회
       const course = await Course.findByPk(courseId, {
         include: [
           {
             model: User,
             as: "creator",
             attributes: [
-              "userId",
-              "petName",
-              "petBirthDate",
-              "petProfileImageUrl",
+              "user_id", // snake_case 필드
+              "dog_name",
+              "dog_birth_year",
+              "dog_image",
             ],
             include: [
               {
@@ -222,16 +223,16 @@ class CourseService {
             model: CourseFeature,
             as: "features",
             through: { attributes: [] },
-            attributes: ["featureId", "name", "isCustom"],
+            attributes: ["feature_id", "name", "is_custom"],
           },
           {
             model: MarkingPhotozone,
             as: "markingPhotozones",
             attributes: [
-              "photozoneId",
+              "photozone_id",
               "latitude",
               "longitude",
-              "isRecommended",
+              "is_recommended",
             ],
           },
         ],
@@ -241,49 +242,42 @@ class CourseService {
         throw new Error("지정된 코스를 찾을 수 없습니다.");
       }
 
-      // 2. 결과 포맷팅
-      // 반려견 나이 계산
-      let petAge = null;
-      if (course.creator && course.creator.petBirthDate) {
-        const birthDate = new Date(course.creator.petBirthDate);
-        const today = new Date();
-        petAge = today.getFullYear() - birthDate.getFullYear();
+      // 2. 반려견 나이 계산
+      const petAge =
+        course.creator && course.creator.dog_birth_year
+          ? new Date().getFullYear() - course.creator.dog_birth_year
+          : null;
 
-        // 생일이 지났는지 확인
-        const monthDiff = today.getMonth() - birthDate.getMonth();
-        if (
-          monthDiff < 0 ||
-          (monthDiff === 0 && today.getDate() < birthDate.getDate())
-        ) {
-          petAge--;
-        }
-      }
-
+      // 3. 결과 포맷 변환 및 반환
       const result = {
-        courseId: course.courseId,
-        courseName: course.courseName,
+        courseId: course.course_id,
+        courseName: course.course_name,
         difficulty: course.difficulty,
-        recommendedPetSize: course.recommendedPetSize,
-        averageTailcopterScore: course.averageTailcopterScore,
-        courseLengthMeters: course.courseLengthMeters,
-        coverImageUrl: course.coverImageUrl,
-        pathCoordinates: course.pathCoordinates,
-        features: course.features.map((feature) => feature.name), // 문자열 배열로
+        recommendedPetSize: course.recommended_pet_size,
+        averageTailcopterScore: course.average_tailcopter_score,
+        courseLengthMeters: course.course_length_meters,
+        estimatedDurationSeconds: course.estimated_duration_seconds,
+        coverImageUrl: course.cover_image_url,
+        pathCoordinates: course.path_coordinates,
+        features: course.features.map((feature) => feature.name),
         creator: course.creator
           ? {
-              petName: course.creator.petName,
+              petName: course.creator.dog_name,
               petAge: petAge,
-              breedName: course.creator.breed
-                ? course.creator.breed.name
-                : null,
-              petProfileImageUrl: course.creator.petProfileImageUrl, // 프로필 아이콘 URL 추가
+              breedName: course.creator.dog_breed,
+              petProfileImageUrl: course.creator.dog_image,
             }
           : null,
-        createdAt: course.createdAt,
+        markingPhotozones: course.markingPhotozones.map((zone) => ({
+          photozoneId: zone.photozone_id,
+          latitude: zone.latitude,
+          longitude: zone.longitude,
+          isRecommended: zone.is_recommended,
+        })),
+        createdAt: course.created_at,
       };
 
       logger.info("코스 상세 정보 조회 서비스 완료", { courseId });
-
       return result;
     } catch (error) {
       logger.error("코스 상세 정보 조회 서비스 오류:", error);
