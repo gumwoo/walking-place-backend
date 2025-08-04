@@ -1,3 +1,5 @@
+// C:\walking-backend\src\controllers\markingPhotoController.js
+
 const markingPhotoService = require('../services/markingPhotoService');
 const markingPhotozoneService = require('../services/markingPhotozoneService');
 const logger = require('../config/logger');
@@ -15,7 +17,8 @@ class MarkingPhotoController {
     try {
       logger.info('새로운 마킹 포인트 등록 요청 시작');
       
-      const userId = req.user.userId; // 인증 미들웨어에서 설정
+      // 인증 미들웨어에서 설정된 user_id를 올바르게 가져옵니다.
+      const userId = req.user.user_id;
       const { walkRecordId, latitude, longitude, photoUrl } = req.body;
       
       if (!walkRecordId || !latitude || !longitude || !photoUrl) {
@@ -73,7 +76,8 @@ class MarkingPhotoController {
       logger.info('마킹 포토존 상세 정보 조회 요청 시작');
       
       const { photozoneId } = req.params;
-      const userId = req.user.userId; // engagementTextData 계산용
+      // 인증 미들웨어에서 설정된 user_id를 올바르게 가져옵니다.
+      const userId = req.user.user_id; 
       
       if (!photozoneId) {
         return res.status(400).json({
@@ -122,7 +126,8 @@ class MarkingPhotoController {
       
       const { photozoneId } = req.params;
       const { photoUrl } = req.body;
-      const userId = req.user.userId;
+      // 인증 미들웨어에서 설정된 user_id를 올바르게 가져옵니다.
+      const userId = req.user.user_id;
       
       if (!photozoneId || !photoUrl) {
         return res.status(400).json({
@@ -168,7 +173,5 @@ class MarkingPhotoController {
     }
   }
 }
-
-module.exports = new MarkingPhotoController();
 
 module.exports = new MarkingPhotoController();

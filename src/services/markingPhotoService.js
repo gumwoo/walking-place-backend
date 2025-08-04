@@ -1,4 +1,6 @@
-const { PhotozonePhoto, MarkingPhotozone, User, Walk } = require('../models');
+// C:\walking-backend\src\services\markingPhotoService.js
+
+const { MarkingPhoto, MarkingPhotozone, User, WalkRecord } = require('../models');
 const logger = require('../config/logger');
 const { Op } = require('sequelize');
 
@@ -27,7 +29,7 @@ class MarkingPhotoService {
       });
 
       // 1. 산책 기록 존재 여부 확인
-      const walkRecord = await Walk.findByPk(walkRecordId);
+      const walkRecord = await WalkRecord.findByPk(walkRecordId);
       if (!walkRecord) {
         throw new Error('지정된 산책 기록을 찾을 수 없습니다.');
       }
@@ -40,39 +42,38 @@ class MarkingPhotoService {
 
       if (nearbyPhotozone) {
         // 기존 포토존에 연결
-        photozoneId = nearbyPhotozone.id;
+        photozoneId = nearbyPhotozone.photozone_id; // 컬럼명 'photozone_id'로 수정
         logger.info('기존 포토존에 연결', { photozoneId });
       } else {
         // 새로운 포토존 생성
         const newPhotozone = await MarkingPhotozone.create({
           course_id: walkRecord.course_id, // 산책 기록의 코스와 연결
-          name: `포토존-${Date.now()}`, // 임시 이름
-          location: {
-            type: 'Point',
-            coordinates: [longitude, latitude] // PostGIS 형식: [경도, 위도]
-          }
+          is_recommended: false, // 기본값 설정
+          latitude: latitude,
+          longitude: longitude
         });
-        photozoneId = newPhotozone.id;
+        photozoneId = newPhotozone.photozone_id; // 컬럼명 'photozone_id'로 수정
         isNewPhotozone = true;
         logger.info('새로운 포토존 생성', { photozoneId });
       }
 
       // 3. 마킹 사진 생성
-      const markingPhoto = await PhotozonePhoto.create({
-        marking_photozone_id: photozoneId,
+      const markingPhoto = await MarkingPhoto.create({
+        photozone_id: photozoneId, // 컬럼명 'photozone_id'로 수정
         user_id: userId,
-        walk_id: walkRecordId,
-        file_url: photoUrl
+        walk_record_id: walkRecordId, // 컬럼명 'walk_record_id'로 수정
+        image_url: photoUrl, // 컬럼명 'image_url'로 수정
+        taken_at: new Date()
       });
 
       logger.info('새로운 마킹 포인트 등록 서비스 완료', {
-        markingPhotoId: markingPhoto.id,
+        markingPhotoId: markingPhoto.photo_id, // 컬럼명 'photo_id'로 수정
         photozoneId,
         isNewPhotozone
       });
 
       return {
-        markingPhotoId: markingPhoto.id,
+        markingPhotoId: markingPhoto.photo_id, // 컬럼명 'photo_id'로 수정
         photozoneId,
         latitude,
         longitude,
@@ -88,7 +89,7 @@ class MarkingPhotoService {
   /**
    * 50m 반경 내 기존 포토존 검색 (위도/경도 기반)
    * @param {number} latitude - 기준 위도
-   * @param {number} longitude - 기준 경도  
+   * @param {number} longitude - 기준 경도  
    * @param {number} radiusMeters - 반경 (미터)
    * @returns {Object|null} 발견된 포토존 또는 null
    */
@@ -97,18 +98,15 @@ class MarkingPhotoService {
       // PostGIS ST_Distance 함수 사용하여 거리 기반 검색
       // 또는 Haversine 공식을 JavaScript로 구현
       const photozones = await MarkingPhotozone.findAll({
-        attributes: ['id', 'location']
+        attributes: ['photozone_id', 'latitude', 'longitude'] // 필드명 수정
       });
 
       for (const zone of photozones) {
         // PostGIS Point에서 좌표 추출
-        if (zone.location && zone.location.coordinates) {
-          const [zoneLng, zoneLat] = zone.location.coordinates;
-          const distance = this.calculateDistance(latitude, longitude, zoneLat, zoneLng);
-          
-          if (distance <= radiusMeters) {
-            return zone;
-          }
+        const distance = this.calculateDistance(latitude, longitude, parseFloat(zone.latitude), parseFloat(zone.longitude));
+        
+        if (distance <= radiusMeters) {
+          return zone;
         }
       }
 
@@ -138,9 +136,5 @@ class MarkingPhotoService {
     return R * c; // 미터 단위 거리
   }
 }
-
-module.exports = new MarkingPhotoService();
-
-module.exports = new MarkingPhotoService();
 
 module.exports = new MarkingPhotoService();

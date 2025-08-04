@@ -19,25 +19,19 @@ const WalkRecordMarkingPhotozone = require('./WalkRecordMarkingPhotozone');
 
 // ====== ERD 기준 관계 설정 ======
 
-// User - Location (N:1, preferredLocationId)
+// User - Location (N:1, preferred_location_id)
 User.belongsTo(Location, {
-  foreignKey: 'preferredLocationId',
+  foreignKey: 'preferred_location_id',
+  targetKey: 'location_id',
   as: 'preferredLocation'
 });
 Location.hasMany(User, {
-  foreignKey: 'preferredLocationId',
+  foreignKey: 'preferred_location_id',
+  sourceKey: 'location_id',
   as: 'users'
 });
 
-// User - Breed (N:1, breedId)
-User.belongsTo(Breed, {
-  foreignKey: 'breedId',
-  as: 'breed'
-});
-Breed.hasMany(User, {
-  foreignKey: 'breedId',
-  as: 'users'
-});
+// User - Breed 관계는 현재 구조에서 제거 (dog_breed 문자열 사용)
 
 // User - Term (N:M through UserTermAgreement)
 User.belongsToMany(Term, {
@@ -55,41 +49,49 @@ Term.belongsToMany(User, {
 
 // User - WalkRecord (1:N)
 User.hasMany(WalkRecord, {
-  foreignKey: 'userId',
+  foreignKey: 'user_id',
+  sourceKey: 'id',
   as: 'walkRecords'
 });
 WalkRecord.belongsTo(User, {
-  foreignKey: 'userId',
+  foreignKey: 'user_id',
+  targetKey: 'id',
   as: 'user'
 });
 
-// User - Course (1:N, creatorUserId)
+// User - Course (1:N, creator_user_id)
 User.hasMany(Course, {
-  foreignKey: 'creatorUserId',
+  foreignKey: 'creator_user_id',
+  sourceKey: 'id',
   as: 'createdCourses'
 });
 Course.belongsTo(User, {
-  foreignKey: 'creatorUserId',
+  foreignKey: 'creator_user_id',
+  targetKey: 'id',
   as: 'creator'
 });
 
 // User - MarkingPhoto (1:N)
 User.hasMany(MarkingPhoto, {
-  foreignKey: 'userId',
+  foreignKey: 'user_id',
+  sourceKey: 'id',
   as: 'markingPhotos'
 });
 MarkingPhoto.belongsTo(User, {
-  foreignKey: 'userId',
+  foreignKey: 'user_id',
+  targetKey: 'id',
   as: 'user'
 });
 
 // Course - WalkRecord (1:N)
 Course.hasMany(WalkRecord, {
-  foreignKey: 'courseId',
+  foreignKey: 'course_id',
+  sourceKey: 'course_id',
   as: 'walkRecords'
 });
 WalkRecord.belongsTo(Course, {
-  foreignKey: 'courseId',
+  foreignKey: 'course_id',
+  targetKey: 'course_id',
   as: 'course'
 });
 

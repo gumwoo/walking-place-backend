@@ -11,60 +11,62 @@ const { MarkingPhotozone } = require("../models");
 const walkRecordController = {
   // ✅ 산책 시작 API (NEW_COURSE or 자유 산책)
   async startWalk(req, res) {
-    console.log("✅ startWalk 진입");
-  try {
-    const userId = req.user?.user_id || process.env.TEST_USER_ID;
-    console.log("🔥 사용자 ID:", req.user);
+    try {
+      const userId = req.user?.user_id || process.env.TEST_USER_ID;
+      
+      if (!userId) {
+        return ApiResponse.unauthorized(res, "유효한 사용자 ID가 없습니다.");
+      }
 
-    if (!userId) {
-      return ApiResponse.badRequest(res, "유효한 사용자 ID가 없습니다.");
+      const { walk_type, course_id } = req.body;
+
+      if (walk_type === "EXISTING_COURSE" && !course_id) {
+        return ApiResponse.badRequest(res, "코스 ID가 필요합니다.");
+      }
+
+      const startTime = new Date();
+      const walkDate = startTime.toISOString().slice(0, 10); // YYYY-MM-DD
+
+      const newWalk = await WalkRecord.create({
+        user_id: userId,
+        course_id: walk_type === "EXISTING_COURSE" ? course_id : null,
+        status: "STARTED",
+        start_time: startTime,
+        walk_date: walkDate,
+        path_coordinates: [], // 초기 빈 경로
+        marking_count: 0,
+        is_course_registered: false,
+      });
+
+      return ApiResponse.created(
+        res,
+        {
+          walk_record_id: newWalk.walk_record_id,
+          status: newWalk.status,
+          start_time: newWalk.start_time,
+        },
+        "산책이 시작되었습니다."
+      );
+    } catch (error) {
+      logger.error("산책 시작 중 오류가 발생했습니다.", { error });
+      return ApiResponse.serverError(
+        res,
+        "산책 시작 중 오류가 발생했습니다.",
+        error
+      );
     }
-
-    const { walk_type, course_id } = req.body;
-
-    if (walk_type === "EXISTING_COURSE" && !course_id) {
-      return ApiResponse.badRequest(res, "코스 ID가 필요합니다.");
-    }
-
-    const startTime = new Date();
-    const walkDate = startTime.toISOString().slice(0, 10); // YYYY-MM-DD
-
-    const newWalk = await WalkRecord.create({
-      user_id: userId,
-      course_id: walk_type === "EXISTING_COURSE" ? course_id : null,
-      status: "STARTED",
-      start_time: startTime,
-      walk_date: walkDate,
-      path_coordinates: [],
-      marking_count: 0,
-      is_course_registered: false,
-    });
-
-    return ApiResponse.created(
-      res,
-      {
-        walk_record_id: newWalk.walk_record_id,
-        status: newWalk.status,
-        start_time: newWalk.start_time,
-      },
-      "산책이 시작되었습니다."
-    );
-  } catch (error) {
-    console.error("🔥 산책 시작 오류:", error);
-    return ApiResponse.serverError(
-      res,
-      "산책 시작 중 오류가 발생했습니다.",
-      error
-    );
-  }
-},
-
+  },
 
   // ✅ [PATCH] /api/v1/walk-records/:walkRecordId/path  산책 경로 좌표 및 데이터 주기적 업데이트
   async updateTrack(req, res) {
     try {
       const { walkRecordId } = req.params;
-      const { currentPathCoordinates } = req.body;
+      const { 
+      currentPathCoordinates, 
+      currentDistanceMeters, 
+      currentDurationSeconds 
+    } = req.body;
+      const userId = req.user?.user_id || process.env.TEST_USER_ID;
 
       // 유효성 검사 강화: 배열 + 각 요소가 [number, number]인지 확인
       const isValidCoordinate = (coord) =>
@@ -84,27 +86,33 @@ const walkRecordController = {
         );
       }
 
-      const walkRecord = await WalkRecord.findByPk(walkRecordId);
+      const walkRecord = await WalkRecord.findOne({
+        where: { walk_record_id: walkRecordId, user_id: userId },
+      });
 
       if (!walkRecord) {
         return ApiResponse.notFound(res, "해당 산책 기록을 찾을 수 없습니다.");
       }
 
       // 기존 좌표에 누적
-      const updatedCoordinates = Array.isArray(walkRecord.path_coordinates )
-        ? [...walkRecord.path_coordinates , ...currentPathCoordinates]
+      const updatedCoordinates = Array.isArray(walkRecord.path_coordinates)
+        ? [...walkRecord.path_coordinates, ...currentPathCoordinates]
         : [...currentPathCoordinates];
 
-      walkRecord.path_coordinates  = updatedCoordinates;
+      walkRecord.path_coordinates = updatedCoordinates;
       await walkRecord.save();
 
       return ApiResponse.updated(
         res,
-        walkRecord.path_coordinates ,
+        {
+        coordinates: walkRecord.path_coordinates,
+        distance: walkRecord.distance_meters,
+        duration: walkRecord.duration_seconds
+      },
         "좌표가 성공적으로 저장되었습니다."
       );
     } catch (error) {
-      console.error("좌표 저장 오류:", error);
+      logger.error("좌표 저장 중 오류가 발생했습니다.", { error });
       return ApiResponse.serverError(
         res,
         "좌표 저장 중 오류가 발생했습니다.",
@@ -132,10 +140,10 @@ const walkRecordController = {
         "COMPLETED",
         "CANCELED",
         "PAUSED",
-        "RESUMED",
+        "ABANDONED",
       ];
       if (typeof status !== "string" || !validStatuses.includes(status)) {
-        console.warn("유효하지 않은 상태값 수신됨:", status);
+        logger.warn(`유효하지 않은 상태값 수신됨: ${status}`);
         return ApiResponse.badRequest(
           res,
           `유효하지 않은 상태입니다: ${status}`
@@ -167,7 +175,7 @@ const walkRecordController = {
         `산책 상태가 ${status}로 변경되었습니다.`
       );
     } catch (err) {
-      console.error("산책 상태 변경 오류:", err?.message, err?.stack);
+      logger.error("산책 상태 변경 중 오류가 발생했습니다.", { err });
       return ApiResponse.serverError(
         res,
         "산책 상태 변경 중 오류가 발생했습니다.",
@@ -235,13 +243,6 @@ const walkRecordController = {
       const walkRecordId = req.params.walkRecordId;
       const { tailcopterScore } = req.body;
 
-      // UUID 형식 검사
-      if (!isUuid(walkRecordId)) {
-        return ApiResponse.badRequest(
-          res,
-          `유효하지 않은 walkRecordId 형식입니다: ${walkRecordId}`
-        );
-      }
 
       if (typeof tailcopterScore !== "number" || tailcopterScore < 0) {
         return ApiResponse.validationError(
@@ -267,7 +268,7 @@ const walkRecordController = {
         "꼬리콥터 점수가 성공적으로 저장되었습니다."
       );
     } catch (err) {
-      console.error("꼬리콥터 점수 저장 오류:", err?.message, err?.stack);
+      logger.error("꼬리콥터 점수 저장 중 오류가 발생했습니다.", { err });
       return ApiResponse.serverError(
         res,
         "꼬리콥터 점수 저장 중 오류가 발생했습니다.",
@@ -294,12 +295,11 @@ const walkRecordController = {
         tailcopterScore,
       } = req.body;
 
-      // WalkRecord + User(pet_name) + Course(courseName) 조인
       const walkRecord = await WalkRecord.findOne({
         where: { walkRecordId, userId },
         include: [
           { model: Course, as: "course", attributes: ["courseName"] },
-          { model: User, as: "user", attributes: ["pet_name"] },
+          { model: User, as: "user", attributes: ["dog_name"] },
         ],
       });
 
@@ -311,9 +311,7 @@ const walkRecordController = {
         return ApiResponse.badRequest(res, "이미 저장된 산책 기록입니다.");
       }
 
-      // pet_name 가져오기 (User alias로 접근!)
-      const petName = walkRecord.user?.get("pet_name") || "반려견";
-
+      const petName = walkRecord.user?.get("dog_name") || "반려견";
       let generatedTitle = requestTitle;
 
       if (!requestTitle || requestTitle.trim() === "") {
@@ -324,16 +322,6 @@ const walkRecordController = {
         }
       }
 
-      // 확인용 로그
-      console.log("✅ pet_name:", petName);
-      console.log(
-        "🐶 walkRecord.user JSON:",
-        JSON.stringify(walkRecord.user, null, 2)
-      );
-
-      console.log("✅ 최종 title:", generatedTitle);
-
-      // 업데이트
       await WalkRecord.update(
         {
           status: "COMPLETED",
@@ -361,7 +349,7 @@ const walkRecordController = {
         "산책 기록이 성공적으로 저장되었습니다."
       );
     } catch (err) {
-      console.error("산책 기록 저장 오류:", err);
+      logger.error("산책 기록 저장 중 오류가 발생했습니다.", { err });
       return ApiResponse.serverError(
         res,
         "산책 기록 저장 중 오류가 발생했습니다.",
@@ -370,7 +358,7 @@ const walkRecordController = {
     }
   },
 
-  // 산책 경로 및 마킹 이미지 등 상세 정보 조회   /api/v1/walk-records/{walk_record_id}/details
+  // 산책 경로 및 마킹 이미지 등 상세 정보 조회  /api/v1/walk-records/{walk_record_id}/details
   async getDetails(req, res) {
     try {
       const walkRecordId = req.params.walkRecordId;
@@ -416,7 +404,7 @@ const walkRecordController = {
 
       return ApiResponse.success(res, walkRecord, "산책 일지 상세 조회 성공");
     } catch (err) {
-      console.error("산책 일지 상세 조회 오류:", err);
+      logger.error("산책 일지 상세 조회 중 오류가 발생했습니다.", { err });
       return ApiResponse.serverError(
         res,
         "산책 일지 상세 조회 중 오류가 발생했습니다.",
@@ -424,6 +412,6 @@ const walkRecordController = {
       );
     }
   },
-}
+};
 
 module.exports = walkRecordController;

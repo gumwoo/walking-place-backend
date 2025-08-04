@@ -79,7 +79,9 @@ const authenticateToken = async (req, res, next) => {
     }
 
     // 사용자 존재 여부 확인
+    console.log("🔍 [AUTH DEBUG] decoded.userId:", decoded.userId, "typeof:", typeof decoded.userId);
     const user = await User.findByPk(decoded.userId);
+    console.log("🔍 [AUTH DEBUG] User.findByPk 완료, user:", user ? "존재함" : "없음");
     if (!user) {
       logger.warn('존재하지 않는 사용자', { 
         userId: decoded.userId,
@@ -92,7 +94,18 @@ const authenticateToken = async (req, res, next) => {
       });
     }
 
+    console.log("🔍 [AUTH DEBUG] User 객체 정보:", {
+      id: user.id,
+      oauth_id: user.oauth_id,
+      oauth_provider: user.oauth_provider,
+      dog_name: user.dog_name,
+      dog_breed: user.dog_breed,
+      dog_size: user.dog_size,
+      preferred_location_id: user.preferred_location_id
+    });
+
     // 요청 객체에 사용자 정보 추가 (snake_case 통일)
+    console.log("🔍 [AUTH DEBUG] req.user 객체 생성 시작");
     req.user = {
       user_id: user.id,  // DB의 user_id 컴럼과 일치
       social_id: user.oauth_id,
@@ -102,13 +115,16 @@ const authenticateToken = async (req, res, next) => {
       pet_size: user.dog_size,
       preferred_location_id: user.preferred_location_id
     };
+    console.log("🔍 [AUTH DEBUG] req.user 객체 생성 완료:", req.user);
 
     logger.debug('인증 성공', { 
-      userId: req.user.userId,
+      userId: req.user.user_id,  // ✅ 수정됨
       path: req.path 
     });
 
+    console.log("🔍 [AUTH DEBUG] next() 호출 시작");
     next();
+    console.log("🔍 [AUTH DEBUG] next() 호출 완료");
 
   } catch (error) {
     logger.error('인증 미들웨어 오류:', {

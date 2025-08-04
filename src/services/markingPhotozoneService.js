@@ -1,5 +1,8 @@
+// C:\walking-backend\src\services\markingPhotozoneService.js
+
 const { MarkingPhotozone, MarkingPhoto, User, Breed } = require('../models');
 const logger = require('../config/logger');
+const { Op } = require('sequelize'); // Op 객체를 가져옵니다.
 
 /**
  * 마킹 포토존 관련 서비스
@@ -28,16 +31,8 @@ class MarkingPhotozoneService {
         include: [
           {
             model: User,
-            as: 'uploader',
-            attributes: ['petName', 'petBirthDate', 'petProfileImageUrl'],
-            include: [
-              {
-                model: Breed,
-                as: 'breed',
-                attributes: ['name'],
-                required: false
-              }
-            ],
+            as: 'user', // 별칭을 'user'로 수정
+            attributes: ['dog_name', 'dog_birth_year', 'dog_image', 'dog_breed'],
             required: true
           }
         ],
@@ -52,15 +47,10 @@ class MarkingPhotozoneService {
       const formattedPhotos = photos.map(photo => {
         // 반려견 나이 계산
         let petAge = null;
-        if (photo.uploader && photo.uploader.petBirthDate) {
-          const birthDate = new Date(photo.uploader.petBirthDate);
+        if (photo.user && photo.user.dog_birth_year) {
+          const birthYear = parseInt(photo.user.dog_birth_year, 10);
           const today = new Date();
-          petAge = today.getFullYear() - birthDate.getFullYear();
-          
-          const monthDiff = today.getMonth() - birthDate.getMonth();
-          if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-            petAge--;
-          }
+          petAge = today.getFullYear() - birthYear;
         }
 
         return {
@@ -68,9 +58,9 @@ class MarkingPhotozoneService {
           photoUrl: photo.imageUrl,
           uploadedAt: photo.takenAt,
           uploader: {
-            profileImageUrl: photo.uploader.petProfileImageUrl,
-            petName: photo.uploader.petName,
-            petBreed: photo.uploader.breed ? photo.uploader.breed.name : null,
+            profileImageUrl: photo.user.dog_image,
+            petName: photo.user.dog_name,
+            petBreed: photo.user.dog_breed, // dog_breed 속성 사용
             petAge: petAge
           }
         };
@@ -145,20 +135,20 @@ class MarkingPhotozoneService {
   async calculateEngagementData(photozoneId, currentUserId) {
     try {
       // 현재 사용자를 제외한 가장 최근 방문자 찾기
-      const recentVisitor = await PhotozonePhoto.findOne({
+      const recentVisitor = await MarkingPhoto.findOne({
         where: {
-          marking_photozone_id: photozoneId,
-          user_id: { [require('sequelize').Op.ne]: currentUserId }
+          photozoneId: photozoneId,
+          userId: { [Op.ne]: currentUserId }
         },
         include: [
           {
             model: User,
-            as: 'user',
-            attributes: ['pet_name'],
+            as: 'user', // 별칭을 'user'로 수정
+            attributes: ['dog_name'], // 'petName'을 'dog_name'으로 수정
             required: true
           }
         ],
-        order: [['created_at', 'DESC']]
+        order: [['takenAt', 'DESC']] // created_at 대신 takenAt 사용
       });
 
       if (!recentVisitor) {
@@ -170,7 +160,7 @@ class MarkingPhotozoneService {
 
       // 시간 차이 계산
       const now = new Date();
-      const visitTime = new Date(recentVisitor.created_at);
+      const visitTime = new Date(recentVisitor.takenAt); // takenAt 사용
       const diffMs = now - visitTime;
       const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
       const diffDays = Math.floor(diffHours / 24);
@@ -179,15 +169,15 @@ class MarkingPhotozoneService {
       if (diffHours < 1) {
         timeAgo = "방금";
       } else if (diffHours < 24) {
-        timeAgo = `${diffHours}시간`;
+        timeAgo = `${diffHours}시간 전`;
       } else if (diffDays < 7) {
-        timeAgo = `${diffDays}일`;
+        timeAgo = `${diffDays}일 전`;
       } else {
-        timeAgo = "1주일 이상";
+        timeAgo = "1주일 이상 전";
       }
 
       return {
-        previousVisitorPetName: recentVisitor.user.pet_name,
+        previousVisitorPetName: recentVisitor.user.dog_name, // uploader 별칭에 맞춰 수정
         previousVisitTimeAgo: timeAgo
       };
 
@@ -201,7 +191,5 @@ class MarkingPhotozoneService {
   }
 }
 
-module.exports = new MarkingPhotozoneService();
-
-
+// 클래스 정의 중복 제거
 module.exports = new MarkingPhotozoneService();
