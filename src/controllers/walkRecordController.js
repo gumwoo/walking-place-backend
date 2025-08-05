@@ -1,15 +1,77 @@
+// C:\walking-backend\src\controllers\walkRecordController.js
+
 const logger = require("../config/logger");
 const WalkRecord = require("../models/WalkRecord");
 const ApiResponse = require("../utils/response");
 const { Op } = require("sequelize");
-const matchWalkPath = require("../services/matchWalkPath"); // 실제 경로 분석 함수
+const matchWalkPath = require("../services/matchWalkPath");
 const Course = require("../models/Course");
 const MarkingPhoto = require("../models/MarkingPhoto");
 const User = require("../models/User");
 const { MarkingPhotozone } = require("../models");
 
 const walkRecordController = {
-  // ✅ 산책 시작 API (NEW_COURSE or 자유 산책)
+  /**
+   * @swagger
+   * /walk-records:
+   *  post:
+   *    summary: 산책 시작
+   *    tags: [Walk Records]
+   *    security:
+   *      - bearerAuth: []
+   *    requestBody:
+   *      required: true
+   *      content:
+   *        application/json:
+   *          schema:
+   *            type: object
+   *            properties:
+   *              walk_type:
+   *                type: string
+   *                enum: [EXISTING_COURSE, NEW_COURSE]
+   *                description: 산책 유형 (기존 코스 또는 자유 산책)
+   *              course_id:
+   * type: string
+   * format: uuid
+   * nullable: true
+   * description: EXISTING_COURSE 선택 시 필수, NEW_COURSE 시 NULL
+   * required:
+   * - walk_type
+   * example:
+   * walk_type: NEW_COURSE
+   * responses:
+   * '201':
+   * description: 산책이 성공적으로 시작되었습니다.
+   * content:
+   * application/json:
+   * schema:
+   * type: object
+   * properties:
+   * success:
+   * type: boolean
+   * example: true
+   * message:
+   * type: string
+   * example: 산책이 시작되었습니다.
+   * data:
+   * type: object
+   * properties:
+   * walk_record_id:
+   * type: string
+   * format: uuid
+   * status:
+   * type: string
+   * enum: [STARTED, PAUSED, COMPLETED, CANCELED, ABANDONED]
+   * start_time:
+   * type: string
+   * format: date-time
+   * '400':
+   * description: 잘못된 요청 (e.g., 코스 ID 누락)
+   * '401':
+   * description: 인증 실패
+   * '500':
+   * description: 서버 오류
+   */
   async startWalk(req, res) {
     try {
       const userId = req.user?.user_id || process.env.TEST_USER_ID;
@@ -25,7 +87,7 @@ const walkRecordController = {
       }
 
       const startTime = new Date();
-      const walkDate = startTime.toISOString().slice(0, 10); // YYYY-MM-DD
+      const walkDate = startTime.toISOString().slice(0, 10);
 
       const newWalk = await WalkRecord.create({
         user_id: userId,
@@ -33,7 +95,7 @@ const walkRecordController = {
         status: "STARTED",
         start_time: startTime,
         walk_date: walkDate,
-        path_coordinates: [], // 초기 빈 경로
+        path_coordinates: [],
         marking_count: 0,
         is_course_registered: false,
       });
@@ -57,7 +119,56 @@ const walkRecordController = {
     }
   },
 
-  // ✅ [PATCH] /api/v1/walk-records/:walkRecordId/path  산책 경로 좌표 및 데이터 주기적 업데이트
+  /**
+   * @swagger
+   * /walk-records/{walkRecordId}/track:
+   * patch:
+   * summary: 산책 경로 및 데이터 주기적 업데이트
+   * tags: [Walk Records]
+   * security:
+   * - bearerAuth: []
+   * parameters:
+   * - in: path
+   * name: walkRecordId
+   * required: true
+   * schema:
+   * type: string
+   * format: uuid
+   * description: 산책 기록 고유 ID
+   * requestBody:
+   * required: true
+   * content:
+   * application/json:
+   * schema:
+   * type: object
+   * properties:
+   * currentPathCoordinates:
+   * type: array
+   * items:
+   * type: array
+   * items:
+   * type: number
+   * description: 현재까지의 누적 산책 경로 좌표
+   * currentDistanceMeters:
+   * type: number
+   * description: 현재까지의 누적 산책 거리 (미터)
+   * currentDurationSeconds:
+   * type: number
+   * description: 현재까지의 누적 산책 시간 (초)
+   * example:
+   * currentPathCoordinates: [[37.5665, 126.9780], [37.5667, 126.9782]]
+   * currentDistanceMeters: 1200
+   * currentDurationSeconds: 600
+   * responses:
+   * '200':
+   * description: 좌표가 성공적으로 저장되었습니다.
+   * '400':
+   * description: 잘못된 요청 (e.g., 좌표 형식이 올바르지 않음)
+   * '404':
+   * description: 산책 기록을 찾을 수 없습니다.
+   * '500':
+   * description: 서버 오류
+   */
   async updateTrack(req, res) {
     try {
       const { walkRecordId } = req.params;
@@ -68,7 +179,6 @@ const walkRecordController = {
       } = req.body;
       const userId = req.user?.user_id || process.env.TEST_USER_ID;
 
-      // 유효성 검사 강화: 배열 + 각 요소가 [number, number]인지 확인
       const isValidCoordinate = (coord) =>
         Array.isArray(coord) &&
         coord.length === 2 &&
@@ -94,7 +204,6 @@ const walkRecordController = {
         return ApiResponse.notFound(res, "해당 산책 기록을 찾을 수 없습니다.");
       }
 
-      // 기존 좌표에 누적
       const updatedCoordinates = Array.isArray(walkRecord.path_coordinates)
         ? [...walkRecord.path_coordinates, ...currentPathCoordinates]
         : [...currentPathCoordinates];
@@ -121,20 +230,77 @@ const walkRecordController = {
     }
   },
 
-  // ✅ 산책 상태 변경 API (일시정지, 재시작 등)
-  // [PATCH] /api/v1/walk-records/{walk_record_id}/status
+  /**
+   * @swagger
+   * /walk-records/{walkRecordId}/status:
+   * patch:
+   * summary: 산책 상태 변경 (일시정지/재개 등)
+   * tags: [Walk Records]
+   * security:
+   * - bearerAuth: []
+   * parameters:
+   * - in: path
+   * name: walkRecordId
+   * required: true
+   * schema:
+   * type: string
+   * format: uuid
+   * description: 산책 기록 고유 ID
+   * requestBody:
+   * required: true
+   * content:
+   * application/json:
+   * schema:
+   * type: object
+   * properties:
+   * status:
+   * type: string
+   * enum: [STARTED, PAUSED, COMPLETED, CANCELED, ABANDONED]
+   * description: 변경할 산책 상태
+   * example:
+   * status: PAUSED
+   * responses:
+   * '200':
+   * description: 산책 상태가 성공적으로 변경되었습니다.
+   * content:
+   * application/json:
+   * schema:
+   * type: object
+   * properties:
+   * success:
+   * type: boolean
+   * example: true
+   * message:
+   * type: string
+   * example: 산책 상태가 PAUSED로 변경되었습니다.
+   * data:
+   * type: object
+   * properties:
+   * walkRecordId:
+   * type: string
+   * format: uuid
+   * newStatus:
+   * type: string
+   * enum: [STARTED, PAUSED, COMPLETED, CANCELED, ABANDONED]
+   * '400':
+   * description: 잘못된 요청 (유효하지 않은 상태값)
+   * '401':
+   * description: 인증 실패
+   * '404':
+   * description: 산책 기록을 찾을 수 없습니다.
+   * '500':
+   * description: 서버 오류
+   */
   async updateStatus(req, res) {
     try {
       const walkRecordId = req.params.walkRecordId;
       const userId = req.user?.user_id || process.env.TEST_USER_ID;
       const { status } = req.body;
 
-      // 1. userId 유효성 검사
       if (!userId) {
         return ApiResponse.unauthorized(res, "인증된 사용자 정보가 없습니다.");
       }
 
-      // 2. 상태 값 검사
       const validStatuses = [
         "STARTED",
         "COMPLETED",
@@ -150,7 +316,6 @@ const walkRecordController = {
         );
       }
 
-      // 3. 산책 기록 조회
       const walkRecord = await WalkRecord.findOne({
         where: {
           walk_record_id: walkRecordId,
@@ -162,7 +327,6 @@ const walkRecordController = {
         return ApiResponse.notFound(res, "산책 기록을 찾을 수 없습니다.");
       }
 
-      // 4. 상태 업데이트
       walkRecord.status = status;
       await walkRecord.save();
 
@@ -184,7 +348,58 @@ const walkRecordController = {
     }
   },
 
-  // ✅ [PUT] /api/v1/walk-records/:walkRecordId/end (산책 종료)
+  /**
+   * @swagger
+   * /walk-records/{walkRecordId}/end:
+   * put:
+   * summary: 산책 종료
+   * tags: [Walk Records]
+   * security:
+   * - bearerAuth: []
+   * parameters:
+   * - in: path
+   * name: walkRecordId
+   * required: true
+   * schema:
+   * type: string
+   * format: uuid
+   * description: 산책 기록 고유 ID
+   * requestBody:
+   * required: true
+   * content:
+   * application/json:
+   * schema:
+   * type: object
+   * properties:
+   * finalDurationSeconds:
+   * type: integer
+   * description: 최종 산책 시간(초)
+   * finalDistanceMeters:
+   * type: integer
+   * description: 최종 산책 거리(미터)
+   * finalPathCoordinates:
+   * type: array
+   * items:
+   * type: array
+   * items:
+   * type: number
+   * description: 최종 산책 경로 좌표 리스트
+   * required:
+   * - finalDurationSeconds
+   * - finalDistanceMeters
+   * - finalPathCoordinates
+   * example:
+   * finalDurationSeconds: 3600
+   * finalDistanceMeters: 5000
+   * finalPathCoordinates: [[37.5665, 126.9780], [37.5667, 126.9782]]
+   * responses:
+   * '200':
+   * description: 산책이 성공적으로 종료되고 경로가 분석되었습니다.
+   * '404':
+   * description: 산책 기록을 찾을 수 없습니다.
+   * '500':
+   * description: 서버 오류
+   */
   async endWalkRecord(req, res) {
     const { walkRecordId } = req.params;
     const userId = req.user?.user_id || process.env.TEST_USER_ID;
@@ -203,7 +418,6 @@ const walkRecordController = {
         return ApiResponse.notFound(res, "산책 기록을 찾을 수 없습니다.");
       }
 
-      // 실제 경로 분석 함수 호출 (예: PostGIS 기반 등)
       await matchWalkPath(walkRecordId);
 
       const {
@@ -212,7 +426,6 @@ const walkRecordController = {
         finalPathCoordinates,
       } = req.body;
 
-      // 종료 상태 업데이트
       await walkRecord.update({
         status: "COMPLETED",
         end_time: new Date(),
@@ -245,7 +458,47 @@ const walkRecordController = {
     }
   },
 
-  // ✅ [PUT] 꼬리콥터 점수 저장
+  /**
+   * @swagger
+   * /walk-records/{walkRecordId}/score:
+   * put:
+   * summary: 꼬리콥터 점수 저장
+   * tags: [Walk Records]
+   * security:
+   * - bearerAuth: []
+   * parameters:
+   * - in: path
+   * name: walkRecordId
+   * required: true
+   * schema:
+   * type: string
+   * format: uuid
+   * description: 산책 기록 고유 ID
+   * requestBody:
+   * required: true
+   * content:
+   * application/json:
+   * schema:
+   * type: object
+   * properties:
+   * tailcopterScore:
+   * type: integer
+   * minimum: 0
+   * description: 꼬리콥터 게임 점수
+   * required:
+   * - tailcopterScore
+   * example:
+   * tailcopterScore: 12500
+   * responses:
+   * '200':
+   * description: 꼬리콥터 점수가 성공적으로 저장되었습니다.
+   * '400':
+   * description: 잘못된 요청 (e.g., 점수가 유효하지 않음)
+   * '404':
+   * description: 산책 기록을 찾을 수 없습니다.
+   * '500':
+   * description: 서버 오류
+   */
   async updateScore(req, res) {
     try {
       const userId = req.user?.user_id || process.env.TEST_USER_ID;
@@ -288,7 +541,93 @@ const walkRecordController = {
     }
   },
 
-  // ✅ [POST] /api/v1/walk-records/:walkRecordId/save - 산책기록 최종 저장 (산책일지 저장)
+  /**
+   * @swagger
+   * /walk-records/{walkRecordId}/save:
+   * post:
+   * summary: 산책 기록 최종 저장 (일지 저장)
+   * tags: [Walk Records]
+   * security:
+   * - bearerAuth: []
+   * parameters:
+   * - in: path
+   * name: walkRecordId
+   * required: true
+   * schema:
+   * type: string
+   * format: uuid
+   * description: 산책 기록 고유 ID
+   * requestBody:
+   * required: true
+   * content:
+   * application/json:
+   * schema:
+   * type: object
+   * properties:
+   * title:
+   * type: string
+   * nullable: true
+   * description: 산책 일지 제목 (미입력 시 자동 생성)
+   * walkDate:
+   * type: string
+   * format: date
+   * nullable: true
+   * description: 산책 날짜 (YYYY-MM-DD)
+   * pathImageUrl:
+   * type: string
+   * nullable: true
+   * description: 산책 경로 이미지 URL
+   * distanceMeters:
+   * type: integer
+   * description: 최종 산책 거리(미터)
+   * markingCount:
+   * type: integer
+   * description: 최종 마킹 횟수
+   * tailcopterScore:
+   * type: integer
+   * description: 최종 꼬리콥터 점수
+   * required:
+   * - distanceMeters
+   * - markingCount
+   * - tailcopterScore
+   * example:
+   * title: '새로운 산책 일지'
+   * walkDate: '2023-10-27'
+   * pathImageUrl: 'http://example.com/path.png'
+   * distanceMeters: 5500
+   * markingCount: 3
+   * tailcopterScore: 12500
+   * responses:
+   * '200':
+   * description: 산책 기록이 성공적으로 저장되었습니다.
+   * content:
+   * application/json:
+   * schema:
+   * type: object
+   * properties:
+   * success:
+   * type: boolean
+   * example: true
+   * message:
+   * type: string
+   * example: 산책 기록이 성공적으로 저장되었습니다.
+   * data:
+   * type: object
+   * properties:
+   * walkRecordId:
+   * type: string
+   * format: uuid
+   * petName:
+   * type: string
+   * title:
+   * type: string
+   * '400':
+   * description: 잘못된 요청 (e.g., 이미 저장된 기록)
+   * '404':
+   * description: 산책 기록을 찾을 수 없습니다.
+   * '500':
+   * description: 서버 오류
+   */
   async saveRecord(req, res) {
     try {
       const userId = req.user?.user_id || process.env.TEST_USER_ID;
@@ -335,10 +674,10 @@ const walkRecordController = {
           status: "COMPLETED",
           end_time: new Date(),
           distance_meters: distanceMeters,
-          marking_count: markingCount, 
+          marking_count: markingCount,
           tailcopter_score: tailcopterScore,
           title: generatedTitle,
-          walk_date: walkDate || walkRecord.get("walk_date"), 
+          walk_date: walkDate || walkRecord.get("walk_date"),
           path_image_url: pathImageUrl || walkRecord.get("path_image_url"),
           is_record_saved: true,
         },
@@ -366,7 +705,69 @@ const walkRecordController = {
     }
   },
 
-  // 산책 경로 및 마킹 이미지 등 상세 정보 조회  /api/v1/walk-records/{walk_record_id}/details
+  /**
+   * @swagger
+   * /walk-records/{walkRecordId}/details:
+   * get:
+   * summary: 산책 일지 상세 정보 조회
+   * tags: [Walk Records]
+   * security:
+   * - bearerAuth: []
+   * parameters:
+   * - in: path
+   * name: walkRecordId
+   * required: true
+   * schema:
+   * type: string
+   * format: uuid
+   * description: 산책 기록 고유 ID
+   * responses:
+   * '200':
+   * description: 산책 일지 상세 조회 성공
+   * content:
+   * application/json:
+   * schema:
+   * type: object
+   * properties:
+   * walk_record_id:
+   * type: string
+   * format: uuid
+   * user_id:
+   * type: string
+   * format: uuid
+   * course:
+   * type: object
+   * properties:
+   * course_name:
+   * type: string
+   * markingPhotos:
+   * type: array
+   * items:
+   * type: object
+   * properties:
+   * marking_photo_id:
+   * type: string
+   * format: uuid
+   * photo_url:
+   * type: string
+   * format: url
+   * photozone:
+   * type: object
+   * properties:
+   * photozone_name:
+   * type: string
+   * path_image_url:
+   * type: string
+   * format: url
+   * title:
+   * type: string
+   * '400':
+   * description: 산책 경로 이미지가 존재하지 않습니다.
+   * '404':
+   * description: 산책 기록을 찾을 수 없습니다.
+   * '500':
+   * description: 서버 오류
+   */
   async getDetails(req, res) {
     try {
       const walkRecordId = req.params.walkRecordId;
@@ -382,16 +783,16 @@ const walkRecordController = {
         include: [
           {
             model: Course,
-            as: "course", // 코스 정보
+            as: "course",
           },
           {
             model: MarkingPhoto,
-            as: "markingPhotos", // 마킹 사진 목록
+            as: "markingPhotos",
             required: false,
             include: [
               {
                 model: MarkingPhotozone,
-                as: "photozone", // 각 마킹 사진의 포토존 정보
+                as: "photozone",
                 required: false,
               },
             ],

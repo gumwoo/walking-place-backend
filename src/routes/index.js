@@ -10,7 +10,6 @@ const walkRecordRoutes = require('./walkRecords');
 const courseRoutes = require('./courses');
 const markingPhotoRoutes = require('./markingPhotos');
 const markingPhotozoneRoutes = require('./markingPhotozones');
-const mapRoutes = require('./map');
 
 // ===== API v1 라우터 등록 =====
 
@@ -25,7 +24,6 @@ router.use('/walk-records', walkRecordRoutes);      // 산책 기록 관련
 router.use('/courses', courseRoutes);               // 코스 관련
 router.use('/marking-photos', markingPhotoRoutes);  // 마킹 사진 업로드
 router.use('/marking-photozones', markingPhotozoneRoutes); // 마킹 포토존
-router.use('/map', mapRoutes);                          // 지도 주변 정보
 
 // ===== 기본 라우터 =====
 
@@ -44,8 +42,7 @@ router.get('/', (req, res) => {
       walkRecords: '/api/v1/walk-records',
       courses: '/api/v1/courses',
       markingPhotos: '/api/v1/marking-photos',
-      markingPhotozones: '/api/v1/marking-photozones',
-      map: '/api/v1/map'
+      markingPhotozones: '/api/v1/marking-photozones'
     }
   });
 });

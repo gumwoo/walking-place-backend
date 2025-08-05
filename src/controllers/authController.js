@@ -2,13 +2,62 @@ const authService = require('../services/authService');
 const logger = require('../config/logger');
 
 /**
- * 인증 관련 컨트롤러
+ * @swagger
+ * tags:
+ * name: Auth
+ * description: 인증 관련 API
  */
 class AuthController {
 
   /**
-   * 카카오 로그인/회원가입
-   * POST /api/v1/auth/kakao
+   * @swagger
+   * /api/v1/auth/kakao:
+   * post:
+   * tags: [Auth]
+   * summary: 카카오 액세스 토큰으로 로그인/회원가입
+   * description: "클라이언트에서 받은 유효한 카카오 액세스 토큰으로 로그인하거나 신규 회원가입을 처리합니다. 토큰은 `Authorization` 헤더에 `Bearer {token}` 형식으로 전달해야 합니다."
+   * security:
+   * - bearerAuth: []
+   * responses:
+   * '200':
+   * description: 로그인 성공 또는 회원가입
+   * content:
+   * application/json:
+   * schema:
+   * $ref: '#/components/schemas/ApiResponse'
+   * example:
+   * success: true
+   * message: "카카오 로그인이 성공적으로 완료되었습니다."
+   * data:
+   * userId: "uuid-of-user"
+   * accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+   * refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+   * isNewUser: false
+   * isProfileSetupCompleted: true
+   * '400':
+   * description: 유효하지 않은 요청 (토큰 누락 등)
+   * content:
+   * application/json:
+   * schema:
+   * $ref: '#/components/schemas/ErrorResponse'
+   * example:
+   * success: false
+   * message: "Authorization 헤더에 Bearer 토큰이 필요합니다."
+   * '401':
+   * description: 유효하지 않은 카카오 토큰
+   * content:
+   * application/json:
+   * schema:
+   * $ref: '#/components/schemas/ErrorResponse'
+   * example:
+   * success: false
+   * message: "유효하지 않은 카카오 토큰입니다."
+   * '500':
+   * description: 서버 오류
+   * content:
+   * application/json:
+   * schema:
+   * $ref: '#/components/schemas/ErrorResponse'
    */
   async kakaoLogin(req, res) {
     try {
@@ -69,8 +118,62 @@ class AuthController {
   }
 
   /**
-   * 액세스 토큰 갱신
-   * POST /api/v1/auth/token/refresh
+   * @swagger
+   * /api/v1/auth/token/refresh:
+   * post:
+   * tags: [Auth]
+   * summary: 액세스 토큰 갱신
+   * description: "만료된 액세스 토큰을 리프레시 토큰을 사용하여 갱신합니다."
+   * requestBody:
+   * required: true
+   * content:
+   * application/json:
+   * schema:
+   * type: object
+   * required:
+   * - refreshToken
+   * properties:
+   * refreshToken:
+   * type: string
+   * description: 리프레시 토큰
+   * example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyMTIzIiwiaWF0IjoxNjMyNzk2MzY2LCJleHAiOjE2MzM0MDE1NjZ9.G31Jk-..."
+   * responses:
+   * '200':
+   * description: 토큰 갱신 성공
+   * content:
+   * application/json:
+   * schema:
+   * $ref: '#/components/schemas/ApiResponse'
+   * example:
+   * success: true
+   * message: "액세스 토큰이 성공적으로 갱신되었습니다."
+   * data:
+   * accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyMTIzIiwiaWF0IjoxNjMyNzk2MzY2LCJleHAiOjE2MzI4MjQ3NjZ9.G31Jk..."
+   * refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyMTIzIiwiaWF0IjoxNjMyNzk2MzY2LCJleHAiOjE2MzM0MDE1NjZ9.G31Jk-..."
+   * '400':
+   * description: 리프레시 토큰 누락
+   * content:
+   * application/json:
+   * schema:
+   * $ref: '#/components/schemas/ErrorResponse'
+   * example:
+   * success: false
+   * message: "리프레시 토큰이 필요합니다."
+   * '401':
+   * description: 유효하지 않은 리프레시 토큰
+   * content:
+   * application/json:
+   * schema:
+   * $ref: '#/components/schemas/ErrorResponse'
+   * example:
+   * success: false
+   * message: "유효하지 않은 리프레시 토큰입니다."
+   * '500':
+   * description: 서버 오류
+   * content:
+   * application/json:
+   * schema:
+   * $ref: '#/components/schemas/ErrorResponse'
    */
   async refreshToken(req, res) {
     try {
@@ -116,8 +219,36 @@ class AuthController {
   }
 
   /**
-   * 로그아웃
-   * POST /api/v1/auth/logout
+   * @swagger
+   * /api/v1/auth/logout:
+   * post:
+   * tags: [Auth]
+   * summary: 로그아웃
+   * description: "사용자의 세션을 로그아웃 처리합니다. JWT는 Stateless이므로 서버에서 토큰을 만료시킬 수 없습니다. 클라이언트에서 토큰을 삭제하면 됩니다. 이 API는 주로 로그 기록용으로 사용됩니다."
+   * security:
+   * - bearerAuth: []
+   * responses:
+   * '200':
+   * description: 로그아웃 성공
+   * content:
+   * application/json:
+   * schema:
+   * $ref: '#/components/schemas/ApiResponse'
+   * example:
+   * success: true
+   * message: "성공적으로 로그아웃되었습니다."
+   * '401':
+   * description: 인증 실패
+   * content:
+   * application/json:
+   * schema:
+   * $ref: '#/components/schemas/ErrorResponse'
+   * '500':
+   * description: 서버 오류
+   * content:
+   * application/json:
+   * schema:
+   * $ref: '#/components/schemas/ErrorResponse'
    */
   async logout(req, res) {
     try {

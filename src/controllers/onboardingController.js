@@ -1,64 +1,99 @@
+// C:\walking-backend\src\controllers\onboardingController.js
+
 const onboardingService = require('../services/onboardingService');
 const logger = require('../config/logger');
 
 /**
- * 온보딩 관련 컨트롤러
+ * @swagger
+ * tags:
+ * name: Onboarding
+ * description: 온보딩 과정에서 필요한 API (위치/견종 검색)
+ * components:
+ * schemas:
+ * Location:
+ * type: object
+ * properties:
+ * location_id:
+ * type: string
+ * format: uuid
+ * example: "8b23c2d6-4e58-4c17-9c98-15c0e1763c32"
+ * description: 위치 고유 ID
+ * name:
+ * type: string
+ * example: "강남구"
+ * description: 위치 이름 (예: 구 이름)
+ * Breed:
+ * type: object
+ * properties:
+ * breed_id:
+ * type: string
+ * format: uuid
+ * example: "b1f8b7d4-8d4e-4f0e-8c38-8e6f1f4b8f3e"
+ * description: 견종 고유 ID
+ * name:
+ * type: string
+ * example: "푸들"
+ * description: 견종 이름
+ * ErrorResponse:
+ * type: object
+ * properties:
+ * success:
+ * type: boolean
+ * example: false
+ * message:
+ * type: string
+ * example: "오류 메시지"
+ * code:
+ * type: string
+ * example: "ERROR_CODE"
  */
 class OnboardingController {
 
   /**
-   * 사용자 약관 동의 상태 저장
-   * POST /api/v1/users/me/terms
-   */
-  async saveTermAgreements(req, res) {
-    try {
-      logger.info('사용자 약관 동의 저장 요청 시작');
-
-      const userId = req.user?.userId || process.env.TEST_USER_ID; // JWT 미들웨어에서 설정
-      const { agreedTermIds } = req.body;
-
-      if (!agreedTermIds || !Array.isArray(agreedTermIds) || agreedTermIds.length === 0) {
-        return res.status(400).json({
-          success: false,
-          message: '동의한 약관 ID 목록이 필요합니다.',
-          code: 'MISSING_AGREED_TERMS'
-        });
-      }
-
-      const result = await onboardingService.saveTermAgreements(userId, agreedTermIds);
-
-      logger.info('사용자 약관 동의 저장 성공', { userId, termCount: agreedTermIds.length });
-
-      return res.status(200).json({
-        success: true,
-        message: result.message,
-        data: {
-          agreedTermCount: result.agreedTermCount
-        }
-      });
-
-    } catch (error) {
-      logger.error('사용자 약관 동의 저장 실패:', error);
-
-      if (error.message.includes('유효하지 않은')) {
-        return res.status(400).json({
-          success: false,
-          message: '유효하지 않은 약관 ID가 포함되어 있습니다.',
-          code: 'INVALID_TERM_IDS'
-        });
-      }
-
-      return res.status(500).json({
-        success: false,
-        message: '약관 동의 저장 중 오류가 발생했습니다.',
-        code: 'TERM_AGREEMENT_ERROR'
-      });
-    }
-  }
-
-  /**
-   * 위치 검색
-   * GET /api/v1/locations/search?keyword={keyword}
+   * @swagger
+   * /api/v1/locations/search:
+   * get:
+   * tags: [Onboarding]
+   * summary: 위치 검색
+   * description: "사용자가 선호하는 위치를 검색합니다."
+   * parameters:
+   * - in: query
+   * name: keyword
+   * required: true
+   * schema:
+   * type: string
+   * description: 검색할 위치 키워드
+   * example: "강남"
+   * responses:
+   * '200':
+   * description: 위치 검색 성공
+   * content:
+   * application/json:
+   * schema:
+   * type: object
+   * properties:
+   * success:
+   * type: boolean
+   * example: true
+   * message:
+   * type: string
+   * example: "위치 검색이 완료되었습니다."
+   * data:
+   * type: array
+   * items:
+   * $ref: '#/components/schemas/Location'
+   * '400':
+   * description: 잘못된 요청 (키워드 누락)
+   * content:
+   * application/json:
+   * schema:
+   * $ref: '#/components/schemas/ErrorResponse'
+   * '500':
+   * description: 서버 오류
+   * content:
+   * application/json:
+   * schema:
+   * $ref: '#/components/schemas/ErrorResponse'
    */
   async searchLocations(req, res) {
     try {
@@ -96,8 +131,44 @@ class OnboardingController {
   }
 
   /**
-   * 견종 검색
-   * GET /api/v1/breeds/search?keyword={keyword}
+   * @swagger
+   * /api/v1/breeds/search:
+   * get:
+   * tags: [Onboarding]
+   * summary: 견종 검색
+   * description: "사용자가 반려견의 견종을 검색합니다."
+   * parameters:
+   * - in: query
+   * name: keyword
+   * required: false
+   * schema:
+   * type: string
+   * description: 검색할 견종 키워드 (선택 사항)
+   * example: "푸들"
+   * responses:
+   * '200':
+   * description: 견종 검색 성공
+   * content:
+   * application/json:
+   * schema:
+   * type: object
+   * properties:
+   * success:
+   * type: boolean
+   * example: true
+   * message:
+   * type: string
+   * example: "견종 검색이 완료되었습니다."
+   * data:
+   * type: array
+   * items:
+   * $ref: '#/components/schemas/Breed'
+   * '500':
+   * description: 서버 오류
+   * content:
+   * application/json:
+   * schema:
+   * $ref: '#/components/schemas/ErrorResponse'
    */
   async searchBreeds(req, res) {
     try {
@@ -122,86 +193,6 @@ class OnboardingController {
         success: false,
         message: '견종 검색 중 오류가 발생했습니다.',
         code: 'BREED_SEARCH_ERROR'
-      });
-    }
-  }
-  /**
-   * 사용자 프로필 조회
-   * GET /api/v1/users/me/profile
-   */
-  async getUserProfile(req, res) {
-    try {
-      logger.info('사용자 프로필 조회 요청 시작');
-
-      const userId = req.user?.userId || process.env.TEST_USER_ID; // JWT 미들웨어에서 설정
-
-      const profile = await onboardingService.getUserProfile(userId);
-
-      logger.info('사용자 프로필 조회 성공', { userId });
-
-      return res.status(200).json({
-        success: true,
-        message: '프로필 조회가 완료되었습니다.',
-        data: profile
-      });
-
-    } catch (error) {
-      logger.error('사용자 프로필 조회 실패:', error);
-
-      if (error.message.includes('사용자를 찾을 수 없습니다')) {
-        return res.status(404).json({
-          success: false,
-          message: '사용자를 찾을 수 없습니다.',
-          code: 'USER_NOT_FOUND'
-        });
-      }
-
-      return res.status(500).json({
-        success: false,
-        message: '프로필 조회 중 오류가 발생했습니다.',
-        code: 'PROFILE_FETCH_ERROR'
-      });
-    }
-  }
-
-  /**
-   * 사용자 요약 프로필 조회 (메인 화면용)
-   * GET /api/v1/users/me/summary-profile
-   */
-  async getUserSummaryProfile(req, res) {
-    try {
-      logger.info('사용자 요약 프로필 조회 요청 시작');
-
-      const userId = req.user?.userId || process.env.TEST_USER_ID; // JWT 미들웨어에서 설정
-
-      const profile = await onboardingService.getUserProfile(userId);
-
-      logger.info('사용자 요약 프로필 조회 성공', { userId });
-
-      return res.status(200).json({
-        success: true,
-        message: '요약 프로필 조회가 완료되었습니다.',
-        data: {
-          petName: profile.petName || '반려견',
-          petProfileImageUrl: profile.petProfileImageUrl
-        }
-      });
-
-    } catch (error) {
-      logger.error('사용자 요약 프로필 조회 실패:', error);
-
-      if (error.message.includes('사용자를 찾을 수 없습니다')) {
-        return res.status(404).json({
-          success: false,
-          message: '사용자를 찾을 수 없습니다.',
-          code: 'USER_NOT_FOUND'
-        });
-      }
-
-      return res.status(500).json({
-        success: false,
-        message: '요약 프로필 조회 중 오류가 발생했습니다.',
-        code: 'SUMMARY_PROFILE_FETCH_ERROR'
       });
     }
   }
