@@ -14,63 +14,63 @@ const walkRecordController = {
   /**
    * @swagger
    * /walk-records:
-   *  post:
-   *    summary: 산책 시작
-   *    tags: [Walk Records]
-   *    security:
-   *      - bearerAuth: []
-   *    requestBody:
-   *      required: true
-   *      content:
-   *        application/json:
-   *          schema:
-   *            type: object
-   *            properties:
-   *              walk_type:
-   *                type: string
-   *                enum: [EXISTING_COURSE, NEW_COURSE]
-   *                description: 산책 유형 (기존 코스 또는 자유 산책)
-   *              course_id:
-   * type: string
-   * format: uuid
-   * nullable: true
-   * description: EXISTING_COURSE 선택 시 필수, NEW_COURSE 시 NULL
-   * required:
-   * - walk_type
-   * example:
-   * walk_type: NEW_COURSE
-   * responses:
-   * '201':
-   * description: 산책이 성공적으로 시작되었습니다.
-   * content:
-   * application/json:
-   * schema:
-   * type: object
-   * properties:
-   * success:
-   * type: boolean
-   * example: true
-   * message:
-   * type: string
-   * example: 산책이 시작되었습니다.
-   * data:
-   * type: object
-   * properties:
-   * walk_record_id:
-   * type: string
-   * format: uuid
-   * status:
-   * type: string
-   * enum: [STARTED, PAUSED, COMPLETED, CANCELED, ABANDONED]
-   * start_time:
-   * type: string
-   * format: date-time
-   * '400':
-   * description: 잘못된 요청 (e.g., 코스 ID 누락)
-   * '401':
-   * description: 인증 실패
-   * '500':
-   * description: 서버 오류
+   *   post:
+   *     summary: 산책 시작
+   *     tags: [Walk Records]
+   *     security:
+   *       - bearerAuth: []
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               walk_type:
+   *                 type: string
+   *                 enum: [EXISTING_COURSE, NEW_COURSE]
+   *                 description: 산책 유형 (기존 코스 또는 자유 산책)
+   *               course_id:
+   *                 type: string
+   *                 format: uuid
+   *                 nullable: true
+   *                 description: EXISTING_COURSE 선택 시 필수, NEW_COURSE 시 NULL
+   *             required:
+   *               - walk_type
+   *             example:
+   *               walk_type: NEW_COURSE
+   *     responses:
+   *       '201':
+   *         description: 산책이 성공적으로 시작되었습니다.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: 산책이 시작되었습니다.
+   *                 data:
+   *                   type: object
+   *                   properties:
+   *                     walk_record_id:
+   *                       type: string
+   *                       format: uuid
+   *                     status:
+   *                       type: string
+   *                       enum: [STARTED, PAUSED, COMPLETED, CANCELED, ABANDONED]
+   *                     start_time:
+   *                       type: string
+   *                       format: date-time
+   *       '400':
+   *         description: 잘못된 요청 (e.g., 코스 ID 누락)
+   *       '401':
+   *         description: 인증 실패
+   *       '500':
+   *         description: 서버 오류
    */
   async startWalk(req, res) {
     try {
@@ -122,52 +122,52 @@ const walkRecordController = {
   /**
    * @swagger
    * /walk-records/{walkRecordId}/track:
-   * patch:
-   * summary: 산책 경로 및 데이터 주기적 업데이트
-   * tags: [Walk Records]
-   * security:
-   * - bearerAuth: []
-   * parameters:
-   * - in: path
-   * name: walkRecordId
-   * required: true
-   * schema:
-   * type: string
-   * format: uuid
-   * description: 산책 기록 고유 ID
-   * requestBody:
-   * required: true
-   * content:
-   * application/json:
-   * schema:
-   * type: object
-   * properties:
-   * currentPathCoordinates:
-   * type: array
-   * items:
-   * type: array
-   * items:
-   * type: number
-   * description: 현재까지의 누적 산책 경로 좌표
-   * currentDistanceMeters:
-   * type: number
-   * description: 현재까지의 누적 산책 거리 (미터)
-   * currentDurationSeconds:
-   * type: number
-   * description: 현재까지의 누적 산책 시간 (초)
-   * example:
-   * currentPathCoordinates: [[37.5665, 126.9780], [37.5667, 126.9782]]
-   * currentDistanceMeters: 1200
-   * currentDurationSeconds: 600
-   * responses:
-   * '200':
-   * description: 좌표가 성공적으로 저장되었습니다.
-   * '400':
-   * description: 잘못된 요청 (e.g., 좌표 형식이 올바르지 않음)
-   * '404':
-   * description: 산책 기록을 찾을 수 없습니다.
-   * '500':
-   * description: 서버 오류
+   *   patch:
+   *     summary: 산책 경로 및 데이터 주기적 업데이트
+   *     tags: [Walk Records]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: walkRecordId
+   *         required: true
+   *         schema:
+   *           type: string
+   *           format: uuid
+   *           description: 산책 기록 고유 ID
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               currentPathCoordinates:
+   *                 type: array
+   *                 items:
+   *                   type: array
+   *                   items:
+   *                     type: number
+   *                 description: 현재까지의 누적 산책 경로 좌표
+   *               currentDistanceMeters:
+   *                 type: number
+   *                 description: 현재까지의 누적 산책 거리 (미터)
+   *               currentDurationSeconds:
+   *                 type: number
+   *                 description: 현재까지의 누적 산책 시간 (초)
+   *             example:
+   *               currentPathCoordinates: [[37.5665, 126.9780], [37.5667, 126.9782]]
+   *               currentDistanceMeters: 1200
+   *               currentDurationSeconds: 600
+   *     responses:
+   *       '200':
+   *         description: 좌표가 성공적으로 저장되었습니다.
+   *       '400':
+   *         description: 잘못된 요청 (e.g., 좌표 형식이 올바르지 않음)
+   *       '404':
+   *         description: 산책 기록을 찾을 수 없습니다.
+   *       '500':
+   *         description: 서버 오류
    */
   async updateTrack(req, res) {
     try {
@@ -233,63 +233,63 @@ const walkRecordController = {
   /**
    * @swagger
    * /walk-records/{walkRecordId}/status:
-   * patch:
-   * summary: 산책 상태 변경 (일시정지/재개 등)
-   * tags: [Walk Records]
-   * security:
-   * - bearerAuth: []
-   * parameters:
-   * - in: path
-   * name: walkRecordId
-   * required: true
-   * schema:
-   * type: string
-   * format: uuid
-   * description: 산책 기록 고유 ID
-   * requestBody:
-   * required: true
-   * content:
-   * application/json:
-   * schema:
-   * type: object
-   * properties:
-   * status:
-   * type: string
-   * enum: [STARTED, PAUSED, COMPLETED, CANCELED, ABANDONED]
-   * description: 변경할 산책 상태
-   * example:
-   * status: PAUSED
-   * responses:
-   * '200':
-   * description: 산책 상태가 성공적으로 변경되었습니다.
-   * content:
-   * application/json:
-   * schema:
-   * type: object
-   * properties:
-   * success:
-   * type: boolean
-   * example: true
-   * message:
-   * type: string
-   * example: 산책 상태가 PAUSED로 변경되었습니다.
-   * data:
-   * type: object
-   * properties:
-   * walkRecordId:
-   * type: string
-   * format: uuid
-   * newStatus:
-   * type: string
-   * enum: [STARTED, PAUSED, COMPLETED, CANCELED, ABANDONED]
-   * '400':
-   * description: 잘못된 요청 (유효하지 않은 상태값)
-   * '401':
-   * description: 인증 실패
-   * '404':
-   * description: 산책 기록을 찾을 수 없습니다.
-   * '500':
-   * description: 서버 오류
+   *   patch:
+   *     summary: 산책 상태 변경 (일시정지/재개 등)
+   *     tags: [Walk Records]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: walkRecordId
+   *         required: true
+   *         schema:
+   *           type: string
+   *           format: uuid
+   *           description: 산책 기록 고유 ID
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               status:
+   *                 type: string
+   *                 enum: [STARTED, PAUSED, COMPLETED, CANCELED, ABANDONED]
+   *                 description: 변경할 산책 상태
+   *             example:
+   *               status: PAUSED
+   *     responses:
+   *       '200':
+   *         description: 산책 상태가 성공적으로 변경되었습니다.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: 산책 상태가 PAUSED로 변경되었습니다.
+   *                 data:
+   *                   type: object
+   *                   properties:
+   *                     walkRecordId:
+   *                       type: string
+   *                       format: uuid
+   *                     newStatus:
+   *                       type: string
+   *                       enum: [STARTED, PAUSED, COMPLETED, CANCELED, ABANDONED]
+   *       '400':
+   *         description: 잘못된 요청 (유효하지 않은 상태값)
+   *       '401':
+   *         description: 인증 실패
+   *       '404':
+   *         description: 산책 기록을 찾을 수 없습니다.
+   *       '500':
+   *         description: 서버 오류
    */
   async updateStatus(req, res) {
     try {
@@ -351,54 +351,54 @@ const walkRecordController = {
   /**
    * @swagger
    * /walk-records/{walkRecordId}/end:
-   * put:
-   * summary: 산책 종료
-   * tags: [Walk Records]
-   * security:
-   * - bearerAuth: []
-   * parameters:
-   * - in: path
-   * name: walkRecordId
-   * required: true
-   * schema:
-   * type: string
-   * format: uuid
-   * description: 산책 기록 고유 ID
-   * requestBody:
-   * required: true
-   * content:
-   * application/json:
-   * schema:
-   * type: object
-   * properties:
-   * finalDurationSeconds:
-   * type: integer
-   * description: 최종 산책 시간(초)
-   * finalDistanceMeters:
-   * type: integer
-   * description: 최종 산책 거리(미터)
-   * finalPathCoordinates:
-   * type: array
-   * items:
-   * type: array
-   * items:
-   * type: number
-   * description: 최종 산책 경로 좌표 리스트
-   * required:
-   * - finalDurationSeconds
-   * - finalDistanceMeters
-   * - finalPathCoordinates
-   * example:
-   * finalDurationSeconds: 3600
-   * finalDistanceMeters: 5000
-   * finalPathCoordinates: [[37.5665, 126.9780], [37.5667, 126.9782]]
-   * responses:
-   * '200':
-   * description: 산책이 성공적으로 종료되고 경로가 분석되었습니다.
-   * '404':
-   * description: 산책 기록을 찾을 수 없습니다.
-   * '500':
-   * description: 서버 오류
+   *   put:
+   *     summary: 산책 종료
+   *     tags: [Walk Records]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: walkRecordId
+   *         required: true
+   *         schema:
+   *           type: string
+   *           format: uuid
+   *           description: 산책 기록 고유 ID
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               finalDurationSeconds:
+   *                 type: integer
+   *                 description: 최종 산책 시간(초)
+   *               finalDistanceMeters:
+   *                 type: integer
+   *                 description: 최종 산책 거리(미터)
+   *               finalPathCoordinates:
+   *                 type: array
+   *                 items:
+   *                   type: array
+   *                   items:
+   *                     type: number
+   *                 description: 최종 산책 경로 좌표 리스트
+   *             required:
+   *               - finalDurationSeconds
+   *               - finalDistanceMeters
+   *               - finalPathCoordinates
+   *             example:
+   *               finalDurationSeconds: 3600
+   *               finalDistanceMeters: 5000
+   *               finalPathCoordinates: [[37.5665, 126.9780], [37.5667, 126.9782]]
+   *     responses:
+   *       '200':
+   *         description: 산책이 성공적으로 종료되고 경로가 분석되었습니다.
+   *       '404':
+   *         description: 산책 기록을 찾을 수 없습니다.
+   *       '500':
+   *         description: 서버 오류
    */
   async endWalkRecord(req, res) {
     const { walkRecordId } = req.params;
@@ -461,43 +461,43 @@ const walkRecordController = {
   /**
    * @swagger
    * /walk-records/{walkRecordId}/score:
-   * put:
-   * summary: 꼬리콥터 점수 저장
-   * tags: [Walk Records]
-   * security:
-   * - bearerAuth: []
-   * parameters:
-   * - in: path
-   * name: walkRecordId
-   * required: true
-   * schema:
-   * type: string
-   * format: uuid
-   * description: 산책 기록 고유 ID
-   * requestBody:
-   * required: true
-   * content:
-   * application/json:
-   * schema:
-   * type: object
-   * properties:
-   * tailcopterScore:
-   * type: integer
-   * minimum: 0
-   * description: 꼬리콥터 게임 점수
-   * required:
-   * - tailcopterScore
-   * example:
-   * tailcopterScore: 12500
-   * responses:
-   * '200':
-   * description: 꼬리콥터 점수가 성공적으로 저장되었습니다.
-   * '400':
-   * description: 잘못된 요청 (e.g., 점수가 유효하지 않음)
-   * '404':
-   * description: 산책 기록을 찾을 수 없습니다.
-   * '500':
-   * description: 서버 오류
+   *   put:
+   *     summary: 꿈리콥터 점수 저장
+   *     tags: [Walk Records]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: walkRecordId
+   *         required: true
+   *         schema:
+   *           type: string
+   *           format: uuid
+   *           description: 산책 기록 고유 ID
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               tailcopterScore:
+   *                 type: integer
+   *                 minimum: 0
+   *                 description: 꿈리콥터 게임 점수
+   *             required:
+   *               - tailcopterScore
+   *             example:
+   *               tailcopterScore: 12500
+   *     responses:
+   *       '200':
+   *         description: 꿈리콥터 점수가 성공적으로 저장되었습니다.
+   *       '400':
+   *         description: 잘못된 요청 (e.g., 점수가 유효하지 않음)
+   *       '404':
+   *         description: 산책 기록을 찾을 수 없습니다.
+   *       '500':
+   *         description: 서버 오류
    */
   async updateScore(req, res) {
     try {
@@ -544,89 +544,89 @@ const walkRecordController = {
   /**
    * @swagger
    * /walk-records/{walkRecordId}/save:
-   * post:
-   * summary: 산책 기록 최종 저장 (일지 저장)
-   * tags: [Walk Records]
-   * security:
-   * - bearerAuth: []
-   * parameters:
-   * - in: path
-   * name: walkRecordId
-   * required: true
-   * schema:
-   * type: string
-   * format: uuid
-   * description: 산책 기록 고유 ID
-   * requestBody:
-   * required: true
-   * content:
-   * application/json:
-   * schema:
-   * type: object
-   * properties:
-   * title:
-   * type: string
-   * nullable: true
-   * description: 산책 일지 제목 (미입력 시 자동 생성)
-   * walkDate:
-   * type: string
-   * format: date
-   * nullable: true
-   * description: 산책 날짜 (YYYY-MM-DD)
-   * pathImageUrl:
-   * type: string
-   * nullable: true
-   * description: 산책 경로 이미지 URL
-   * distanceMeters:
-   * type: integer
-   * description: 최종 산책 거리(미터)
-   * markingCount:
-   * type: integer
-   * description: 최종 마킹 횟수
-   * tailcopterScore:
-   * type: integer
-   * description: 최종 꼬리콥터 점수
-   * required:
-   * - distanceMeters
-   * - markingCount
-   * - tailcopterScore
-   * example:
-   * title: '새로운 산책 일지'
-   * walkDate: '2023-10-27'
-   * pathImageUrl: 'http://example.com/path.png'
-   * distanceMeters: 5500
-   * markingCount: 3
-   * tailcopterScore: 12500
-   * responses:
-   * '200':
-   * description: 산책 기록이 성공적으로 저장되었습니다.
-   * content:
-   * application/json:
-   * schema:
-   * type: object
-   * properties:
-   * success:
-   * type: boolean
-   * example: true
-   * message:
-   * type: string
-   * example: 산책 기록이 성공적으로 저장되었습니다.
-   * data:
-   * type: object
-   * properties:
-   * walkRecordId:
-   * type: string
-   * format: uuid
-   * petName:
-   * type: string
-   * title:
-   * type: string
-   * '400':
-   * description: 잘못된 요청 (e.g., 이미 저장된 기록)
-   * '404':
-   * description: 산책 기록을 찾을 수 없습니다.
-   * '500':
-   * description: 서버 오류
+   *   post:
+   *     summary: 산책 기록 최종 저장 (일지 저장)
+   *     tags: [Walk Records]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: walkRecordId
+   *         required: true
+   *         schema:
+   *           type: string
+   *           format: uuid
+   *           description: 산책 기록 고유 ID
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               title:
+   *                 type: string
+   *                 nullable: true
+   *                 description: 산책 일지 제목 (미입력 시 자동 생성)
+   *               walkDate:
+   *                 type: string
+   *                 format: date
+   *                 nullable: true
+   *                 description: 산책 날짜 (YYYY-MM-DD)
+   *               pathImageUrl:
+   *                 type: string
+   *                 nullable: true
+   *                 description: 산책 경로 이미지 URL
+   *               distanceMeters:
+   *                 type: integer
+   *                 description: 최종 산책 거리(미터)
+   *               markingCount:
+   *                 type: integer
+   *                 description: 최종 마킹 횟수
+   *               tailcopterScore:
+   *                 type: integer
+   *                 description: 최종 꿈리콥터 점수
+   *             required:
+   *               - distanceMeters
+   *               - markingCount
+   *               - tailcopterScore
+   *             example:
+   *               title: '새로운 산책 일지'
+   *               walkDate: '2023-10-27'
+   *               pathImageUrl: 'http://example.com/path.png'
+   *               distanceMeters: 5500
+   *               markingCount: 3
+   *               tailcopterScore: 12500
+   *     responses:
+   *       '200':
+   *         description: 산책 기록이 성공적으로 저장되었습니다.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: 산책 기록이 성공적으로 저장되었습니다.
+   *                 data:
+   *                   type: object
+   *                   properties:
+   *                     walkRecordId:
+   *                       type: string
+   *                       format: uuid
+   *                     petName:
+   *                       type: string
+   *                     title:
+   *                       type: string
+   *       '400':
+   *         description: 잘못된 요청 (e.g., 이미 저장된 기록)
+   *       '404':
+   *         description: 산책 기록을 찾을 수 없습니다.
+   *       '500':
+   *         description: 서버 오류
    */
   async saveRecord(req, res) {
     try {
@@ -708,65 +708,65 @@ const walkRecordController = {
   /**
    * @swagger
    * /walk-records/{walkRecordId}/details:
-   * get:
-   * summary: 산책 일지 상세 정보 조회
-   * tags: [Walk Records]
-   * security:
-   * - bearerAuth: []
-   * parameters:
-   * - in: path
-   * name: walkRecordId
-   * required: true
-   * schema:
-   * type: string
-   * format: uuid
-   * description: 산책 기록 고유 ID
-   * responses:
-   * '200':
-   * description: 산책 일지 상세 조회 성공
-   * content:
-   * application/json:
-   * schema:
-   * type: object
-   * properties:
-   * walk_record_id:
-   * type: string
-   * format: uuid
-   * user_id:
-   * type: string
-   * format: uuid
-   * course:
-   * type: object
-   * properties:
-   * course_name:
-   * type: string
-   * markingPhotos:
-   * type: array
-   * items:
-   * type: object
-   * properties:
-   * marking_photo_id:
-   * type: string
-   * format: uuid
-   * photo_url:
-   * type: string
-   * format: url
-   * photozone:
-   * type: object
-   * properties:
-   * photozone_name:
-   * type: string
-   * path_image_url:
-   * type: string
-   * format: url
-   * title:
-   * type: string
-   * '400':
-   * description: 산책 경로 이미지가 존재하지 않습니다.
-   * '404':
-   * description: 산책 기록을 찾을 수 없습니다.
-   * '500':
-   * description: 서버 오류
+   *   get:
+   *     summary: 산책 일지 상세 정보 조회
+   *     tags: [Walk Records]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: walkRecordId
+   *         required: true
+   *         schema:
+   *           type: string
+   *           format: uuid
+   *           description: 산책 기록 고유 ID
+   *     responses:
+   *       '200':
+   *         description: 산책 일지 상세 조회 성공
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 walk_record_id:
+   *                   type: string
+   *                   format: uuid
+   *                 user_id:
+   *                   type: string
+   *                   format: uuid
+   *                 course:
+   *                   type: object
+   *                   properties:
+   *                     course_name:
+   *                       type: string
+   *                 markingPhotos:
+   *                   type: array
+   *                   items:
+   *                     type: object
+   *                     properties:
+   *                       marking_photo_id:
+   *                         type: string
+   *                         format: uuid
+   *                       photo_url:
+   *                         type: string
+   *                         format: url
+   *                       photozone:
+   *                         type: object
+   *                         properties:
+   *                           photozone_name:
+   *                             type: string
+   *                 path_image_url:
+   *                   type: string
+   *                   format: url
+   *                 title:
+   *                   type: string
+   *       '400':
+   *         description: 산책 경로 이미지가 존재하지 않습니다.
+   *       '404':
+   *         description: 산책 기록을 찾을 수 없습니다.
+   *       '500':
+   *         description: 서버 오류
    */
   async getDetails(req, res) {
     try {

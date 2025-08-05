@@ -4,88 +4,88 @@ const logger = require('../config/logger');
 /**
  * @swagger
  * tags:
- * name: Courses
- * description: 산책 코스 관련 API
+ *   name: Courses
+ *   description: 산책 코스 관련 API
  */
 class CourseController {
 
   /**
    * @swagger
    * /api/v1/courses/recommendations:
-   * get:
-   * tags: [Courses]
-   * summary: 우리 동네 추천 코스 목록 조회
-   * description: "현재 위치를 기준으로 주변 추천 코스 요약 목록을 조회합니다."
-   * parameters:
-   * - in: query
-   * name: latitude
-   * required: true
-   * schema:
-   * type: number
-   * format: float
-   * example: 37.5665
-   * - in: query
-   * name: longitude
-   * required: true
-   * schema:
-   * type: number
-   * format: float
-   * example: 126.9780
-   * - in: query
-   * name: radius
-   * schema:
-   * type: integer
-   * default: 2000
-   * description: 검색 반경(미터)
-   * - in: query
-   * name: sortBy
-   * schema:
-   * type: string
-   * enum: [tailcopterScoreDesc, recent]
-   * default: tailcopterScoreDesc
-   * description: 정렬 기준. 꼬리콥터 점수 내림차순 또는 최신순
-   * - in: query
-   * name: areaName
-   * schema:
-   * type: string
-   * description: 지역명 (예: 서울특별시 중구)
-   * - in: query
-   * name: petSize
-   * schema:
-   * type: string
-   * enum: [SMALL, MEDIUM, LARGE, ALL]
-   * description: 추천 견종 크기
-   * - in: query
-   * name: page
-   * schema:
-   * type: integer
-   * default: 1
-   * description: 페이지 번호
-   * - in: query
-   * name: size
-   * schema:
-   * type: integer
-   * default: 10
-   * description: 페이지당 항목 수
-   * responses:
-   * '200':
-   * description: 추천 코스 목록 조회 성공
-   * content:
-   * application/json:
-   * schema:
-   * $ref: '#/components/schemas/CourseListResponse'
-   * '400':
-   * description: 유효하지 않은 요청 (위도/경도 누락)
-   * content:
-   * application/json:
-   * schema:
-   * $ref: '#/components/schemas/ErrorResponse'
-   * '500':
-   * description: 서버 오류
-   * content:
-   * application/json:
-   * schema:
-   * $ref: '#/components/schemas/ErrorResponse'
+   *   get:
+   *     tags: [Courses]
+   *     summary: 우리 동네 추천 코스 목록 조회
+   *     description: "현재 위치를 기준으로 주변 추천 코스 요약 목록을 조회합니다."
+   *     parameters:
+   *       - in: query
+   *         name: latitude
+   *         required: true
+   *         schema:
+   *           type: number
+   *           format: float
+   *           example: 37.5665
+   *       - in: query
+   *         name: longitude
+   *         required: true
+   *         schema:
+   *           type: number
+   *           format: float
+   *           example: 126.9780
+   *       - in: query
+   *         name: radius
+   *         schema:
+   *           type: integer
+   *           default: 2000
+   *           description: "검색반경(미터)"
+   *       - in: query
+   *         name: sortBy
+   *         schema:
+   *           type: string
+   *           enum: [tailcopterScoreDesc, recent]
+   *           default: tailcopterScoreDesc
+   *           description: "정렬 기준. 꼬리콥터 점수 내림차순 또는 최신순"
+   *       - in: query
+   *         name: areaName
+   *         schema:
+   *           type: string
+   *           description: "지역명 (예: 서울특별시 중구)"
+   *       - in: query
+   *         name: petSize
+   *         schema:
+   *           type: string
+   *           enum: [SMALL, MEDIUM, LARGE, ALL]
+   *           description: "추천 견종 크기"
+   *       - in: query
+   *         name: page
+   *         schema:
+   *           type: integer
+   *           default: 1
+   *           description: "페이지 번호"
+   *       - in: query
+   *         name: size
+   *         schema:
+   *           type: integer
+   *           default: 10
+   *           description: "페이지당 항목 수"
+   *     responses:
+   *       '200':
+   *         description: "추천 코스 목록 조회 성공"
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/CourseListResponse'
+   *       '400':
+   *         description: 유효하지 않은 요청 (위도/경도 누락)
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   *       '500':
+   *         description: 서버 오류
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
    */
   async getRecommendedCourses(req, res) {
     try {
@@ -146,44 +146,44 @@ class CourseController {
   /**
    * @swagger
    * /api/v1/courses/{courseId}:
-   * get:
-   * tags: [Courses]
-   * summary: 코스 상세 정보 조회
-   * description: "특정 코스의 상세 정보를 조회합니다. 경로, 특징, 평균 점수 등이 포함됩니다."
-   * parameters:
-   * - in: path
-   * name: courseId
-   * required: true
-   * schema:
-   * type: string
-   * format: uuid
-   * description: 코스의 고유 ID
-   * example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
-   * responses:
-   * '200':
-   * description: 코스 상세 정보 조회 성공
-   * content:
-   * application/json:
-   * schema:
-   * $ref: '#/components/schemas/CourseDetailsResponse'
-   * '400':
-   * description: 유효하지 않은 요청 (코스 ID 누락)
-   * content:
-   * application/json:
-   * schema:
-   * $ref: '#/components/schemas/ErrorResponse'
-   * '404':
-   * description: 코스를 찾을 수 없음
-   * content:
-   * application/json:
-   * schema:
-   * $ref: '#/components/schemas/ErrorResponse'
-   * '500':
-   * description: 서버 오류
-   * content:
-   * application/json:
-   * schema:
-   * $ref: '#/components/schemas/ErrorResponse'
+   *   get:
+   *     tags: [Courses]
+   *     summary: 코스 상세 정보 조회
+   *     description: "특정 코스의 상세 정보를 조회합니다. 경로, 특징, 평균 점수 등이 포함됩니다."
+   *     parameters:
+   *       - in: path
+   *         name: courseId
+   *         required: true
+   *         schema:
+   *           type: string
+   *           format: uuid
+   *           description: 코스의 고유 ID
+   *           example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+   *     responses:
+   *       '200':
+   *         description: 코스 상세 정보 조회 성공
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/CourseDetailsResponse'
+   *       '400':
+   *         description: 유효하지 않은 요청 (코스 ID 누락)
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   *       '404':
+   *         description: 코스를 찾을 수 없음
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   *       '500':
+   *         description: 서버 오류
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
    */
   async getCourseDetails(req, res) {
     try {
@@ -231,44 +231,44 @@ class CourseController {
   /**
    * @swagger
    * /api/v1/courses/{courseId}/marking-photozones:
-   * get:
-   * tags: [Courses]
-   * summary: 코스 내 마킹 포토존 정보 조회
-   * description: "특정 코스 내에 위치한 마킹 포토존 목록을 조회합니다."
-   * parameters:
-   * - in: path
-   * name: courseId
-   * required: true
-   * schema:
-   * type: string
-   * format: uuid
-   * description: 코스의 고유 ID
-   * example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
-   * responses:
-   * '200':
-   * description: 마킹 포토존 목록 조회 성공
-   * content:
-   * application/json:
-   * schema:
-   * $ref: '#/components/schemas/CoursePhotozoneResponse'
-   * '400':
-   * description: 유효하지 않은 요청 (코스 ID 누락)
-   * content:
-   * application/json:
-   * schema:
-   * $ref: '#/components/schemas/ErrorResponse'
-   * '404':
-   * description: 코스를 찾을 수 없음
-   * content:
-   * application/json:
-   * schema:
-   * $ref: '#/components/schemas/ErrorResponse'
-   * '500':
-   * description: 서버 오류
-   * content:
-   * application/json:
-   * schema:
-   * $ref: '#/components/schemas/ErrorResponse'
+   *   get:
+   *     tags: [Courses]
+   *     summary: 코스 내 마킹 포토존 정보 조회
+   *     description: "특정 코스 내에 위치한 마킹 포토존 목록을 조회합니다."
+   *     parameters:
+   *       - in: path
+   *         name: courseId
+   *         required: true
+   *         schema:
+   *           type: string
+   *           format: uuid
+   *           description: 코스의 고유 ID
+   *           example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+   *     responses:
+   *       '200':
+   *         description: 마킹 포토존 목록 조회 성공
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/CoursePhotozoneResponse'
+   *       '400':
+   *         description: 유효하지 않은 요청 (코스 ID 누락)
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   *       '404':
+   *         description: 코스를 찾을 수 없음
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   *       '500':
+   *         description: 서버 오류
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
    */
   async getCoursePhotozones(req, res) {
     try {
@@ -322,48 +322,48 @@ class CourseController {
   /**
    * @swagger
    * /api/v1/courses/new/details:
-   * get:
-   * tags: [Courses]
-   * summary: 새 코스 등록을 위한 기본 정보 조회
-   * description: "산책 기록 ID를 바탕으로 새로운 코스 등록 시 필요한 기본 정보(경로, 거리, 시간 등)를 미리 조회합니다."
-   * security:
-   * - bearerAuth: []
-   * parameters:
-   * - in: query
-   * name: walkRecordId
-   * required: true
-   * schema:
-   * type: string
-   * format: uuid
-   * description: 코스를 생성할 산책 기록의 고유 ID
-   * example: "c2d3e4f5-g6h7-8901-2345-67890abcdef1"
-   * responses:
-   * '200':
-   * description: 기본 정보 조회 성공
-   * content:
-   * application/json:
-   * schema:
-   * $ref: '#/components/schemas/NewCourseDetailsResponse'
-   * '400':
-   * description: 유효하지 않은 요청 (산책 기록 ID 누락)
-   * content:
-   * application/json:
-   * schema:
-   * $ref: '#/components/schemas/ErrorResponse'
-   * '401':
-   * description: 인증 실패
-   * '404':
-   * description: 산책 기록을 찾을 수 없음
-   * content:
-   * application/json:
-   * schema:
-   * $ref: '#/components/schemas/ErrorResponse'
-   * '500':
-   * description: 서버 오류
-   * content:
-   * application/json:
-   * schema:
-   * $ref: '#/components/schemas/ErrorResponse'
+   *   get:
+   *     tags: [Courses]
+   *     summary: 새 코스 등록을 위한 기본 정보 조회
+   *     description: "산책 기록 ID를 바탕으로 새로운 코스 등록 시 필요한 기본 정보(경로, 거리, 시간 등)를 미리 조회합니다."
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: query
+   *         name: walkRecordId
+   *         required: true
+   *         schema:
+   *           type: string
+   *           format: uuid
+   *           description: 코스를 생성할 산책 기록의 고유 ID
+   *           example: "c2d3e4f5-g6h7-8901-2345-67890abcdef1"
+   *     responses:
+   *       '200':
+   *         description: 기본 정보 조회 성공
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/NewCourseDetailsResponse'
+   *       '400':
+   *         description: 유효하지 않은 요청 (산책 기록 ID 누락)
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   *       '401':
+   *         description: 인증 실패
+   *       '404':
+   *         description: 산책 기록을 찾을 수 없음
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   *       '500':
+   *         description: 서버 오류
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
    */
   async getNewCourseDetails(req, res) {
     try {
@@ -411,79 +411,79 @@ class CourseController {
   /**
    * @swagger
    * /api/v1/courses/new:
-   * post:
-   * tags: [Courses]
-   * summary: 새로운 코스 최종 등록
-   * description: "산책 기록과 코스 정보를 최종 등록하여 새로운 코스를 생성합니다."
-   * security:
-   * - bearerAuth: []
-   * requestBody:
-   * required: true
-   * content:
-   * application/json:
-   * schema:
-   * type: object
-   * required:
-   * - walkRecordId
-   * - courseName
-   * - difficulty
-   * - recommendedPetSize
-   * properties:
-   * walkRecordId:
-   * type: string
-   * format: uuid
-   * description: 코스 생성의 기반이 되는 산책 기록 ID
-   * example: "c2d3e4f5-g6h7-8901-2345-67890abcdef1"
-   * courseName:
-   * type: string
-   * maxLength: 10
-   * description: 코스의 이름
-   * example: "우리 동네 한바퀴"
-   * difficulty:
-   * type: string
-   * enum: [상, 중, 하]
-   * description: 코스의 난이도
-   * example: "중"
-   * recommendedPetSize:
-   * type: string
-   * enum: [SMALL, MEDIUM, LARGE]
-   * description: 추천 견종 크기
-   * example: "MEDIUM"
-   * selectedFeatures:
-   * type: array
-   * items:
-   * type: string
-   * maxLength: 5
-   * description: 코스 특징 목록
-   * maxItems: 3
-   * example: ["물가", "벤치"]
-   * responses:
-   * '201':
-   * description: 코스 등록 성공
-   * content:
-   * application/json:
-   * schema:
-   * $ref: '#/components/schemas/CourseCreateResponse'
-   * '400':
-   * description: 유효하지 않은 요청 (필수값 누락, 유효성 검증 실패 등)
-   * content:
-   * application/json:
-   * schema:
-   * $ref: '#/components/schemas/ErrorResponse'
-   * '401':
-   * description: 인증 실패
-   * '404':
-   * description: 산책 기록 또는 사용자를 찾을 수 없음
-   * content:
-   * application/json:
-   * schema:
-   * $ref: '#/components/schemas/ErrorResponse'
-   * '500':
-   * description: 서버 오류
-   * content:
-   * application/json:
-   * schema:
-   * $ref: '#/components/schemas/ErrorResponse'
+   *   post:
+   *     tags: [Courses]
+   *     summary: 새로운 코스 최종 등록
+   *     description: "산책 기록과 코스 정보를 최종 등록하여 새로운 코스를 생성합니다."
+   *     security:
+   *       - bearerAuth: []
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - walkRecordId
+   *               - courseName
+   *               - difficulty
+   *               - recommendedPetSize
+   *             properties:
+   *               walkRecordId:
+   *                 type: string
+   *                 format: uuid
+   *                 description: 코스 생성의 기반이 되는 산책 기록 ID
+   *                 example: "c2d3e4f5-g6h7-8901-2345-67890abcdef1"
+   *               courseName:
+   *                 type: string
+   *                 maxLength: 10
+   *                 description: 코스의 이름
+   *                 example: "우리 동네 한바퀴"
+   *               difficulty:
+   *                 type: string
+   *                 enum: [상, 중, 하]
+   *                 description: 코스의 난이도
+   *                 example: "중"
+   *               recommendedPetSize:
+   *                 type: string
+   *                 enum: [SMALL, MEDIUM, LARGE]
+   *                 description: 추천 견종 크기
+   *                 example: "MEDIUM"
+   *               selectedFeatures:
+   *                 type: array
+   *                 items:
+   *                   type: string
+   *                   maxLength: 5
+   *                 description: 코스 특징 목록
+   *                 maxItems: 3
+   *                 example: ["물가", "벤치"]
+   *     responses:
+   *       '201':
+   *         description: 코스 등록 성공
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/CourseCreateResponse'
+   *       '400':
+   *         description: 유효하지 않은 요청 (필수값 누락, 유효성 검증 실패 등)
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   *       '401':
+   *         description: 인증 실패
+   *       '404':
+   *         description: 산책 기록 또는 사용자를 찾을 수 없음
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   *       '500':
+   *         description: 서버 오류
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
    */
   async createNewCourse(req, res) {
     try {
