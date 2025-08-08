@@ -10,7 +10,7 @@ const walkRecordRoutes = require('./walkRecords');
 const courseRoutes = require('./courses');
 const markingPhotoRoutes = require('./markingPhotos');
 const markingPhotozoneRoutes = require('./markingPhotozones');
-
+const uploadRoutes = require('./upload');
 // ===== API v1 라우터 등록 =====
 
 // A. 인증 및 온보딩 API
@@ -26,7 +26,8 @@ router.use('/marking-photos', markingPhotoRoutes);  // 마킹 사진 업로드
 router.use('/marking-photozones', markingPhotozoneRoutes); // 마킹 포토존
 
 // ===== 기본 라우터 =====
-
+// C. 파일 업로드 API (B 섹션 다음에 추가)
+router.use('/upload', uploadRoutes);    
 // API 루트 정보
 router.get('/', (req, res) => {
   res.status(200).json({
@@ -42,7 +43,8 @@ router.get('/', (req, res) => {
       walkRecords: '/api/v1/walk-records',
       courses: '/api/v1/courses',
       markingPhotos: '/api/v1/marking-photos',
-      markingPhotozones: '/api/v1/marking-photozones'
+      markingPhotozones: '/api/v1/marking-photozones',
+      upload: '/api/v1/upload'  // 추가
     }
   });
 });

@@ -25,7 +25,9 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: `http://localhost:${PORT}`, // 서버 URL
+        // EC2 IP 주소나 도메인을 사용하도록 환경 변수 BASE_URL 추가
+        url: process.env.BASE_URL || `http://localhost:${PORT}`, 
+        description: process.env.NODE_ENV === 'production' ? 'Production Server' : 'Development Server',
       },
     ],
     components: {

@@ -8,6 +8,7 @@ const passport = require('passport');
 const path = require('path');
 
 const logger = require('./config/logger');
+const { validateS3Config } = require('./config/s3Config'); // S3 설정 검증 추가
 const { sequelize } = require('./config/database');
 const models = require('./models'); // 새로운 모델들 import
 const { setupSwagger } = require('./config/swagger'); // Swagger 설정
@@ -101,6 +102,20 @@ app.use(errorHandler);
 // 데이터베이스 연결 테스트
 const connectDatabase = async () => {
   try {
+    // S3 설정 검증
+    try {
+      validateS3Config();
+      logger.info('S3 설정 검증 완료');
+    } catch (error) {
+      logger.error('S3 configuration validation failed:', error);
+      // 개발 환경에서는 경고만 표시, 운영 환경에서는 서버 종료
+      if (process.env.NODE_ENV === 'production') {
+        process.exit(1);
+      } else {
+        logger.warn('S3 설정이 완전하지 않지만 개발 환경에서 계속 진행합니다.');
+      }
+    }
+
     await sequelize.authenticate();
     logger.info('PostgreSQL 데이터베이스 연결 성공');
     

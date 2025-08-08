@@ -8,7 +8,8 @@ router.post('/me/terms', authenticateToken, userController.agreeToTerms);
 
 // PUT /api/v1/users/me/profile - 사용자 프로필 업데이트 (위치/반려동물 정보)
 router.put('/me/profile', authenticateToken, userController.updateProfile);
-
+// GET /api/v1/users/terms - 약관 목록 조회
+router.get('/terms', userController.getTerms);
 // GET /api/v1/users/me/summary-profile - 대표 반려동물 이름 및 아이콘 정보 조회
 router.get('/me/summary-profile', authenticateToken, userController.getSummaryProfile);
 

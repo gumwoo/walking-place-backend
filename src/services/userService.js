@@ -81,6 +81,21 @@ async getProfile(userId) {
   }
 }
 
+
+// src/services/userService.js에 추가
+async getAllTerms() {
+  try {
+    const terms = await Term.findAll({
+      attributes: ['term_id', 'title', 'content', 'is_required', 'version'],
+      order: [['is_required', 'DESC'], ['created_at', 'ASC']]
+    });
+    
+    return terms;
+  } catch (error) {
+    logger.error('약관 목록 조회 실패:', error);
+    throw error;
+  }
+}
   // 약관 동의 저장
   async agreeToTerms(userId, agreedTermIds) {
     try {

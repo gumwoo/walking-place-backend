@@ -164,6 +164,38 @@ const logger = require('../config/logger');
  *           example: "ERROR_CODE"
  */
 class UserController {
+
+/**
+ * @swagger
+ * /api/v1/users/terms:
+ *   get:
+ *     tags: [Users]
+ *     summary: 약관 목록 조회
+ *     description: "모든 약관 목록을 조회합니다."
+ *     responses:
+ *       '200':
+ *         description: 약관 목록 조회 성공
+ */
+async getTerms(req, res) {
+  try {
+    const terms = await userService.getAllTerms();
+    
+    return res.status(200).json({
+      success: true,
+      message: '약관 목록 조회가 완료되었습니다.',
+      data: terms
+    });
+  } catch (error) {
+    logger.error('약관 목록 조회 실패:', error);
+    
+    return res.status(500).json({
+      success: false,
+      message: '약관 목록 조회 중 오류가 발생했습니다.',
+      code: 'TERMS_FETCH_ERROR'
+    });
+  }
+}
+
   /**
    * @swagger
    * /api/v1/users/me/terms:

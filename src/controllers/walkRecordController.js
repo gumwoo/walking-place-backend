@@ -13,7 +13,7 @@ const { MarkingPhotozone } = require("../models");
 const walkRecordController = {
   /**
    * @swagger
-   * /walk-records:
+   * /api/v1/walk-records:
    *   post:
    *     summary: 산책 시작
    *     tags: [Walk Records]
@@ -121,7 +121,7 @@ const walkRecordController = {
 
   /**
    * @swagger
-   * /walk-records/{walkRecordId}/track:
+   * /api/v1/walk-records/{walkRecordId}/track:
    *   patch:
    *     summary: 산책 경로 및 데이터 주기적 업데이트
    *     tags: [Walk Records]
@@ -232,7 +232,7 @@ const walkRecordController = {
 
   /**
    * @swagger
-   * /walk-records/{walkRecordId}/status:
+   * /api/v1/walk-records/{walkRecordId}/status:
    *   patch:
    *     summary: 산책 상태 변경 (일시정지/재개 등)
    *     tags: [Walk Records]
@@ -350,7 +350,7 @@ const walkRecordController = {
 
   /**
    * @swagger
-   * /walk-records/{walkRecordId}/end:
+   * /api/v1/walk-records/{walkRecordId}/end:
    *   put:
    *     summary: 산책 종료
    *     tags: [Walk Records]
@@ -460,7 +460,7 @@ const walkRecordController = {
 
   /**
    * @swagger
-   * /walk-records/{walkRecordId}/score:
+   * /api/v1/walk-records/{walkRecordId}/score:
    *   put:
    *     summary: 꿈리콥터 점수 저장
    *     tags: [Walk Records]
@@ -543,7 +543,7 @@ const walkRecordController = {
 
   /**
    * @swagger
-   * /walk-records/{walkRecordId}/save:
+   * /api/v1/walk-records/{walkRecordId}/save:
    *   post:
    *     summary: 산책 기록 최종 저장 (일지 저장)
    *     tags: [Walk Records]
@@ -707,7 +707,7 @@ const walkRecordController = {
 
   /**
    * @swagger
-   * /walk-records/{walkRecordId}/details:
+   * /api/v1/walk-records/{walkRecordId}/details:
    *   get:
    *     summary: 산책 일지 상세 정보 조회
    *     tags: [Walk Records]
